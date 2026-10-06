@@ -1,3 +1,90 @@
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+/* ── Cold theme tokens ─────────────────────────────────────────────────── */
+:root {
+  --canvas: #f6f9fc;
+  --surface: #ffffff;
+  --raised: #eef3f9;
+  --line: #dde6f0;
+  --ink: #0b1626;
+  --muted: #56667d;
+  --faint: #8b9bb2;
+  --accent: #2463eb;
+  --on-accent: #ffffff;
+  --ok: #0891b2;
+  --warn: #e0457b;
+  --bar: #cfdbea;
+}
+
+.dark {
+  --canvas: #060a11;
+  --surface: #0a101a;
+  --raised: #0f1724;
+  --line: #182334;
+  --ink: #e6edf7;
+  --muted: #8494ab;
+  --faint: #536279;
+  --accent: #74b4ff;
+  --on-accent: #04101f;
+  --ok: #67e8f9;
+  --warn: #fb7fa4;
+  --bar: #1e2c41;
+}
+
+@theme inline {
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-raised: var(--raised);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
+  --color-bar: var(--bar);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.6;
+  letter-spacing: -0.005em;
+}
+
+/* Scroll reveal + float (only what Tailwind can't do) */
+.lp-reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.lp-reveal.lp-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

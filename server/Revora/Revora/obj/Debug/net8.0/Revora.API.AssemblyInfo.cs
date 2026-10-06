@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Revora.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a083028e07e53b2de7eed1058dcb702ff584f9c5")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6c95aa8b80591678c2cec610a9b86ca0e751cef6")]
 [assembly: System.Reflection.AssemblyProductAttribute("Revora.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Revora.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
