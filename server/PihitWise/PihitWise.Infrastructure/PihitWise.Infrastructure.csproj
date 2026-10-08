@@ -15,8 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Revora.Application\Revora.Application.csproj" />
-    <ProjectReference Include="..\Revora.Domain\Revora.Domain.csproj" />
+    <ProjectReference Include="..\PihitWise.Application\PihitWise.Application.csproj" />
+    <ProjectReference Include="..\PihitWise.Domain\PihitWise.Domain.csproj" />
   </ItemGroup>
 
 </Project>

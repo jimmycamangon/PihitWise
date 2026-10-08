@@ -1,4 +1,4 @@
-using Revora.Infrastructure;
+using PihitWise.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 

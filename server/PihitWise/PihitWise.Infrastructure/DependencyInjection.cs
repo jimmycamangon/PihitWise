@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Revora.Infrastructure.Persistence;
+using PihitWise.Infrastructure.Persistence;
 
-namespace Revora.Infrastructure;
+namespace PihitWise.Infrastructure;
 
 // Registers everything the Infrastructure layer provides, so Program.cs
 // only needs one line: builder.Services.AddInfrastructure(builder.Configuration);
