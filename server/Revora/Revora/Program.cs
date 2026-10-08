@@ -1,6 +1,19 @@
+using Revora.Infrastructure;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+builder.Services.AddInfrastructure(builder.Configuration);
+
+// Lets the React dev server (Vite on port 5173) call this API from the browser.
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Client", policy => policy
+        .WithOrigins("http://localhost:5173")
+        .AllowAnyHeader()
+        .AllowAnyMethod());
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -17,6 +30,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("Client");
 
 app.UseAuthorization();
 
