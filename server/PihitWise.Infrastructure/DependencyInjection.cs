@@ -26,6 +26,10 @@ public static class DependencyInjection
         services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
         services.AddScoped<IAuthService, AuthService>();
 
+        // JWT settings come from the "Jwt" section; Jwt:Key lives in user-secrets.
+        services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
+        services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
+
         return services;
     }
 }
