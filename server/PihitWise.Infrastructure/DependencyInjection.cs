@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PihitWise.Domain.Entities;
 using PihitWise.Infrastructure.Persistence;
 
 namespace PihitWise.Infrastructure;
@@ -15,6 +17,10 @@ public static class DependencyInjection
             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' is missing.");
 
         services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
+
+        // Turns a plain password into a salted hash, and checks a password against a stored hash.
+        // Ask for IPasswordHasher<User> in a constructor to use it.
+        services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
         return services;
     }
