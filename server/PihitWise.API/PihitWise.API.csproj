@@ -21,10 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\PihitWise.Application\PihitWise.Application.csproj" />
     <ProjectReference Include="..\PihitWise.Infrastructure\PihitWise.Infrastructure.csproj" />
   </ItemGroup>
