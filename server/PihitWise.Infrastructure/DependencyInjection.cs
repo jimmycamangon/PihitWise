@@ -4,6 +4,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PihitWise.Domain.Entities;
 using PihitWise.Infrastructure.Persistence;
+using PihitWise.Infrastructure.Auth;
+using PihitWise.Application.Auth;
+
 
 namespace PihitWise.Infrastructure;
 
@@ -21,6 +24,7 @@ public static class DependencyInjection
         // Turns a plain password into a salted hash, and checks a password against a stored hash.
         // Ask for IPasswordHasher<User> in a constructor to use it.
         services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+        services.AddScoped<IAuthService, AuthService>();
 
         return services;
     }

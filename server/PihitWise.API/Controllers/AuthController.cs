@@ -11,37 +11,23 @@ namespace PihitWise.API.Controllers
     [Route("api/auth")]
     public class AuthController : ControllerBase
     {
-        private readonly AppDbContext _db;
-        private readonly IPasswordHasher<User> _hasher;
 
-        // ASP.NET gives us these automatically (this is called dependency injection)
-        public AuthController(AppDbContext db, IPasswordHasher<User> hasher)
+        private readonly IAuthService _authService;
+
+        public AuthController(IAuthService authService)
         {
-            _db = db;
-            _hasher = hasher;
+            _authService = authService;
         }
 
         [HttpPost("register")]  // POST /api/auth/register
         public async Task<IActionResult> Register(RegisterRequest request)
         {
-            if (await _db.Users.AnyAsync(u => u.Email == request.Email))
-                return Conflict("Email is already registered");
-
-
-            var user = new User
+            var userResponse = await _authService.RegisterAsync(request);
+            if (userResponse == null)
             {
-                Id = Guid.NewGuid(),
-                FullName = request.FullName,
-                Email = request.Email,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            user.PasswordHash = _hasher.HashPassword(user, request.Password);
-
-            _db.Users.Add(user);
-            await _db.SaveChangesAsync();
-
-            return Ok(new { user.Id, user.FullName, user.Email });
+                return BadRequest("Email is already in use.");
+            }
+            return Ok(userResponse);
         }
     }
 }
