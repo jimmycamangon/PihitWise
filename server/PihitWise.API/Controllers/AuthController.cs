@@ -29,5 +29,16 @@ namespace PihitWise.API.Controllers
             }
             return Ok(userResponse);
         }
+
+        [HttpPost("login")]  // POST /api/auth/login
+        public async Task<IActionResult> Login(LoginRequest request)
+        {
+            var loginResponse = await _authService.LoginAsync(request);
+            if (loginResponse == null)
+            {
+                return Unauthorized("Invalid email or password.");
+            }
+            return Ok(loginResponse);
+        }
     }
 }
