@@ -4,6 +4,9 @@ using PihitWise.Infrastructure.Persistence;
 using PihitWise.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using PihitWise.Application.Auth;
+using Microsoft.AspNetCore.Authorization;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace PihitWise.API.Controllers
 {
@@ -39,6 +42,17 @@ namespace PihitWise.API.Controllers
                 return Unauthorized("Invalid email or password.");
             }
             return Ok(loginResponse);
+        }
+
+        [Authorize]
+        [HttpGet("me")]
+        public IActionResult Me()
+        {
+            var id = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
+            var email = User.FindFirstValue(JwtRegisteredClaimNames.Email);
+            var name = User.FindFirstValue(JwtRegisteredClaimNames.Name);
+
+            return Ok(new { id, email, name });
         }
     }
 }
