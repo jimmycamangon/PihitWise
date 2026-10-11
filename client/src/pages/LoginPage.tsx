@@ -31,9 +31,7 @@ export default function LoginPage() {
 
         setLoading(true)
         try {
-            await login(email, password)
             const result = await login(email, password)
-            
             localStorage.setItem('token', result.token)
             navigate('/dashboard', { replace: true })
         } catch(err) {
