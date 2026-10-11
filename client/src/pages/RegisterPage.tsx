@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import AuthLayout, { Field } from '../components/AuthLayout'
 import Icon from '../components/Icon'
+import { register } from '../api/auth'
+import { FormMessage } from '../components/ui'
 
 interface RegisterErrors { name?: string; email?: string; password?: string; confirm?: string; terms?: string }
 
@@ -10,6 +12,9 @@ const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const MIN_PASSWORD = 8
 
 export default function RegisterPage() {
+    const [loading, setLoading] = useState(false)
+    const navigate = useNavigate()
+
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -18,7 +23,7 @@ export default function RegisterPage() {
     const [errors, setErrors] = useState<RegisterErrors>({})
     const [notice, setNotice] = useState('')
 
-    const onSubmit = (e: FormEvent) => {
+    const onSubmit = async (e: FormEvent) => {
         e.preventDefault()
         const next: RegisterErrors = {}
         if (!name.trim()) next.name = 'Enter your name.'
@@ -29,8 +34,15 @@ export default function RegisterPage() {
         setErrors(next)
         if (Object.keys(next).length > 0) return setNotice('')
 
-        // TODO: call the auth API once the backend exposes a register endpoint
-        setNotice('Sign up isn\'t connected to the server yet.')
+        setLoading(true)
+        try {
+            await register(name, email, password)
+            navigate('/login')
+        } catch (err) {
+            setNotice((err as Error).message)
+        } finally {
+            setLoading(false)
+        }
     }
 
     return (
@@ -43,16 +55,28 @@ export default function RegisterPage() {
             <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
                 <Field label="Full name" icon="user" type="text" name="name" autoComplete="name"
                     placeholder="Juan Dela Cruz" value={name} error={errors.name}
-                    onChange={(e) => setName(e.target.value)} />
+                    onChange={(e) => {
+                        setName(e.target.value)
+                        setErrors({ ...errors, name: undefined })
+                        }} />
                 <Field label="Email" icon="mail" type="email" name="email" autoComplete="email"
                     placeholder="you@example.com" value={email} error={errors.email}
-                    onChange={(e) => setEmail(e.target.value)} />
+                    onChange={(e) => {
+                        setEmail(e.target.value)
+                        setErrors({ ...errors, email: undefined })
+                        }} />
                 <Field label="Password" icon="lock" type="password" name="password" autoComplete="new-password"
                     placeholder={`At least ${MIN_PASSWORD} characters`} value={password} error={errors.password}
-                    onChange={(e) => setPassword(e.target.value)} />
+                    onChange={(e) => {
+                        setPassword(e.target.value)
+                        setErrors({ ...errors, password: undefined })
+                        }} />
                 <Field label="Confirm password" icon="lock" type="password" name="confirm" autoComplete="new-password"
                     placeholder="Repeat your password" value={confirm} error={errors.confirm}
-                    onChange={(e) => setConfirm(e.target.value)} />
+                    onChange={(e) => {
+                        setConfirm(e.target.value)
+                        setErrors({ ...errors, confirm: undefined })
+                        }} />
 
                 <div>
                     <label className="flex items-start gap-2 text-xs text-muted cursor-pointer">
@@ -68,19 +92,13 @@ export default function RegisterPage() {
                     {errors.terms && <p className="text-[11px] text-warn mt-1.5">{errors.terms}</p>}
                 </div>
 
-                <button type="submit"
+                <button type="submit" disabled={loading}
                     className="inline-flex items-center justify-center gap-2 h-10 rounded-md bg-accent text-on-accent
-                         text-[13px] font-medium hover:opacity-90 transition-opacity cursor-pointer">
-                    Create account
+                         text-[13px] font-medium hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                    {loading ? 'Creating account...' : 'Create account'}
                     <Icon name="arrow" size={14} />
                 </button>
-
-                {notice && (
-                    <p role="status" className="text-[11px] text-muted text-center">
-                        {notice}{' '}
-                        <Link to="/dashboard" className="text-accent no-underline hover:opacity-80">Open the sample dashboard</Link>
-                    </p>
-                )}
+                <FormMessage text={notice} />
             </form>
         </AuthLayout>
     )

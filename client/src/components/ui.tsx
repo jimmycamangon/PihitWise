@@ -120,3 +120,9 @@ export function DataTable<T extends { id: string }>({ columns, rows, empty }: Da
         </div>
     )
 }
+
+
+export function FormMessage({ text }: { text: string }) {
+    if (!text) return null
+    return <p role="alert" className="text-[11px] text-warn text-center">{text}</p>
+}
