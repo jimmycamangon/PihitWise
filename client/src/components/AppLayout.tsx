@@ -44,9 +44,14 @@ export default function AppLayout() {
     useEffect(() => {
         getMe()
             .then((data) => setMe(data))
-            .catch(() => { localStorage.removeItem('token'); navigate('/login', { replace: true })})
+            .catch(() => { localStorage.removeItem('token'); navigate('/login', { replace: true }) })
     }, [navigate])
 
+    const signOut = () => {
+        localStorage.removeItem('token')
+        navigate('/login', { replace: true })
+    }
+    
     return (
         <div className="min-h-screen bg-canvas text-ink font-sans antialiased transition-colors duration-300">
 
@@ -72,11 +77,8 @@ export default function AppLayout() {
                         <div className="text-xs font-medium text-ink truncate">{me?.name}</div>
                         <div className="text-[11px] text-faint truncate">{me?.email}</div>
                     </div>
-                    <button type="button" className={navLink({ isActive: false })} 
-                        onClick={() => { 
-                            localStorage.removeItem('token') 
-                            navigate('/login', { replace: true })
-                        }}>
+                    <button type="button" className={navLink({ isActive: false })}
+                        onClick={signOut}>
                         <Icon name="logout" size={14} />
                         Sign out
                     </button>
@@ -94,6 +96,11 @@ export default function AppLayout() {
                         <div className="flex items-center gap-2.5">
                             <span className="hidden sm:inline-flex"><Badge>Sample data</Badge></span>
                             <ThemeToggle />
+                            <button className="lg:hidden w-8 h-8 rounded-md border border-line text-muted
+                            flex items-center justify-center
+                            hover:text-ink hover:bg-raised transition-colors cursor-pointer" type="button" onClick={signOut} aria-label="Sign Out">
+                                <Icon name="logout" size={16} />
+                            </button>
                         </div>
                     </div>
 
