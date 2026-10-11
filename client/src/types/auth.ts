@@ -8,3 +8,9 @@ export interface LoginResult {
     token: string
     user: User
 }
+
+export interface Me {
+    id: string
+    email: string
+    name: string
+}

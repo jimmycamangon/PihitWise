@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Link, NavLink, Outlet } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import Icon from './Icon'
 import type { IconName } from './Icon'
 import Logo from './Logo'
@@ -7,6 +7,9 @@ import ThemeToggle from './ThemeToggle'
 import { Badge } from './ui'
 import { bikes, user } from '../data/mock'
 import type { BikeContext } from '../hooks/useBike'
+import { getMe } from '../api/auth'
+import type { Me } from '../types/auth'
+
 
 const navItems: { to: string; label: string; icon: IconName }[] = [
     { to: '/dashboard', label: 'Dashboard', icon: 'grid' },
@@ -23,6 +26,9 @@ const navLink = ({ isActive }: { isActive: boolean }) =>
      ${isActive ? 'bg-raised text-ink font-medium' : 'text-muted hover:text-ink hover:bg-raised'}`
 
 export default function AppLayout() {
+    const navigate = useNavigate()
+    const [me, setMe] = useState<Me | null>(null)
+
     const [bikeId, setBikeId] = useState(bikes[0].id)
     const bike = bikes.find((b) => b.id === bikeId) ?? bikes[0]
     const context: BikeContext = { bike, setBikeId }
@@ -34,6 +40,12 @@ export default function AppLayout() {
             {bikes.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
         </select>
     )
+
+    useEffect(() => {
+        getMe()
+            .then((data) => setMe(data))
+            .catch(() => { localStorage.removeItem('token'); navigate('/login', { replace: true })})
+    }, [])
 
     return (
         <div className="min-h-screen bg-canvas text-ink font-sans antialiased transition-colors duration-300">
@@ -57,13 +69,17 @@ export default function AppLayout() {
                 </nav>
                 <div className="p-3 border-t border-line">
                     <div className="px-2.5 mb-2">
-                        <div className="text-xs font-medium text-ink truncate">{user.name}</div>
-                        <div className="text-[11px] text-faint truncate">{user.email}</div>
+                        <div className="text-xs font-medium text-ink truncate">{me?.name}</div>
+                        <div className="text-[11px] text-faint truncate">{me?.email}</div>
                     </div>
-                    <Link to="/login" className={navLink({ isActive: false })}>
+                    <button type="button" className={navLink({ isActive: false })} 
+                        onClick={() => { 
+                            localStorage.removeItem('token') 
+                            navigate('/login', { replace: true })
+                        }}>
                         <Icon name="logout" size={14} />
                         Sign out
-                    </Link>
+                    </button>
                 </div>
             </aside>
 

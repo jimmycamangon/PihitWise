@@ -35,7 +35,7 @@ export default function LoginPage() {
             const result = await login(email, password)
             
             localStorage.setItem('token', result.token)
-            navigate('/dashboard')
+            navigate('/dashboard', { replace: true })
         } catch(err) {
             setNotice((err as Error).message)
         } finally {
