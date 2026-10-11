@@ -1,9 +1,11 @@
 ﻿using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PihitWise.Infrastructure;
 using PihitWise.Infrastructure.Auth;
+using PihitWise.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,6 +67,13 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
+
+// Applies any new EF Core migrations on start, so the live database (Neon)
+// stays in sync without running "dotnet ef database update" against it by hand.
+using (var scope = app.Services.CreateScope())
+{
+    scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
