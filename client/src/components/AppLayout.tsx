@@ -5,7 +5,7 @@ import type { IconName } from './Icon'
 import Logo from './Logo'
 import ThemeToggle from './ThemeToggle'
 import { Badge } from './ui'
-import { bikes, user } from '../data/mock'
+import { bikes } from '../data/mock'
 import type { BikeContext } from '../hooks/useBike'
 import { getMe } from '../api/auth'
 import type { Me } from '../types/auth'
@@ -45,7 +45,7 @@ export default function AppLayout() {
         getMe()
             .then((data) => setMe(data))
             .catch(() => { localStorage.removeItem('token'); navigate('/login', { replace: true })})
-    }, [])
+    }, [navigate])
 
     return (
         <div className="min-h-screen bg-canvas text-ink font-sans antialiased transition-colors duration-300">
