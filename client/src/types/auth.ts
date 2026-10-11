@@ -3,3 +3,8 @@ export interface User {
     fullName: string
     email: string
 }
+
+export interface LoginResult {
+    token: string
+    user: User
+}
