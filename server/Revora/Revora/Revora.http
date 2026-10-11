@@ -1,6 +1,0 @@
-@Revora_HostAddress = http://localhost:5225
-
-GET {{Revora_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
