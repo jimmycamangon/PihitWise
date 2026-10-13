@@ -8,6 +8,9 @@ import { createVehicle } from '../api/vehicles'
 import Modal from '../components/Modal'
 import { Badge } from '../components/ui'
 
+
+interface VehicleErrors { name?: string, brand?: string, model?: string, year?: string, plateNumber?: string, odometer?: string }
+
 export default function GaragePage() {
     const [vehicles, setVehicles] = useState<Vehicle[]>([])
     const [loading, setLoading] = useState(false)
@@ -21,6 +24,8 @@ export default function GaragePage() {
     const [plateNumber, setplateNumber] = useState('')
     const [odometer, setOdometer] = useState('')
 
+    const [fieldErrors, setFieldErrors] = useState<VehicleErrors>({})
+
     useEffect(() => {
         setLoading(true)
         getVehicles()
@@ -32,12 +37,25 @@ export default function GaragePage() {
 
     const onSubmit = async (e: FormEvent) => {
         e.preventDefault()
+
+        const next: VehicleErrors = {}
+        if (!name.trim()) next.name = 'Enter a name.'
+        if (!brand.trim()) next.brand = 'Enter a brand.'
+        if (!model.trim()) next.model = 'Enter a model.'
+        const y = Number(year)
+        if (y < 1950 || y > new Date().getFullYear() + 1) next.year = 'Enter a valid year.'
+        if (plateNumber.trim().length > 10) next.plateNumber = 'Max 10 characters.'
+        if (Number(odometer) < 0) next.odometer = 'Odometer can\'t be negative.'
+        setFieldErrors(next)
+        if (Object.keys(next).length > 0) return
+
+
         try {
             const created = await createVehicle({
                 type: 'Motorcycle',
                 name, brand, model,
                 year: Number(year),
-                plateNumber: plateNumber || null,
+                plateNumber: plateNumber.trim().toUpperCase() || null,
                 odometer: Number(odometer),
             })
             setVehicles([...vehicles, created])
@@ -53,11 +71,11 @@ export default function GaragePage() {
             <FormMessage text={errors} />
 
             <div className="flex items-start justify-between gap-3">
-                <PageHeader title="Garage" subtitle="Every bike you own, in one place." />
+                <PageHeader title="Garage" subtitle="Every vehicle you own, in one place." />
                 <button type="button" onClick={() => setShowForm(true)}
                     className="h-8 px-3.5 rounded-md bg-accent text-on-accent text-xs font-medium
              hover:opacity-90 transition-opacity cursor-pointer whitespace-nowrap">
-                    + Add bike
+                    + Add vehicle
                 </button>
             </div>
 
@@ -79,25 +97,24 @@ export default function GaragePage() {
                 })}
             </div>
 
-            <Modal open={showForm} title="Add bike" onClose={() => setShowForm(false)}>
+            <Modal open={showForm} title="Add vehicle" onClose={() => setShowForm(false)}>
                 <form onSubmit={onSubmit} className="flex flex-col gap-3 mb-4">
-                    <Field label="Name" icon="user" name="name"
-                        value={name} onChange={(e) => setName(e.target.value)} />
-                    {/* brand, model, year, plateNumber, odometer: same way */}
-                    <Field label="Brand" icon="user" name="brand"
-                        value={brand} onChange={(e) => setBrand(e.target.value)} />
-                    <Field label="Model" icon="user" name="model"
-                        value={model} onChange={(e) => setModel(e.target.value)} />
-                    <Field label="Year" icon="user" name="year" type="number"
-                        value={year} onChange={(e) => setYear(e.target.value)} />
-                    <Field label="Plate Number" icon="user" name="plateNumber"
-                        value={plateNumber} onChange={(e) => setplateNumber(e.target.value)} />
-                    <Field label="Odometer" icon="user" name="odometer" type="number"
-                        value={odometer} onChange={(e) => setOdometer(e.target.value)} />
+                    <Field label="Name" icon="garage" placeholder="My daily ride" name="name"
+                        value={name} onChange={(e) => setName(e.target.value)} error={fieldErrors.name} />
+                    <Field label="Brand" icon="tag" placeholder="Honda" name="brand"
+                        value={brand} onChange={(e) => setBrand(e.target.value)} error={fieldErrors.brand} />
+                    <Field label="Model" icon="bike" placeholder="Click 125i" name="model"
+                        value={model} onChange={(e) => setModel(e.target.value)} error={fieldErrors.model} />
+                    <Field label="Year" icon="calendar" placeholder="2022" name="year" type="number"
+                        value={year} onChange={(e) => setYear(e.target.value)} error={fieldErrors.year} />
+                    <Field label="Plate Number" icon="hash" placeholder="ABC 1234" name="plateNumber"
+                        value={plateNumber} onChange={(e) => setplateNumber(e.target.value)} error={fieldErrors.plateNumber} />
+                    <Field label="Odometer" icon="gauge" placeholder="12000" name="odometer" type="number"
+                        value={odometer} onChange={(e) => setOdometer(e.target.value)} error={fieldErrors.odometer} />
                     <button type="submit"
                         className="h-10 mt-2 rounded-md bg-accent text-on-accent text-[13px] font-medium
          hover:opacity-90 transition-opacity cursor-pointer">
-                        Save bike
+                        Save vehicle
                     </button>
                 </form>
             </Modal>
