@@ -1,15 +1,19 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import Icon from './Icon'
 
 interface ToastProps { message: string; onClose: () => void }
 
 /** A small message at the bottom of the screen. Hides itself after 3 seconds. Empty message = hidden. */
 export default function Toast({ message, onClose }: ToastProps) {
+    // Keep the latest onClose without restarting the timer on every render.
+    const closeRef = useRef(onClose)
+    useEffect(() => { closeRef.current = onClose })
+
     useEffect(() => {
         if (!message) return
-        const timer = setTimeout(onClose, 3000)
+        const timer = setTimeout(() => closeRef.current(), 3000)
         return () => clearTimeout(timer)
-    }, [message, onClose])
+    }, [message])
 
     if (!message) return null
 
