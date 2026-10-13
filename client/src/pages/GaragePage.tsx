@@ -14,7 +14,7 @@ interface VehicleErrors { name?: string, brand?: string, model?: string, year?: 
 
 export default function GaragePage() {
     const [vehicles, setVehicles] = useState<Vehicle[]>([])
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
     const [errors, setErrors] = useState('')
     const [showForm, setShowForm] = useState(false)
 
@@ -38,7 +38,6 @@ export default function GaragePage() {
     }
 
     useEffect(() => {
-        setLoading(true)
         getVehicles()
             .then((data) => setVehicles(data))
             .catch((errors) => setErrors(errors.message))
@@ -145,6 +144,8 @@ export default function GaragePage() {
                     )
                 })}
             </div>
+
+            {!loading && vehicles.length === 0 && <p className="text-[13px] text-muted">No vehicles yet.</p>}
 
             <Modal open={showForm} title={editingId ? 'Edit vehicle' : 'Add vehicle'} onClose={() => setShowForm(false)}>
                 <form onSubmit={onSubmit} className="flex flex-col gap-3 mb-4">
