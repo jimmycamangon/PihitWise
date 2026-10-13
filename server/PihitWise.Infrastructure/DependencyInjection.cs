@@ -3,9 +3,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PihitWise.Domain.Entities;
+
+using PihitWise.Application.Auth;
+using PihitWise.Application.Vehicles;
+
 using PihitWise.Infrastructure.Persistence;
 using PihitWise.Infrastructure.Auth;
-using PihitWise.Application.Auth;
+using PihitWise.Infrastructure.Vehicles;
 
 
 namespace PihitWise.Infrastructure;
@@ -25,6 +29,7 @@ public static class DependencyInjection
         // Ask for IPasswordHasher<User> in a constructor to use it.
         services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IVehicleService, VehicleService>();
 
         // JWT settings come from the "Jwt" section; Jwt:Key lives in user-secrets.
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
