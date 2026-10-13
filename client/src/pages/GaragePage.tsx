@@ -5,6 +5,8 @@ import { useState, useEffect, type FormEvent } from 'react'
 import type { Vehicle } from '../types/vehicles'
 import { Field } from '../components/AuthLayout'
 import { createVehicle } from '../api/vehicles'
+import Modal from '../components/Modal'
+import { Badge } from '../components/ui'
 
 export default function GaragePage() {
     const [vehicles, setVehicles] = useState<Vehicle[]>([])
@@ -50,37 +52,34 @@ export default function GaragePage() {
             {loading && <p>Loading...</p>}
             <FormMessage text={errors} />
 
-            <PageHeader title="Garage" subtitle="Every bike you own, in one place." />
-            <button type="button" onClick={() => setShowForm(true)}>
-                + Add bike
-            </button>
+            <div className="flex items-start justify-between gap-3">
+                <PageHeader title="Garage" subtitle="Every bike you own, in one place." />
+                <button type="button" onClick={() => setShowForm(true)}
+                    className="h-8 px-3.5 rounded-md bg-accent text-on-accent text-xs font-medium
+             hover:opacity-90 transition-opacity cursor-pointer whitespace-nowrap">
+                    + Add bike
+                </button>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {vehicles.map((bike) => {
                     return (
-                        <div key={bike.id}
-                            className={`bg-surface border rounded-xl p-5}`}>
-                            <div className="flex items-start justify-between gap-3 mb-5">
+                        <div key={bike.id} className="bg-surface border border-line rounded-xl p-5">
+                            <div className="flex items-start justify-between gap-3 mb-4">
                                 <div>
                                     <div className="text-base font-medium text-ink">{bike.name}</div>
-                                    <div className="text-base font-medium text-ink">{bike.brand}</div>
-                                    <div className="text-base font-medium text-ink">{bike.model}</div>
-                                    <div className="text-xs text-faint">{bike.year} · {bike.plateNumber ?? 'No plate'}</div>
+                                    <div className="text-xs text-muted">{bike.brand} {bike.model} · {bike.year}</div>
                                 </div>
+                                <Badge>{bike.plateNumber ?? 'No plate'}</Badge>
                             </div>
-
-                            <div className="grid grid-cols-2 gap-x-4 gap-y-4">
-                                <div>
-                                    <Label>Odometer</Label>
-                                    <div className="font-mono text-sm text-ink tracking-tight mt-1">{km(bike.odometer)}</div>
-                                </div>
-                            </div>
+                            <Label>Odometer</Label>
+                            <div className="font-mono text-sm text-ink tracking-tight mt-1">{km(bike.odometer)}</div>
                         </div>
                     )
                 })}
             </div>
 
-            {showForm && (
+            <Modal open={showForm} title="Add bike" onClose={() => setShowForm(false)}>
                 <form onSubmit={onSubmit} className="flex flex-col gap-3 mb-4">
                     <Field label="Name" icon="user" name="name"
                         value={name} onChange={(e) => setName(e.target.value)} />
@@ -95,10 +94,13 @@ export default function GaragePage() {
                         value={plateNumber} onChange={(e) => setplateNumber(e.target.value)} />
                     <Field label="Odometer" icon="user" name="odometer" type="number"
                         value={odometer} onChange={(e) => setOdometer(e.target.value)} />
-                    <button type="submit">Save</button>
-                    <button type="button" onClick={() => setShowForm(false)}>Cancel</button>
+                    <button type="submit"
+                        className="h-10 mt-2 rounded-md bg-accent text-on-accent text-[13px] font-medium
+         hover:opacity-90 transition-opacity cursor-pointer">
+                        Save bike
+                    </button>
                 </form>
-            )} 
+            </Modal>
         </>
     )
 }
