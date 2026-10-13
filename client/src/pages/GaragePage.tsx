@@ -4,10 +4,11 @@ import { getVehicles } from '../api/vehicles'
 import { useState, useEffect, type FormEvent } from 'react'
 import type { Vehicle } from '../types/vehicles'
 import { Field } from '../components/AuthLayout'
-import { createVehicle } from '../api/vehicles'
+import { createVehicle, deleteVehicle, updateVehicle } from '../api/vehicles'
 import Modal from '../components/Modal'
 import { Badge } from '../components/ui'
-
+import ConfirmDialog from '../components/ConfirmDialog'
+import Toast from '../components/Toast'
 
 interface VehicleErrors { name?: string, brand?: string, model?: string, year?: string, plateNumber?: string, odometer?: string }
 
@@ -25,6 +26,16 @@ export default function GaragePage() {
     const [odometer, setOdometer] = useState('')
 
     const [fieldErrors, setFieldErrors] = useState<VehicleErrors>({})
+    const [deleteId, setDeleteId] = useState<string | null>(null)
+    const [editingId, setEditingId] = useState<string | null>(null)
+    const [toast, setToast] = useState('')
+
+    const resetForm = () => {
+        setName(''); setBrand(''); setModel('')
+        setYear(''); setplateNumber(''); setOdometer('')
+        setFieldErrors({})
+        setEditingId(null)
+    }
 
     useEffect(() => {
         setLoading(true)
@@ -50,21 +61,47 @@ export default function GaragePage() {
         if (Object.keys(next).length > 0) return
 
 
-        try {
-            const created = await createVehicle({
-                type: 'Motorcycle',
-                name, brand, model,
-                year: Number(year),
-                plateNumber: plateNumber.trim().toUpperCase() || null,
-                odometer: Number(odometer),
-            })
+        const data = {
+            type: 'Motorcycle' as const,
+            name, brand, model,
+            year: Number(year),
+            plateNumber: plateNumber.trim().toUpperCase() || null,
+            odometer: Number(odometer),
+        }
+        if (editingId) {
+            const updated = await updateVehicle(editingId, data)
+            setVehicles(vehicles.map((v) => (v.id === editingId ? updated : v)))
+            setToast('Vehicle updated')
+        } else {
+            const created = await createVehicle(data)
             setVehicles([...vehicles, created])
-            setShowForm
+            setToast('Vehicle added')
+        }
+        setShowForm(false)
+        resetForm()
+    }
+
+    const onEdit = (vehicle: Vehicle) => {
+        setEditingId(vehicle.id)
+        setName(vehicle.name)
+        setBrand(vehicle.brand)
+        setModel(vehicle.model)
+        setYear(String(vehicle.year))
+        setplateNumber(vehicle.plateNumber ?? '')
+        setOdometer(String(vehicle.odometer))
+        setFieldErrors({})
+        setShowForm(true)
+    }
+
+    const onDelete = async (id: string) => {
+        try {
+            await deleteVehicle(id)
+            setVehicles(vehicles.filter((v) => v.id !== id))
+            setToast('Vehicle deleted')
         } catch (err) {
             setErrors((err as Error).message)
         }
     }
-
     return (
         <>
             {loading && <p>Loading...</p>}
@@ -80,18 +117,30 @@ export default function GaragePage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {vehicles.map((bike) => {
+                {vehicles.map((vehicle) => {
                     return (
-                        <div key={bike.id} className="bg-surface border border-line rounded-xl p-5">
+                        <div key={vehicle.id} className="bg-surface border border-line rounded-xl p-5">
                             <div className="flex items-start justify-between gap-3 mb-4">
                                 <div>
-                                    <div className="text-base font-medium text-ink">{bike.name}</div>
-                                    <div className="text-xs text-muted">{bike.brand} {bike.model} · {bike.year}</div>
+                                    <div className="text-base font-medium text-ink">{vehicle.name}</div>
+                                    <div className="text-xs text-muted">{vehicle.brand} {vehicle.model} · {vehicle.year}</div>
                                 </div>
-                                <Badge>{bike.plateNumber ?? 'No plate'}</Badge>
+                                <Badge>{vehicle.plateNumber ?? 'No plate'}</Badge>
                             </div>
                             <Label>Odometer</Label>
-                            <div className="font-mono text-sm text-ink tracking-tight mt-1">{km(bike.odometer)}</div>
+                            <div className="font-mono text-sm text-ink tracking-tight mt-1">{km(vehicle.odometer)}</div>
+                            <div className="flex gap-2 mt-4 pt-4 border-t border-line">
+                                <button type="button" onClick={() => onEdit(vehicle)}
+                                    className="h-8 px-3 rounded-md border border-line text-xs text-ink
+             hover:bg-raised transition-colors cursor-pointer">
+                                    Edit
+                                </button>
+                                <button type="button" onClick={() => setDeleteId(vehicle.id)}
+                                    className="h-8 px-3 rounded-md border border-line text-xs text-warn
+             hover:bg-raised transition-colors cursor-pointer">
+                                    Delete
+                                </button>
+                            </div>
                         </div>
                     )
                 })}
@@ -100,17 +149,51 @@ export default function GaragePage() {
             <Modal open={showForm} title="Add vehicle" onClose={() => setShowForm(false)}>
                 <form onSubmit={onSubmit} className="flex flex-col gap-3 mb-4">
                     <Field label="Name" icon="garage" placeholder="My daily ride" name="name"
-                        value={name} onChange={(e) => setName(e.target.value)} error={fieldErrors.name} />
-                    <Field label="Brand" icon="tag" placeholder="Honda" name="brand"
-                        value={brand} onChange={(e) => setBrand(e.target.value)} error={fieldErrors.brand} />
-                    <Field label="Model" icon="bike" placeholder="Click 125i" name="model"
-                        value={model} onChange={(e) => setModel(e.target.value)} error={fieldErrors.model} />
-                    <Field label="Year" icon="calendar" placeholder="2022" name="year" type="number"
-                        value={year} onChange={(e) => setYear(e.target.value)} error={fieldErrors.year} />
+                        value={name}
+                        onChange={(e) => {
+                            setName(e.target.value)
+                            setFieldErrors({ ...fieldErrors, name: undefined })
+                        }}
+                        error={fieldErrors.name} />
+                    <div className="grid grid-cols-2 gap-3">
+                        <Field label="Brand" icon="tag" placeholder="Honda" name="brand"
+                            value={brand}
+                            onChange={(e) => {
+                                setBrand(e.target.value)
+                                setFieldErrors({ ...fieldErrors, brand: undefined })
+                            }}
+                            error={fieldErrors.brand} />
+                        <Field label="Model" icon="bike" placeholder="Click 125i" name="model"
+                            value={model}
+                            onChange={(e) => {
+                                setModel(e.target.value)
+                                setFieldErrors({ ...fieldErrors, model: undefined })
+                            }}
+                            error={fieldErrors.model} />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                        <Field label="Year" icon="calendar" placeholder="2022" name="year" type="number"
+                            value={year}
+                            onChange={(e) => {
+                                setYear(e.target.value)
+                                setFieldErrors({ ...fieldErrors, year: undefined })
+                            }}
+                            error={fieldErrors.year} />
+                        <Field label="Odometer" icon="gauge" placeholder="12000" name="odometer" type="number"
+                            value={odometer}
+                            onChange={(e) => {
+                                setOdometer(e.target.value)
+                                setFieldErrors({ ...fieldErrors, odometer: undefined })
+                            }}
+                            error={fieldErrors.odometer} />
+                    </div>
                     <Field label="Plate Number" icon="hash" placeholder="ABC 1234" name="plateNumber"
-                        value={plateNumber} onChange={(e) => setplateNumber(e.target.value)} error={fieldErrors.plateNumber} />
-                    <Field label="Odometer" icon="gauge" placeholder="12000" name="odometer" type="number"
-                        value={odometer} onChange={(e) => setOdometer(e.target.value)} error={fieldErrors.odometer} />
+                        value={plateNumber}
+                        onChange={(e) => {
+                            setplateNumber(e.target.value)
+                            setFieldErrors({ ...fieldErrors, plateNumber: undefined })
+                        }}
+                        error={fieldErrors.plateNumber} />
                     <button type="submit"
                         className="h-10 mt-2 rounded-md bg-accent text-on-accent text-[13px] font-medium
          hover:opacity-90 transition-opacity cursor-pointer">
@@ -118,6 +201,18 @@ export default function GaragePage() {
                     </button>
                 </form>
             </Modal>
+
+
+            <ConfirmDialog
+                open={deleteId !== null}
+                title="Delete bike"
+                message="This bike will be removed. This can't be undone."
+                confirmText="Delete"
+                danger
+                onConfirm={() => { onDelete(deleteId!); setDeleteId(null) }}
+                onCancel={() => setDeleteId(null)}
+            />
+            <Toast message={toast} onClose={() => setToast('')} />
         </>
     )
 }
