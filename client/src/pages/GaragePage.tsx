@@ -109,7 +109,7 @@ export default function GaragePage() {
 
             <div className="flex items-start justify-between gap-3">
                 <PageHeader title="Garage" subtitle="Every vehicle you own, in one place." />
-                <button type="button" onClick={() => setShowForm(true)}
+                <button type="button" onClick={() => { resetForm(); setShowForm(true) }}
                     className="h-8 px-3.5 rounded-md bg-accent text-on-accent text-xs font-medium
              hover:opacity-90 transition-opacity cursor-pointer whitespace-nowrap">
                     + Add vehicle
@@ -146,7 +146,7 @@ export default function GaragePage() {
                 })}
             </div>
 
-            <Modal open={showForm} title="Add vehicle" onClose={() => setShowForm(false)}>
+            <Modal open={showForm} title={editingId ? 'Edit vehicle' : 'Add vehicle'} onClose={() => setShowForm(false)}>
                 <form onSubmit={onSubmit} className="flex flex-col gap-3 mb-4">
                     <Field label="Name" icon="garage" placeholder="My daily ride" name="name"
                         value={name}
@@ -197,7 +197,7 @@ export default function GaragePage() {
                     <button type="submit"
                         className="h-10 mt-2 rounded-md bg-accent text-on-accent text-[13px] font-medium
          hover:opacity-90 transition-opacity cursor-pointer">
-                        Save vehicle
+                        {editingId ? 'Save changes' : 'Save vehicle'}
                     </button>
                 </form>
             </Modal>
