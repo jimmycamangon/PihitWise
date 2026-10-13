@@ -1,0 +1,62 @@
+import type { Vehicle, VehicleRequest } from "../types/vehicles";
+
+
+export async function getVehicles() : Promise<Vehicle[]> {
+    const token = localStorage.getItem('token')
+
+    const response = await fetch('/api/vehicles', {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${token}` },
+    })
+    if (!response.ok) {
+        throw new Error(await response.text())
+    }
+    return response.json()
+}
+
+
+export async function createVehicle(data: VehicleRequest) : Promise<Vehicle> {
+    const token = localStorage.getItem('token')
+
+    const response = await fetch('/api/vehicles', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(data),
+    })
+    if (!response.ok) {
+        throw new Error(await response.text())
+    }
+    return response.json()
+}
+
+export async function updateVehicle(id: string, data: VehicleRequest) : Promise<Vehicle> {
+    const token = localStorage.getItem('token')
+
+    const response = await fetch(`/api/vehicles/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(data),
+    })
+    if (!response.ok) {
+        throw new Error(await response.text())
+    }
+    return response.json()
+}
+
+export async function deleteVehicle(id: string) : Promise<void> {
+    const token = localStorage.getItem('token')
+
+    const response = await fetch(`/api/vehicles/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+    })
+    if (!response.ok) {
+        throw new Error(await response.text())
+    }
+}
