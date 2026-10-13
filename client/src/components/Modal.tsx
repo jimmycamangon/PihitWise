@@ -25,9 +25,10 @@ export default function Modal({ open, title, onClose, children }: ModalProps) {
             <div className="absolute inset-0 bg-black/50" onClick={onClose} />
 
             <div role="dialog" aria-modal="true" aria-label={title}
-                className="relative w-full sm:max-w-md max-h-[90vh] overflow-y-auto
-                     bg-surface border border-line rounded-t-2xl sm:rounded-xl p-5">
-                <div className="flex items-center justify-between mb-4">
+                className="relative w-full sm:max-w-md max-h-[90vh] flex flex-col
+                     bg-surface border border-line rounded-t-2xl sm:rounded-xl">
+                {/* header stays put; only the body below scrolls */}
+                <div className="flex items-center justify-between px-5 py-3 border-b border-line shrink-0">
                     <h2 className="text-sm font-medium text-ink">{title}</h2>
                     <button type="button" onClick={onClose} aria-label="Close"
                         className="w-8 h-8 rounded-md flex items-center justify-center text-faint
@@ -35,7 +36,7 @@ export default function Modal({ open, title, onClose, children }: ModalProps) {
                         ×
                     </button>
                 </div>
-                {children}
+                <div className="overflow-y-auto p-5">{children}</div>
             </div>
         </div>
     )
