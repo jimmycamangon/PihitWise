@@ -1,20 +1,37 @@
-import { Badge, Label, PageHeader } from '../components/ui'
-import { avgKml, bikes, servicesFor, upcomingReminders } from '../data/mock'
+import { FormMessage, Label, PageHeader } from '../components/ui'
 import { useBike } from '../hooks/useBike'
-import { formatDate, km } from '../lib/format'
+import { km } from '../lib/format'
+import { getVehicles } from '../api/vehicles'
+import { useState, useEffect } from 'react'
+import type { Vehicle } from '../types/vehicles'
 
 export default function GaragePage() {
-    const { bike: active, setBikeId } = useBike()
+    const { bike: active } = useBike()
+    const [vehicles, setVehicles] = useState<Vehicle[]>([])
+    const [loading, setLoading] = useState(false)
+    const [errors, setErrors] = useState('')
+
+    useEffect(() => {
+        setLoading(true)
+        getVehicles()
+            .then((data) => setVehicles(data))
+            .catch((errors) => setErrors(errors.message))
+            .finally(() => setLoading(false))
+    },[])
+
+    
+        {loading && <p>Loading...</p>}
+        <FormMessage text={errors}/>
 
     return (
         <>
             <PageHeader title="Garage" subtitle="Every bike you own, in one place." />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {bikes.map((bike) => {
+                {vehicles.map((bike) => {
                     const isActive = bike.id === active.id
-                    const lastService = servicesFor(bike.id)[0]
-                    const next = upcomingReminders(bike)[0]
+                    // const lastService = servicesFor(bike.id)[0]
+                    // const next = upcomingReminders(bike)[0]
 
                     return (
                         <div key={bike.id}
@@ -22,9 +39,9 @@ export default function GaragePage() {
                             <div className="flex items-start justify-between gap-3 mb-5">
                                 <div>
                                     <div className="text-base font-medium text-ink">{bike.name}</div>
-                                    <div className="text-xs text-faint">{bike.year} · {bike.plate}</div>
+                                    <div className="text-xs text-faint">{bike.year} · {bike.plateNumber}</div>
                                 </div>
-                                {isActive
+                                {/* {isActive
                                     ? <Badge tone="accent">Active</Badge>
                                     : (
                                         <button type="button" onClick={() => setBikeId(bike.id)}
@@ -32,15 +49,15 @@ export default function GaragePage() {
                                                  hover:bg-raised transition-colors cursor-pointer">
                                             Set active
                                         </button>
-                                    )}
+                                    )} */}
                             </div>
 
                             <div className="grid grid-cols-2 gap-x-4 gap-y-4">
                                 <div>
                                     <Label>Odometer</Label>
-                                    <div className="font-mono text-sm text-ink tracking-tight mt-1">{km(bike.odo)}</div>
+                                    <div className="font-mono text-sm text-ink tracking-tight mt-1">{km(bike.odometer)}</div>
                                 </div>
-                                <div>
+                                {/* <div>
                                     <Label>km/L avg</Label>
                                     <div className="font-mono text-sm text-ok tracking-tight mt-1">{avgKml(bike.id).toFixed(1)}</div>
                                 </div>
@@ -53,7 +70,7 @@ export default function GaragePage() {
                                     <Label>Next due</Label>
                                     <div className="text-xs text-ink mt-1">{next ? next.reminder.title : '—'}</div>
                                     {next && <div className="text-[11px] text-faint">{next.status.text}</div>}
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                     )
