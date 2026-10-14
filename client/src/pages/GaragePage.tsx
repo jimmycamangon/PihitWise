@@ -9,6 +9,7 @@ import Modal from '../components/Modal'
 import { Badge } from '../components/ui'
 import ConfirmDialog from '../components/ConfirmDialog'
 import Toast from '../components/Toast'
+import Icon from '../components/Icon'
 
 interface VehicleErrors { name?: string, brand?: string, model?: string, year?: string, plateNumber?: string, odometer?: string }
 
@@ -101,11 +102,9 @@ export default function GaragePage() {
             setErrors((err as Error).message)
         }
     }
+
     return (
         <>
-            {loading && <p>Loading...</p>}
-            <FormMessage text={errors} />
-
             <div className="flex items-start justify-between gap-3">
                 <PageHeader title="Garage" subtitle="Every vehicle you own, in one place." />
                 <button type="button" onClick={() => { resetForm(); setShowForm(true) }}
@@ -114,7 +113,13 @@ export default function GaragePage() {
                     + Add vehicle
                 </button>
             </div>
-
+            <FormMessage text={errors} />
+            {loading && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <VehicleSkeleton />
+                    <VehicleSkeleton />
+                </div>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {vehicles.map((vehicle) => {
                     return (
@@ -145,7 +150,20 @@ export default function GaragePage() {
                 })}
             </div>
 
-            {!loading && vehicles.length === 0 && <p className="text-[13px] text-muted">No vehicles yet.</p>}
+            {!loading && vehicles.length === 0 && (
+                <div className="flex flex-col items-center text-center py-16 border border-dashed border-line rounded-xl">
+                    <div className="w-14 h-14 rounded-full bg-raised flex items-center justify-center mb-4">
+                        <Icon name="bike" size={24} className="text-muted" />
+                    </div>
+                    <div className="text-sm font-medium text-ink">No vehicles yet</div>
+                    <p className="text-xs text-muted mt-1 mb-5">Add your first ride to start tracking it.</p>
+                    <button type="button" onClick={() => { resetForm(); setShowForm(true) }}
+                        className="h-8 px-3.5 rounded-md bg-accent text-on-accent text-xs font-medium
+         hover:opacity-90 transition-opacity cursor-pointer">
+                        + Add your first vehicle
+                    </button>
+                </div>
+            )}
 
             <Modal open={showForm} title={editingId ? 'Edit vehicle' : 'Add vehicle'} onClose={() => setShowForm(false)}>
                 <form onSubmit={onSubmit} className="flex flex-col gap-3 mb-4">
@@ -215,5 +233,27 @@ export default function GaragePage() {
             />
             <Toast message={toast} onClose={() => setToast('')} />
         </>
+
+    )
+}
+
+
+
+function VehicleSkeleton() {
+    return (
+        <div className="h-50 bg-surface border border-line rounded-xl p-5 animate-pulse">
+            {/* name + brand line */}
+            <div className="h-4 w-32 bg-raised rounded mb-2" />
+            <div className="h-3 w-40 bg-raised rounded" />
+
+            {/* odometer */}
+            <div className="h-4 w-24 bg-raised rounded mt-4" />
+
+            {/* buttons */}
+            <div className="flex gap-2 mt-4 pt-4 border-t border-line">
+                <div className="h-8 w-16 bg-raised rounded-md" />
+                <div className="h-8 w-16 bg-raised rounded-md" />
+            </div>
+        </div>
     )
 }
