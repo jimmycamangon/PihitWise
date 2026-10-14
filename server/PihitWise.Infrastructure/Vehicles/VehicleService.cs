@@ -87,6 +87,17 @@ namespace PihitWise.Infrastructure.Vehicles
             return true;
         }
 
+        public async Task<bool> PlateExistsAsync(Guid userId, string plateNumber, Guid? exceptId)
+        {
+            var query = _db.Vehicles
+                .Where(v => v.UserId == userId && v.PlateNumber == plateNumber);
+            if (exceptId.HasValue)
+            {
+                query = query.Where(v => v.Id != exceptId.Value);
+            }
+            return await query.AnyAsync();
+        }
+
         private static VehicleResponse ToResponse(Vehicle v) =>
             new VehicleResponse
             (

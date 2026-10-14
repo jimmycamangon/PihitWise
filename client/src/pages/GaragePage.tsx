@@ -83,7 +83,9 @@ export default function GaragePage() {
             setShowForm(false)
             resetForm()
         } catch (err) {
-            setErrors(err instanceof Error ? err.message : 'Something went wrong.')
+            const msg = err instanceof Error ? err.message : 'Something went wrong.'
+            if (msg.includes('plate')) setFieldErrors({ plateNumber: msg })
+            else setErrors(msg)
         } finally {
             setSaving(false)
         }

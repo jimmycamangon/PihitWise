@@ -8,6 +8,7 @@ namespace PihitWise.Application.Vehicles
         Task<VehicleResponse> CreateAsync(Guid userId, VehicleRequest request);
         Task<VehicleResponse?> UpdateAsync(Guid userId, Guid id, VehicleRequest request);
         Task<bool> DeleteAsync(Guid userId, Guid id);
+        Task<bool> PlateExistsAsync(Guid userId, string plateNumber, Guid? exceptId);
 
     }
 }

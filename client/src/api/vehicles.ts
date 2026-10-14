@@ -1,7 +1,7 @@
 import type { Vehicle, VehicleRequest } from "../types/vehicles";
 import { checkSession } from './session'
 
-export async function getVehicles() : Promise<Vehicle[]> {
+export async function getVehicles(): Promise<Vehicle[]> {
     const token = localStorage.getItem('token')
 
     const response = await fetch('/api/vehicles', {
@@ -16,7 +16,7 @@ export async function getVehicles() : Promise<Vehicle[]> {
 }
 
 
-export async function createVehicle(data: VehicleRequest) : Promise<Vehicle> {
+export async function createVehicle(data: VehicleRequest): Promise<Vehicle> {
     const token = localStorage.getItem('token')
 
     const response = await fetch('/api/vehicles', {
@@ -28,13 +28,17 @@ export async function createVehicle(data: VehicleRequest) : Promise<Vehicle> {
         body: JSON.stringify(data),
     })
     checkSession(response)
+    if (response.status === 409) {
+        const body = await response.json()
+        throw new Error(body.message)
+    }
     if (!response.ok) {
         throw new Error(await response.text())
     }
     return response.json()
 }
 
-export async function updateVehicle(id: string, data: VehicleRequest) : Promise<Vehicle> {
+export async function updateVehicle(id: string, data: VehicleRequest): Promise<Vehicle> {
     const token = localStorage.getItem('token')
 
     const response = await fetch(`/api/vehicles/${id}`, {
@@ -46,13 +50,17 @@ export async function updateVehicle(id: string, data: VehicleRequest) : Promise<
         body: JSON.stringify(data),
     })
     checkSession(response)
+    if (response.status === 409) {
+        const body = await response.json()
+        throw new Error(body.message)
+    }
     if (!response.ok) {
         throw new Error(await response.text())
     }
     return response.json()
 }
 
-export async function deleteVehicle(id: string) : Promise<void> {
+export async function deleteVehicle(id: string): Promise<void> {
     const token = localStorage.getItem('token')
 
     const response = await fetch(`/api/vehicles/${id}`, {
