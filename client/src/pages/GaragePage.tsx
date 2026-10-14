@@ -157,7 +157,11 @@ export default function GaragePage() {
                     </div>
                     <div className="text-sm font-medium text-ink">No vehicles yet</div>
                     <p className="text-xs text-muted mt-1 mb-5">Add your first ride to start tracking it.</p>
-                    {/* your "+ Add vehicle" button here */}
+                    <button type="button" onClick={() => { resetForm(); setShowForm(true) }}
+                        className="h-8 px-3.5 rounded-md bg-accent text-on-accent text-xs font-medium
+         hover:opacity-90 transition-opacity cursor-pointer">
+                        + Add your first vehicle
+                    </button>
                 </div>
             )}
 
