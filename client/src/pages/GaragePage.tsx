@@ -31,6 +31,8 @@ export default function GaragePage() {
     const [editingId, setEditingId] = useState<string | null>(null)
     const [toast, setToast] = useState('')
 
+    const [saving, setSaving] = useState(false)
+
     const resetForm = () => {
         setName(''); setBrand(''); setModel('')
         setYear(''); setplateNumber(''); setOdometer('')
@@ -60,25 +62,31 @@ export default function GaragePage() {
         setFieldErrors(next)
         if (Object.keys(next).length > 0) return
 
-
-        const data = {
-            type: 'Motorcycle' as const,
-            name, brand, model,
-            year: Number(year),
-            plateNumber: plateNumber.trim().toUpperCase() || null,
-            odometer: Number(odometer),
+        setSaving(true)
+        try {
+            const data = {
+                type: 'Motorcycle' as const,
+                name, brand, model,
+                year: Number(year),
+                plateNumber: plateNumber.trim().toUpperCase() || null,
+                odometer: Number(odometer),
+            }
+            if (editingId) {
+                const updated = await updateVehicle(editingId, data)
+                setVehicles(vehicles.map((v) => (v.id === editingId ? updated : v)))
+                setToast('Vehicle updated')
+            } else {
+                const created = await createVehicle(data)
+                setVehicles([...vehicles, created])
+                setToast('Vehicle added')
+            }
+            setShowForm(false)
+            resetForm()
+        } catch (err) {
+            setErrors(err instanceof Error ? err.message : 'Something went wrong.')
+        } finally {
+            setSaving(false)
         }
-        if (editingId) {
-            const updated = await updateVehicle(editingId, data)
-            setVehicles(vehicles.map((v) => (v.id === editingId ? updated : v)))
-            setToast('Vehicle updated')
-        } else {
-            const created = await createVehicle(data)
-            setVehicles([...vehicles, created])
-            setToast('Vehicle added')
-        }
-        setShowForm(false)
-        resetForm()
     }
 
     const onEdit = (vehicle: Vehicle) => {
@@ -115,12 +123,13 @@ export default function GaragePage() {
             </div>
             <FormMessage text={errors} />
             {loading && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <VehicleSkeleton />
                     <VehicleSkeleton />
                     <VehicleSkeleton />
                 </div>
             )}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {vehicles.map((vehicle) => {
                     return (
                         <div key={vehicle.id} className="bg-surface border border-line rounded-xl p-5">
@@ -213,10 +222,10 @@ export default function GaragePage() {
                             setFieldErrors({ ...fieldErrors, plateNumber: undefined })
                         }}
                         error={fieldErrors.plateNumber} />
-                    <button type="submit"
+                    <button type="submit" disabled={saving}
                         className="h-10 mt-2 rounded-md bg-accent text-on-accent text-[13px] font-medium
          hover:opacity-90 transition-opacity cursor-pointer">
-                        {editingId ? 'Save changes' : 'Save vehicle'}
+                        {saving ? 'Saving...' : editingId ? 'Save changes' : 'Save vehicle'}
                     </button>
                 </form>
             </Modal>
