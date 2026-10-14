@@ -31,6 +31,8 @@ export default function GaragePage() {
     const [editingId, setEditingId] = useState<string | null>(null)
     const [toast, setToast] = useState('')
 
+    const [saving, setSaving] = useState(false)
+
     const resetForm = () => {
         setName(''); setBrand(''); setModel('')
         setYear(''); setplateNumber(''); setOdometer('')
@@ -60,25 +62,31 @@ export default function GaragePage() {
         setFieldErrors(next)
         if (Object.keys(next).length > 0) return
 
-
-        const data = {
-            type: 'Motorcycle' as const,
-            name, brand, model,
-            year: Number(year),
-            plateNumber: plateNumber.trim().toUpperCase() || null,
-            odometer: Number(odometer),
+        setSaving(true)
+        try {
+            const data = {
+                type: 'Motorcycle' as const,
+                name, brand, model,
+                year: Number(year),
+                plateNumber: plateNumber.trim().toUpperCase() || null,
+                odometer: Number(odometer),
+            }
+            if (editingId) {
+                const updated = await updateVehicle(editingId, data)
+                setVehicles(vehicles.map((v) => (v.id === editingId ? updated : v)))
+                setToast('Vehicle updated')
+            } else {
+                const created = await createVehicle(data)
+                setVehicles([...vehicles, created])
+                setToast('Vehicle added')
+            }
+            setShowForm(false)
+            resetForm()
+        } catch (err) {
+            setErrors(err instanceof Error ? err.message : 'Something went wrong.')
+        } finally {
+            setSaving(false)
         }
-        if (editingId) {
-            const updated = await updateVehicle(editingId, data)
-            setVehicles(vehicles.map((v) => (v.id === editingId ? updated : v)))
-            setToast('Vehicle updated')
-        } else {
-            const created = await createVehicle(data)
-            setVehicles([...vehicles, created])
-            setToast('Vehicle added')
-        }
-        setShowForm(false)
-        resetForm()
     }
 
     const onEdit = (vehicle: Vehicle) => {
