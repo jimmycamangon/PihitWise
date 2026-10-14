@@ -123,12 +123,13 @@ export default function GaragePage() {
             </div>
             <FormMessage text={errors} />
             {loading && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <VehicleSkeleton />
                     <VehicleSkeleton />
                     <VehicleSkeleton />
                 </div>
             )}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {vehicles.map((vehicle) => {
                     return (
                         <div key={vehicle.id} className="bg-surface border border-line rounded-xl p-5">
