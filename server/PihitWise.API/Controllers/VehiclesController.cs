@@ -35,15 +35,26 @@ namespace PihitWise.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(VehicleRequest request)
         {
-            var createdVehicle = await _vehicleService.CreateAsync(GetUserId(), request);
+            var userId = GetUserId();
 
-            return CreatedAtAction(nameof(GetById), new { id = createdVehicle.Id }, createdVehicle);
+            if (!string.IsNullOrWhiteSpace(request.PlateNumber) &&
+                await _vehicleService.PlateExistsAsync(userId, request.PlateNumber, null))
+                    return Conflict(new { message = "You already have a vehicle with this plate." });
+
+            var createdVehicle = await _vehicleService.CreateAsync(GetUserId(), request);
+                return CreatedAtAction(nameof(GetById), new { id = createdVehicle.Id }, createdVehicle);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(Guid id, VehicleRequest request)
         {
-            var updatedVehicle = await _vehicleService.UpdateAsync(GetUserId(), id, request);
+            var userId = GetUserId();
+
+            if(!string.IsNullOrWhiteSpace(request.PlateNumber) &&
+                await _vehicleService.PlateExistsAsync(userId, request.PlateNumber, id))
+                    return Conflict(new { message = "You already have a vehicle with this plate." });
+
+            var updatedVehicle = await _vehicleService.UpdateAsync(userId, id, request);
             
             if (updatedVehicle is null) return NotFound();
             
