@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import AuthLayout, { Field } from '../components/AuthLayout'
 import Icon from '../components/Icon'
 import { login } from '../api/auth'
@@ -19,7 +19,10 @@ export default function LoginPage() {
     const [password, setPassword] = useState('')
     const [remember, setRemember] = useState(false)
     const [errors, setErrors] = useState<LoginErrors>({})
-    const [notice, setNotice] = useState('')
+    const [searchParams] = useSearchParams()
+    const [notice, setNotice] = useState(
+        searchParams.get('expired') ? 'Your session ended. Please log in again.' : ''
+)
 
     const onSubmit = async (e: FormEvent) => {
         e.preventDefault()
@@ -34,7 +37,7 @@ export default function LoginPage() {
             const result = await login(email, password)
             localStorage.setItem('token', result.token)
             navigate('/dashboard', { replace: true })
-        } catch(err) {
+        } catch (err) {
             setNotice((err as Error).message)
         } finally {
             setLoading(false)
