@@ -9,6 +9,7 @@ import Modal from '../components/Modal'
 import { Badge } from '../components/ui'
 import ConfirmDialog from '../components/ConfirmDialog'
 import Toast from '../components/Toast'
+import Icon from '../components/Icon'
 
 interface VehicleErrors { name?: string, brand?: string, model?: string, year?: string, plateNumber?: string, odometer?: string }
 
@@ -149,7 +150,16 @@ export default function GaragePage() {
                 })}
             </div>
 
-            {!loading && vehicles.length === 0 && <p className="text-[13px] text-muted">No vehicles yet.</p>}
+            {!loading && vehicles.length === 0 && (
+                <div className="flex flex-col items-center text-center py-16 border border-dashed border-line rounded-xl">
+                    <div className="w-14 h-14 rounded-full bg-raised flex items-center justify-center mb-4">
+                        <Icon name="bike" size={24} className="text-muted" />
+                    </div>
+                    <div className="text-sm font-medium text-ink">No vehicles yet</div>
+                    <p className="text-xs text-muted mt-1 mb-5">Add your first ride to start tracking it.</p>
+                    {/* your "+ Add vehicle" button here */}
+                </div>
+            )}
 
             <Modal open={showForm} title={editingId ? 'Edit vehicle' : 'Add vehicle'} onClose={() => setShowForm(false)}>
                 <form onSubmit={onSubmit} className="flex flex-col gap-3 mb-4">
