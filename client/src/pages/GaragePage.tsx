@@ -102,26 +102,6 @@ export default function GaragePage() {
         }
     }
 
-
-    function VehicleSkeleton() {
-        return (
-            <div className="h-50 bg-surface border border-line rounded-xl p-5 animate-pulse">
-                {/* name + brand line */}
-                <div className="h-4 w-32 bg-raised rounded mb-2" />
-                <div className="h-3 w-40 bg-raised rounded" />
-
-                {/* odometer */}
-                <div className="h-4 w-24 bg-raised rounded mt-4" />
-
-                {/* buttons */}
-                <div className="flex gap-2 mt-4 pt-4 border-t border-line">
-                    <div className="h-8 w-16 bg-raised rounded-md" />
-                    <div className="h-8 w-16 bg-raised rounded-md" />
-                </div>
-            </div>
-        )
-    }
-
     return (
         <>
             <div className="flex items-start justify-between gap-3">
@@ -240,5 +220,26 @@ export default function GaragePage() {
             <Toast message={toast} onClose={() => setToast('')} />
         </>
 
+    )
+}
+
+
+
+function VehicleSkeleton() {
+    return (
+        <div className="h-50 bg-surface border border-line rounded-xl p-5 animate-pulse">
+            {/* name + brand line */}
+            <div className="h-4 w-32 bg-raised rounded mb-2" />
+            <div className="h-3 w-40 bg-raised rounded" />
+
+            {/* odometer */}
+            <div className="h-4 w-24 bg-raised rounded mt-4" />
+
+            {/* buttons */}
+            <div className="flex gap-2 mt-4 pt-4 border-t border-line">
+                <div className="h-8 w-16 bg-raised rounded-md" />
+                <div className="h-8 w-16 bg-raised rounded-md" />
+            </div>
+        </div>
     )
 }
