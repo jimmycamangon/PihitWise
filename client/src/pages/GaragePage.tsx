@@ -101,11 +101,29 @@ export default function GaragePage() {
             setErrors((err as Error).message)
         }
     }
+
+
+    function VehicleSkeleton() {
+        return (
+            <div className="h-50 bg-surface border border-line rounded-xl p-5 animate-pulse">
+                {/* name + brand line */}
+                <div className="h-4 w-32 bg-raised rounded mb-2" />
+                <div className="h-3 w-40 bg-raised rounded" />
+
+                {/* odometer */}
+                <div className="h-4 w-24 bg-raised rounded mt-4" />
+
+                {/* buttons */}
+                <div className="flex gap-2 mt-4 pt-4 border-t border-line">
+                    <div className="h-8 w-16 bg-raised rounded-md" />
+                    <div className="h-8 w-16 bg-raised rounded-md" />
+                </div>
+            </div>
+        )
+    }
+
     return (
         <>
-            {loading && <p>Loading...</p>}
-            <FormMessage text={errors} />
-
             <div className="flex items-start justify-between gap-3">
                 <PageHeader title="Garage" subtitle="Every vehicle you own, in one place." />
                 <button type="button" onClick={() => { resetForm(); setShowForm(true) }}
@@ -114,7 +132,13 @@ export default function GaragePage() {
                     + Add vehicle
                 </button>
             </div>
-
+            <FormMessage text={errors} />
+            {loading && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <VehicleSkeleton />
+                    <VehicleSkeleton />
+                </div>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {vehicles.map((vehicle) => {
                     return (
@@ -215,5 +239,6 @@ export default function GaragePage() {
             />
             <Toast message={toast} onClose={() => setToast('')} />
         </>
+
     )
 }
