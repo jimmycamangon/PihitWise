@@ -221,10 +221,10 @@ export default function GaragePage() {
                             setFieldErrors({ ...fieldErrors, plateNumber: undefined })
                         }}
                         error={fieldErrors.plateNumber} />
-                    <button type="submit"
+                    <button type="submit" disabled={saving}
                         className="h-10 mt-2 rounded-md bg-accent text-on-accent text-[13px] font-medium
          hover:opacity-90 transition-opacity cursor-pointer">
-                        {editingId ? 'Save changes' : 'Save vehicle'}
+                        {saving ? 'Saving...' : editingId ? 'Save changes' : 'Save vehicle'}
                     </button>
                 </form>
             </Modal>
