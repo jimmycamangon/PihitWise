@@ -1,5 +1,5 @@
 import type { Vehicle, VehicleRequest } from "../types/vehicles";
-
+import { checkSession } from './session'
 
 export async function getVehicles() : Promise<Vehicle[]> {
     const token = localStorage.getItem('token')
@@ -8,6 +8,7 @@ export async function getVehicles() : Promise<Vehicle[]> {
         method: 'GET',
         headers: { Authorization: `Bearer ${token}` },
     })
+    checkSession(response)
     if (!response.ok) {
         throw new Error(await response.text())
     }
@@ -26,6 +27,7 @@ export async function createVehicle(data: VehicleRequest) : Promise<Vehicle> {
         },
         body: JSON.stringify(data),
     })
+    checkSession(response)
     if (!response.ok) {
         throw new Error(await response.text())
     }
@@ -43,6 +45,7 @@ export async function updateVehicle(id: string, data: VehicleRequest) : Promise<
         },
         body: JSON.stringify(data),
     })
+    checkSession(response)
     if (!response.ok) {
         throw new Error(await response.text())
     }
@@ -56,6 +59,7 @@ export async function deleteVehicle(id: string) : Promise<void> {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
     })
+    checkSession(response)
     if (!response.ok) {
         throw new Error(await response.text())
     }

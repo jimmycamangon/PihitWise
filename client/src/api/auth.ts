@@ -1,4 +1,5 @@
 import type { User, LoginResult, Me } from "../types/auth"
+import { checkSession } from './session'
 
 
 export async function register(fullName: string, email: string, password: string) : Promise<User> {
@@ -32,6 +33,7 @@ export async function getMe() : Promise<Me> {
         method: 'GET',
         headers: { Authorization: `Bearer ${token}` },
     })
+    checkSession(response)
     if(!response.ok) {
         throw new Error(await response.text())
     }
