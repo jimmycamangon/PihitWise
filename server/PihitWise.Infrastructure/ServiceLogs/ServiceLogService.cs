@@ -19,15 +19,15 @@ namespace PihitWise.Infrastructure.ServiceLogs
 
         public async Task<List<ServiceLogResponse>?> GetByVehicleAsync(Guid userId, Guid vehicleId)
         {
-            var serviceLogs = await _db.ServiceLogs
-                .Where(sl => sl.Vehicle.UserId == userId && sl.VehicleId == vehicleId)
-                .OrderByDescending(sl => sl.Date)
-                .ToListAsync();
-
             var owns = await _db.Vehicles
                 .AnyAsync(v => v.Id == vehicleId && v.UserId == userId);
 
             if (!owns) return null;
+
+            var serviceLogs = await _db.ServiceLogs
+                .Where(sl => sl.Vehicle.UserId == userId && sl.VehicleId == vehicleId)
+                .OrderByDescending(sl => sl.Date)
+                .ToListAsync();
 
             return serviceLogs.Select(ToResponse).ToList();
         }
