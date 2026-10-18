@@ -12,7 +12,7 @@ namespace PihitWise.Domain.Entities
         public Guid Id { get; set; }
         public int Odometer { get; set; }
         public string Type { get; set; } = string.Empty;
-        public string? Notes { get; set; } = string.Empty;
+        public string? Notes { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }

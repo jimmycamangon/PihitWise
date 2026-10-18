@@ -23,6 +23,12 @@ namespace PihitWise.Infrastructure.ServiceLogs
                 .Where(sl => sl.Vehicle.UserId == userId && sl.VehicleId == vehicleId)
                 .OrderByDescending(sl => sl.Date)
                 .ToListAsync();
+
+            var owns = await _db.Vehicles
+                .AnyAsync(v => v.Id == vehicleId && v.UserId == userId);
+
+            if (!owns) return null;
+
             return serviceLogs.Select(ToResponse).ToList();
         }
 
