@@ -42,19 +42,19 @@ namespace PihitWise.API.Controllers
             return CreatedAtAction(nameof(GetByVehicle), new { vehicleId = vehicleId }, createdServiceLog);
         }
 
-        [HttpPut("vehicles/services/{id}")]
-        public async Task<IActionResult> Update(Guid serviceLogId, ServiceLogRequest request)
+        [HttpPut("services/{id}")]
+        public async Task<IActionResult> Update(Guid id, ServiceLogRequest request)
         {
-            var updatedServiceLog = await _serviceLogService.UpdateAsync(GetUserId(), serviceLogId, request);
+            var updatedServiceLog = await _serviceLogService.UpdateAsync(GetUserId(), id, request);
             if (updatedServiceLog is null)
                 return NotFound();
             return Ok(updatedServiceLog);
         }
 
-        [HttpDelete("vehicles/services/{id}")]
-        public async Task<IActionResult> Delete(Guid serviceLogId)
+        [HttpDelete("services/{id}")]
+        public async Task<IActionResult> Delete(Guid id)
         {
-            var deleted = await _serviceLogService.DeleteAsync(GetUserId(), serviceLogId);
+            var deleted = await _serviceLogService.DeleteAsync(GetUserId(), id);
             if (!deleted)
                 return NotFound();
             return NoContent();
