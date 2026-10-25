@@ -7,6 +7,7 @@ export interface BikeContext {
     bike: Bike
     setBikeId: (id: string) => void
     vehicle: Vehicle | null
+    vehiclesLoading: boolean
     reloadVehicles: () => void
 }
 
