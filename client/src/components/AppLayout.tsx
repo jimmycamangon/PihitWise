@@ -9,6 +9,8 @@ import { bikes } from '../data/mock'
 import type { BikeContext } from '../hooks/useBike'
 import { getMe } from '../api/auth'
 import type { Me } from '../types/auth'
+import { getVehicles } from '../api/vehicles'
+import type { Vehicle } from '../types/vehicles'
 
 
 const navItems: { to: string; label: string; icon: IconName }[] = [
@@ -31,15 +33,35 @@ export default function AppLayout() {
 
     const [bikeId, setBikeId] = useState(bikes[0].id)
     const bike = bikes.find((b) => b.id === bikeId) ?? bikes[0]
-    const context: BikeContext = { bike, setBikeId }
+
+    const [vehicles, setVehicles] = useState<Vehicle[]>([])
+    const [vehicleId, setVehicleId] = useState<string | null>(null)
+
+
+    const reloadVehicles = () => {
+        getVehicles().then((data) => {
+            setVehicles(data)
+            // chosen bike was deleted, or nothing chosen yet? -> pick the first one
+            if (!data.some((v) => v.id === vehicleId)) {
+                setVehicleId(data[0]?.id ?? null)
+            }
+        })
+    }
+
+    const vehicle = vehicles.find((v) => v.id === vehicleId) ?? null
+    const context: BikeContext = { bike, setBikeId, vehicle, reloadVehicles }
+
 
     const bikeSelect = (
-        <select value={bike.id} onChange={(e) => setBikeId(e.target.value)} aria-label="Active bike"
+        <select value={vehicleId ?? ''} onChange={(e) => setVehicleId(e.target.value)} aria-label="Active bike"
             className="w-full h-8 rounded-md border border-line bg-surface px-2 text-xs text-ink
                  outline-none focus:border-accent cursor-pointer">
-            {bikes.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+            {vehicles.map((v) => <option key={v.id} value={v.id}>{v.name}</option>)}
         </select>
     )
+
+    useEffect(() => { reloadVehicles() }, [])
+
 
     useEffect(() => {
         getMe()
@@ -51,7 +73,7 @@ export default function AppLayout() {
         localStorage.removeItem('token')
         navigate('/login', { replace: true })
     }
-    
+
     return (
         <div className="min-h-screen bg-canvas text-ink font-sans antialiased transition-colors duration-300">
 
@@ -91,7 +113,7 @@ export default function AppLayout() {
                     <div className="h-14 flex items-center justify-between gap-3 px-4 md:px-8">
                         <div className="lg:hidden"><Logo /></div>
                         <div className="hidden lg:block text-xs text-muted">
-                            {bike.name} <span className="text-faint">· {bike.plate}</span>
+                            {vehicle?.name} <span className="text-faint">· {vehicle?.plateNumber}</span>
                         </div>
                         <div className="flex items-center gap-2.5">
                             <span className="hidden sm:inline-flex"><Badge>Sample data</Badge></span>

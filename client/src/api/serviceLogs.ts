@@ -15,7 +15,7 @@ export async function getServiceLogs(vehicleId: string): Promise<ServiceLog[]> {
     return response.json()
 }
 
-export async function createServiceLog(vehicleId: string, data: ServiceLogRequest): Promise<ServiceLog[]> {
+export async function createServiceLog(vehicleId: string, data: ServiceLogRequest): Promise<ServiceLog> {
     const token = localStorage.getItem('token')
 
     const response = await fetch(`/api/vehicles/${vehicleId}/services`, {
@@ -54,7 +54,7 @@ export async function updateServiceLog(id: string, data: ServiceLogRequest): Pro
 export async function deleteServiceLog(id: string): Promise<void> {
     const token = localStorage.getItem('token')
 
-    const response = await fetch(`api/service/${id}`, {
+    const response = await fetch(`/api/services/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
     })
