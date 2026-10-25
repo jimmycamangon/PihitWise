@@ -10,6 +10,7 @@ import { Badge } from '../components/ui'
 import ConfirmDialog from '../components/ConfirmDialog'
 import Toast from '../components/Toast'
 import Icon from '../components/Icon'
+import { useBike } from '../hooks/useBike'
 
 interface VehicleErrors { name?: string, brand?: string, model?: string, year?: string, plateNumber?: string, odometer?: string }
 
@@ -32,6 +33,8 @@ export default function GaragePage() {
     const [toast, setToast] = useState('')
 
     const [saving, setSaving] = useState(false)
+
+    const { reloadVehicles } = useBike()
 
     const resetForm = () => {
         setName(''); setBrand(''); setModel('')
@@ -82,6 +85,7 @@ export default function GaragePage() {
             }
             setShowForm(false)
             resetForm()
+            reloadVehicles()
         } catch (err) {
             const msg = err instanceof Error ? err.message : 'Something went wrong.'
             if (msg.includes('plate')) setFieldErrors({ plateNumber: msg })
@@ -108,6 +112,8 @@ export default function GaragePage() {
             await deleteVehicle(id)
             setVehicles(vehicles.filter((v) => v.id !== id))
             setToast('Vehicle deleted')
+
+            reloadVehicles()
         } catch (err) {
             setErrors((err as Error).message)
         }
