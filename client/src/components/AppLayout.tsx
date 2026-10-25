@@ -36,6 +36,7 @@ export default function AppLayout() {
 
     const [vehicles, setVehicles] = useState<Vehicle[]>([])
     const [vehicleId, setVehicleId] = useState<string | null>(null)
+    const [vehiclesLoading, setVehiclesLoading] = useState(true)
 
 
     const reloadVehicles = () => {
@@ -45,17 +46,18 @@ export default function AppLayout() {
             if (!data.some((v) => v.id === vehicleId)) {
                 setVehicleId(data[0]?.id ?? null)
             }
-        })
+        }).finally(() => setVehiclesLoading(false))
     }
 
     const vehicle = vehicles.find((v) => v.id === vehicleId) ?? null
-    const context: BikeContext = { bike, setBikeId, vehicle, reloadVehicles }
+    const context: BikeContext = { bike, setBikeId, vehicle, vehiclesLoading, reloadVehicles }
 
 
     const bikeSelect = (
         <select value={vehicleId ?? ''} onChange={(e) => setVehicleId(e.target.value)} aria-label="Active bike"
             className="w-full h-8 rounded-md border border-line bg-surface px-2 text-xs text-ink
                  outline-none focus:border-accent cursor-pointer">
+            {vehicles.length === 0 && <option value="">{vehiclesLoading ? 'Loading...' : 'No bikes yet'}</option>}
             {vehicles.map((v) => <option key={v.id} value={v.id}>{v.name}</option>)}
         </select>
     )
