@@ -10,7 +10,7 @@ namespace PihitWise.Domain.Entities
         public Guid Id { get; set; }
         public int Odometer { get; set; }
         public decimal Liters { get; set; }
-        public bool isFullTank { get; set; }
+        public bool IsFullTank { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }
