@@ -1,4 +1,4 @@
-import type { FuelLog, FuelLogRequest } from "../types/fuelLogs";
+import type { FuelLog, FuelLogRequest, FuelEconomy } from "../types/fuelLogs";
 import { checkSession } from "./session";
 
 export async function getFuelLogs(vehicleId: string): Promise<FuelLog[]> {
@@ -64,7 +64,7 @@ export async function deleteFuelLog(id: string): Promise<void> {
     }
 }
 
-export async function getFuelEconomy(vehicleId: string): Promise<FuelLog[]> {
+export async function getFuelEconomy(vehicleId: string): Promise<FuelEconomy> {
     const token = localStorage.getItem('token')
 
     const response = await fetch(`/api/vehicles/${vehicleId}/fuel/economy`, {

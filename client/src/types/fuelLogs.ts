@@ -4,7 +4,6 @@ export interface FuelLog {
     date: string
     liters: number
     cost: number
-    shop: string | null
     odometer: number
     isFullTank: boolean
     createdAt: string
@@ -12,7 +11,7 @@ export interface FuelLog {
 
 export interface FuelLogRequest {
     date: string
-    odomoter: number
+    odometer: number
     liters: number
     cost: number
     isFullTank: boolean
