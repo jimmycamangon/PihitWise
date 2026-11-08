@@ -86,11 +86,11 @@ namespace PihitWise.Infrastructure.FuelLogs
                 .AnyAsync(v => v.Id == vehicleId && v.UserId == userId);
             if (!owns) return null;
 
-            // Oldest first: we walk forward in time.
+            // Smallest km first: km only goes up, so a wrong date can't break the math.
             var fuelLogs = await _db.FuelLogs
                 .Where(fl => fl.VehicleId == vehicleId)
-                .OrderBy(fl => fl.Date)
-                .ThenBy(fl => fl.Odometer)
+                .OrderBy(fl => fl.Odometer)
+                .ThenBy(fl => fl.Date)
                 .ToListAsync();
 
             var points = new List<FuelEconomyPoint>();

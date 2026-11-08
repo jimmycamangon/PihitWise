@@ -89,6 +89,15 @@ export default function FuelPage() {
         if (!date) next.date = 'Pick a date.'
         else if (date > today()) next.date = 'The date can\'t be in the future.'
         if (odometer === '' || Number(odometer) < 0) next.odometer = 'Enter the odometer.'
+        else {
+            // km only goes up. Check the new km against the other fill-ups.
+            const newKm = Number(odometer)
+            const others = logs.filter((l) => l.id !== editingId)
+            const before = others.find((l) => l.date < date && l.odometer > newKm)
+            const after = others.find((l) => l.date > date && l.odometer < newKm)
+            if (before) next.odometer = `Lower than your fill-up on ${formatDate(before.date)} (${km(before.odometer)}).`
+            else if (after) next.odometer = `Higher than your fill-up on ${formatDate(after.date)} (${km(after.odometer)}).`
+        }
         if (liters === '' || Number(liters) <= 0) next.liters = 'Enter the liters.'
         else if (Number(liters) > 1000) next.liters = 'That is too many liters.'
         if (cost === '' || Number(cost) < 0) next.cost = 'Enter the cost.'
