@@ -22,6 +22,40 @@ namespace PihitWise.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("PihitWise.Domain.Entities.FuelLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Cost")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<bool>("IsFullTank")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal>("Liters")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("Odometer")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("VehicleId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VehicleId");
+
+                    b.ToTable("FuelLogs");
+                });
+
             modelBuilder.Entity("PihitWise.Domain.Entities.ServiceLog", b =>
                 {
                     b.Property<Guid>("Id")
@@ -126,6 +160,17 @@ namespace PihitWise.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Vehicles");
+                });
+
+            modelBuilder.Entity("PihitWise.Domain.Entities.FuelLog", b =>
+                {
+                    b.HasOne("PihitWise.Domain.Entities.Vehicle", "Vehicle")
+                        .WithMany()
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Vehicle");
                 });
 
             modelBuilder.Entity("PihitWise.Domain.Entities.ServiceLog", b =>

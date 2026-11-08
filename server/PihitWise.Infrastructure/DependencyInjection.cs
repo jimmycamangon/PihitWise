@@ -7,11 +7,13 @@ using PihitWise.Domain.Entities;
 using PihitWise.Application.Auth;
 using PihitWise.Application.Vehicles;
 using PihitWise.Application.ServiceLogs;
+using PihitWise.Application.FuelLogs;
 
 using PihitWise.Infrastructure.Persistence;
 using PihitWise.Infrastructure.Auth;
 using PihitWise.Infrastructure.Vehicles;
 using PihitWise.Infrastructure.ServiceLogs;
+using PihitWise.Infrastructure.FuelLogs;
 
 namespace PihitWise.Infrastructure;
 
@@ -32,6 +34,7 @@ public static class DependencyInjection
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IVehicleService, VehicleService>();
         services.AddScoped<IServiceLogService, ServiceLogService>();
+        services.AddScoped<IFuelLogService, FuelLogService>();
 
         // JWT settings come from the "Jwt" section; Jwt:Key lives in user-secrets.
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
