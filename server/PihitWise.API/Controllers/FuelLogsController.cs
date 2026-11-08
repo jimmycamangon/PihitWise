@@ -19,7 +19,7 @@ namespace PihitWise.API.Controllers
             this.fuelLogService = fuelLogService;
         }
 
-        [HttpGet("vehicles/{vehicleId}/fuels")]
+        [HttpGet("vehicles/{vehicleId}/fuel")]
         public async Task<IActionResult> GetByVehicle(Guid vehicleId)
         {
             var fuelLogs = await fuelLogService.GetByVehicleAsync(GetUserId(), vehicleId);
@@ -36,7 +36,7 @@ namespace PihitWise.API.Controllers
             return Ok(fuelEconomy);
         }
 
-        [HttpPost("vehicles/{vehicleId}/fuels")]
+        [HttpPost("vehicles/{vehicleId}/fuel")]
         public async Task<IActionResult> Create(Guid vehicleId, FuelLogRequest request)
         {
             var createdFuelLog = await fuelLogService.CreateAsync(GetUserId(), vehicleId, request);
@@ -45,7 +45,7 @@ namespace PihitWise.API.Controllers
             return CreatedAtAction(nameof(GetByVehicle), new { vehicleId = vehicleId }, createdFuelLog);
         }
 
-        [HttpPut("fuels/{id}")]
+        [HttpPut("fuel/{id}")]
         public async Task<IActionResult> Update(Guid id, FuelLogRequest request)
         {
             var updatedFuelLog = await fuelLogService.UpdateAsync(GetUserId(), id, request);
@@ -54,7 +54,7 @@ namespace PihitWise.API.Controllers
             return Ok(updatedFuelLog);
         }
 
-        [HttpDelete("fuels/{id}")]
+        [HttpDelete("fuel/{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
             var deleted = await fuelLogService.DeleteAsync(GetUserId(), id);
@@ -63,13 +63,8 @@ namespace PihitWise.API.Controllers
             return NoContent();
         }
 
-        private Guid GetUserId()
-        {
-            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-            if (userIdClaim is null)
-                throw new Exception("User ID claim not found.");
-            return Guid.Parse(userIdClaim.Value);
-        }
+        private Guid GetUserId() =>
+            Guid.Parse(User.FindFirstValue(JwtRegisteredClaimNames.Sub)!);
 
     }
 }
