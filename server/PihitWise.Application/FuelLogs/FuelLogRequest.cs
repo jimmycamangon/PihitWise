@@ -6,8 +6,8 @@ namespace PihitWise.Application.FuelLogs
     (
         DateOnly Date,
         [Range(0, 1000000)] int Odometer,
-        [Range(0, 1000000)] decimal Liters,
+        [Range(0.01, 1000)] decimal Liters,
         [Range(0, 1000000)] decimal Cost,
-        [MaxLength(500)] string? Notes
+        bool IsFullTank
     );
 }

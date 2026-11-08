@@ -10,7 +10,7 @@ namespace PihitWise.Application.FuelLogs
         int Odometer,
         decimal Liters,
         decimal Cost,
-        string? Notes,
+        bool IsFullTank,
         DateTime CreatedAt
     );
     
