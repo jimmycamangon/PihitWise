@@ -80,29 +80,54 @@ namespace PihitWise.Infrastructure.FuelLogs
             return true;
         }
 
-        public async Task<FuelLogResponse> GetEconomyAsync(Guid userId, Guid vehicleId)
+        public async Task<FuelEconomyResponse?> GetEconomyAsync(Guid userId, Guid vehicleId)
         {
             var owns = await _db.Vehicles
                 .AnyAsync(v => v.Id == vehicleId && v.UserId == userId);
             if (!owns) return null;
+
+            // Oldest first: we walk forward in time.
             var fuelLogs = await _db.FuelLogs
-                .Where(fl => fl.Vehicle.UserId == userId && fl.VehicleId == vehicleId)
-                .OrderByDescending(fl => fl.Date)
+                .Where(fl => fl.VehicleId == vehicleId)
+                .OrderBy(fl => fl.Date)
+                .ThenBy(fl => fl.Odometer)
                 .ToListAsync();
-            if (fuelLogs.Count < 2) return null;
-            var totalLiters = fuelLogs.Sum(fl => fl.Liters);
-            var totalDistance = fuelLogs.Max(fl => fl.Odometer) - fuelLogs.Min(fl => fl.Odometer);
-            var economy = totalDistance / totalLiters;
-            return new FuelLogResponse(
-                Guid.Empty,
-                vehicleId,
-                DateOnly.FromDateTime(DateTime.UtcNow),
-                0,
-                totalLiters,
-                0,
-                false,
-                DateTime.UtcNow
-            );
+
+            var points = new List<FuelEconomyPoint>();
+            decimal totalKm = 0;
+            decimal totalLiters = 0;
+
+            FuelLog? lastFull = null;   // the last full tank = start point
+            decimal liters = 0;         // liters added since that start point
+
+            foreach (var log in fuelLogs)
+            {
+                // Liters only count after we have a start point.
+                if (lastFull is not null)
+                    liters += log.Liters;
+
+                if (!log.IsFullTank) continue;
+
+                // Full tank again: km since the last full tank / liters since then.
+                if (lastFull is not null && liters > 0)
+                {
+                    var km = log.Odometer - lastFull.Odometer;
+                    if (km > 0)
+                    {
+                        var kmPerLiter = km / liters;
+                        points.Add(new FuelEconomyPoint(log.Id, log.Date, Math.Round(kmPerLiter, 1)));
+                        totalKm += km;
+                        totalLiters += liters;
+                    }
+                }
+
+                // This full tank is the new start point.
+                lastFull = log;
+                liters = 0;
+            }
+
+            decimal? average = totalLiters > 0 ? Math.Round(totalKm / totalLiters, 1) : null;
+            return new FuelEconomyResponse(average, points);
         }
 
         private static FuelLogResponse ToResponse(FuelLog fuelLog)
