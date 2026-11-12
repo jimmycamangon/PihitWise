@@ -13,4 +13,5 @@ public class AppDbContext : DbContext
     public DbSet<Vehicle> Vehicles => Set<Vehicle>();
     public DbSet<ServiceLog> ServiceLogs => Set<ServiceLog>();
     public DbSet<FuelLog> FuelLogs => Set<FuelLog>();
+    public DbSet<Reminder> Reminders => Set<Reminder>();
 }
