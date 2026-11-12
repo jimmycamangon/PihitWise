@@ -56,6 +56,38 @@ namespace PihitWise.Infrastructure.Migrations
                     b.ToTable("FuelLogs");
                 });
 
+            modelBuilder.Entity("PihitWise.Domain.Entities.Reminder", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateOnly?>("DueDate")
+                        .HasColumnType("date");
+
+                    b.Property<int?>("DueOdometer")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsDone")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("VehicleId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VehicleId");
+
+                    b.ToTable("Reminders");
+                });
+
             modelBuilder.Entity("PihitWise.Domain.Entities.ServiceLog", b =>
                 {
                     b.Property<Guid>("Id")
@@ -163,6 +195,17 @@ namespace PihitWise.Infrastructure.Migrations
                 });
 
             modelBuilder.Entity("PihitWise.Domain.Entities.FuelLog", b =>
+                {
+                    b.HasOne("PihitWise.Domain.Entities.Vehicle", "Vehicle")
+                        .WithMany()
+                        .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Vehicle");
+                });
+
+            modelBuilder.Entity("PihitWise.Domain.Entities.Reminder", b =>
                 {
                     b.HasOne("PihitWise.Domain.Entities.Vehicle", "Vehicle")
                         .WithMany()
