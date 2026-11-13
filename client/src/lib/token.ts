@@ -24,4 +24,6 @@ export function setToken(token: string, remember = isRemembered()) {
 
 export function clearToken() {
     safe(() => { localStorage.removeItem(KEY); sessionStorage.removeItem(KEY) }, undefined)
+    // Forget the offline copy of this rider's data (see public/sw.js), so the next person can't see it.
+    if ('caches' in window) caches.delete('pihitwise-api').catch(() => { })
 }

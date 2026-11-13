@@ -7,6 +7,7 @@ import Logo from './Logo'
 import ThemeToggle from './ThemeToggle'
 import QuickAdd from './QuickAdd'
 import ReminderBell from './ReminderBell'
+import { useOnline } from '../hooks/useOnline'
 import type { BikeContext } from '../hooks/useBike'
 import { getMe } from '../api/auth'
 import type { Me } from '../types/auth'
@@ -32,6 +33,7 @@ const navLink = ({ isActive }: { isActive: boolean }) =>
 export default function AppLayout() {
     const navigate = useNavigate()
     const [me, setMe] = useState<Me | null>(null)
+    const online = useOnline()
 
     const [vehicles, setVehicles] = useState<Vehicle[]>([])
     const [vehicleId, setVehicleId] = useState<string | null>(null)
@@ -66,7 +68,12 @@ export default function AppLayout() {
     useEffect(() => {
         getMe()
             .then((data) => setMe(data))
-            .catch(() => { clearToken(); navigate('/login', { replace: true }) })
+            .catch((err) => {
+                // No signal (fetch itself failed): stay signed in and work from the offline copy.
+                if (err instanceof TypeError) return
+                clearToken()
+                navigate('/login', { replace: true })
+            })
     }, [navigate])
 
     const signOut = () => {
@@ -142,6 +149,13 @@ export default function AppLayout() {
                         <div className="px-4 pb-2.5">{bikeSelect}</div>
                     </div>
                 </header>
+
+                {!online && (
+                    <div role="status" className="flex items-center gap-2 px-4 md:px-8 py-2 border-b border-line bg-raised text-[11px] text-muted">
+                        <Icon name="alert" size={12} className="text-warn" />
+                        You're offline. Showing the last data loaded on this device; saving needs a connection.
+                    </div>
+                )}
 
                 <main className="px-4 md:px-8 py-6 md:py-8 max-w-6xl">
                     <Outlet context={context} />

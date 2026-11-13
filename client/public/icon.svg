@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- PihitWise app icon: the gauge from the in-app logo, on the dark app background. -->
+  <rect width="512" height="512" rx="112" fill="#0a101a"/>
+  <g transform="translate(76.8 84.3) scale(14.93)" fill="none" stroke="#74b4ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3.34 19a10 10 0 1 1 17.32 0"/>
+    <path d="m12 14 4-4"/>
+  </g>
+  <circle cx="256" cy="293.3" r="20" fill="#74b4ff"/>
+</svg>
