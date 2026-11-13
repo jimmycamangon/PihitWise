@@ -56,5 +56,39 @@ namespace PihitWise.Infrastructure.Auth
                 new UserResponse(user.Id, user.FullName, user.Email)
             );
         }
+
+        public async Task<AccountResult> UpdateProfileAsync(Guid userId, UpdateProfileRequest request)
+        {
+            if (await _db.Users.FindAsync(userId) is not User user)
+                return new AccountResult(AccountError.NotFound);
+
+            var email = request.Email.Trim();
+            if (email != user.Email && await _db.Users.AnyAsync(u => u.Email == email && u.Id != userId))
+                return new AccountResult(AccountError.EmailTaken);
+
+            user.FullName = request.FullName.Trim();
+            user.Email = email;
+            await _db.SaveChangesAsync();
+
+            return new AccountResult(AccountError.None, new LoginResponse
+            (
+                _jwtTokenGenerator.GenerateToken(user),
+                new UserResponse(user.Id, user.FullName, user.Email)
+            ));
+        }
+
+        public async Task<AccountError> ChangePasswordAsync(Guid userId, ChangePasswordRequest request)
+        {
+            if (await _db.Users.FindAsync(userId) is not User user || user.PasswordHash is null)
+                return AccountError.NotFound;
+
+            var result = _hasher.VerifyHashedPassword(user, user.PasswordHash, request.CurrentPassword);
+            if (result == PasswordVerificationResult.Failed)
+                return AccountError.WrongPassword;
+
+            user.PasswordHash = _hasher.HashPassword(user, request.NewPassword);
+            await _db.SaveChangesAsync();
+            return AccountError.None;
+        }
     }
 }

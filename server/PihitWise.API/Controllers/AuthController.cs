@@ -54,5 +54,37 @@ namespace PihitWise.API.Controllers
 
             return Ok(new { id, email, name });
         }
+
+        [Authorize]
+        [HttpPut("me")]  // PUT /api/auth/me
+        public async Task<IActionResult> UpdateProfile(UpdateProfileRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.FullName))
+                return BadRequest("Name is required.");
+
+            var result = await _authService.UpdateProfileAsync(GetUserId(), request);
+            return result.Error switch
+            {
+                AccountError.NotFound => NotFound(),
+                AccountError.EmailTaken => BadRequest("Email is already in use."),
+                _ => Ok(result.Login)
+            };
+        }
+
+        [Authorize]
+        [HttpPut("password")]  // PUT /api/auth/password
+        public async Task<IActionResult> ChangePassword(ChangePasswordRequest request)
+        {
+            var error = await _authService.ChangePasswordAsync(GetUserId(), request);
+            return error switch
+            {
+                AccountError.NotFound => NotFound(),
+                AccountError.WrongPassword => BadRequest("Current password is incorrect."),
+                _ => NoContent()
+            };
+        }
+
+        private Guid GetUserId() =>
+            Guid.Parse(User.FindFirstValue(JwtRegisteredClaimNames.Sub)!);
     }
 }

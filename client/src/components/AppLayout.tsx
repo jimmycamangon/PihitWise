@@ -70,7 +70,7 @@ export default function AppLayout() {
         navigate('/login', { replace: true })
     }
 
-    const context: BikeContext = { vehicle, vehicles, vehiclesLoading, reloadVehicles, me, signOut }
+    const context: BikeContext = { vehicle, vehicles, vehiclesLoading, reloadVehicles, me, setMe, signOut }
 
     return (
         <div className="min-h-screen bg-canvas text-ink font-sans antialiased transition-colors duration-300">
