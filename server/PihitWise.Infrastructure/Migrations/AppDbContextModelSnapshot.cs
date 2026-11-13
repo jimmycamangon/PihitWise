@@ -106,6 +106,9 @@ namespace PihitWise.Infrastructure.Migrations
                     b.Property<bool>("IsDone")
                         .HasColumnType("boolean");
 
+                    b.Property<int?>("RepeatEveryKm")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");

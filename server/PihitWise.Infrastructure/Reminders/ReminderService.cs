@@ -37,8 +37,11 @@ namespace PihitWise.Infrastructure.Reminders
                 Id = Guid.NewGuid(),
                 VehicleId = vehicleId,
                 Title = request.Title,
-                DueOdometer = request.DueOdometer,
+                // A repeating reminder with no due km starts from the bike's odometer now.
+                DueOdometer = request.DueOdometer
+                    ?? (request.RepeatEveryKm is int every ? vehicle.Odometer + every : null),
                 DueDate = request.DueDate,
+                RepeatEveryKm = request.RepeatEveryKm,
                 IsDone = false,
                 CreatedAt = DateTime.UtcNow
             };
@@ -54,8 +57,10 @@ namespace PihitWise.Infrastructure.Reminders
                 .FirstOrDefaultAsync(r => r.Id == id && r.Vehicle.UserId == userId);
             if (reminder is null) return null;
             reminder.Title = request.Title;
-            reminder.DueOdometer = request.DueOdometer;
+            reminder.DueOdometer = request.DueOdometer
+                ?? (request.RepeatEveryKm is int every ? reminder.Vehicle.Odometer + every : null);
             reminder.DueDate = request.DueDate;
+            reminder.RepeatEveryKm = request.RepeatEveryKm;
             await _db.SaveChangesAsync();
             return ToResponse(reminder);
         }
@@ -66,7 +71,16 @@ namespace PihitWise.Infrastructure.Reminders
                 .Include(r => r.Vehicle)
                 .FirstOrDefaultAsync(r => r.Id == id && r.Vehicle.UserId == userId);
             if (reminder is null) return null;
-            reminder.IsDone = true;
+            if (reminder.RepeatEveryKm is int every)
+            {
+                // Repeating: the next one is due "every" km from where the bike is now.
+                reminder.DueOdometer = reminder.Vehicle.Odometer + every;
+                reminder.IsDone = false;
+            }
+            else
+            {
+                reminder.IsDone = true;
+            }
             await _db.SaveChangesAsync();
             return ToResponse(reminder);
         }
@@ -105,7 +119,8 @@ namespace PihitWise.Infrastructure.Reminders
                 status,
                 kmLeft,
                 daysLeft,
-                r.CreatedAt
+                r.CreatedAt,
+                r.RepeatEveryKm
                 );
         }
 

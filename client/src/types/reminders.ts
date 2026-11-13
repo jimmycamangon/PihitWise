@@ -11,10 +11,12 @@ export interface Reminder {
     status: ReminderStatus
     kmLeft: number | null
     daysLeft: number | null
+    repeatEveryKm: number | null   // set = marking it done moves it forward instead of closing it
 }
 
 export interface ReminderRequest {
     title: string
     dueOdometer: number | null
     dueDate: string | null
+    repeatEveryKm: number | null
 }

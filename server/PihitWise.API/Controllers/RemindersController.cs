@@ -29,8 +29,8 @@ namespace PihitWise.API.Controllers
         [HttpPost("vehicles/{vehicleId}/reminders")]
         public async Task<IActionResult> Create(Guid vehicleId, ReminderRequest request)
         {
-            if (request.DueOdometer is null && request.DueDate is null)
-                return BadRequest("Set a due km or a due date.");
+            if (request.DueOdometer is null && request.DueDate is null && request.RepeatEveryKm is null)
+                return BadRequest("Set a due km, a due date, or a repeat.");
 
             var createdReminder = await reminderService.CreateAsync(GetUserId(), vehicleId, request);
             if (createdReminder is null)
@@ -41,8 +41,8 @@ namespace PihitWise.API.Controllers
         [HttpPut("reminders/{id}")]
         public async Task<IActionResult> Update(Guid id, ReminderRequest request)
         {
-            if (request.DueOdometer is null && request.DueDate is null)
-                return BadRequest("Set a due km or a due date.");
+            if (request.DueOdometer is null && request.DueDate is null && request.RepeatEveryKm is null)
+                return BadRequest("Set a due km, a due date, or a repeat.");
 
             var updatedReminder = await reminderService.UpdateAsync(GetUserId(), id, request);
             if (updatedReminder is null)

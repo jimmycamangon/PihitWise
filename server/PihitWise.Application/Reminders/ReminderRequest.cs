@@ -7,6 +7,7 @@ namespace PihitWise.Application.Reminders
     (
         [Required, MaxLength(100)] string Title,
         [Range(0, 1000000)] int? DueOdometer,
-        DateOnly? DueDate
+        DateOnly? DueDate,
+        [Range(1, 100000)] int? RepeatEveryKm = null
     );
 }

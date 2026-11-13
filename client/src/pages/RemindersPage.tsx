@@ -17,11 +17,12 @@ interface ReminderErrors { title?: string, due?: string }
 // Ideas for the title box. The rider can still type anything.
 const titleIdeas = ['Oil change', 'CVT cleaning', 'Brake pads', 'Tire change', 'Chain cleaning', 'LTO registration', 'CTPL insurance']
 
-// "Due at 13,000 km · Dec 18, 2026"
+// "Due at 13,000 km · Dec 18, 2026 · every 1,500 km"
 function dueText(r: Reminder) {
     const parts: string[] = []
     if (r.dueOdometer !== null) parts.push(`at ${km(r.dueOdometer)}`)
     if (r.dueDate !== null) parts.push(formatDate(r.dueDate))
+    if (r.repeatEveryKm !== null) parts.push(`every ${km(r.repeatEveryKm)}`)
     return `Due ${parts.join(' · ')}`
 }
  
@@ -40,7 +41,8 @@ export default function RemindersPage() {
     const [title, setTitle] = useState('')
     const [dueOdometer, setDueOdometer] = useState('')
     const [dueDate, setDueDate] = useState('')
- 
+    const [repeatEveryKm, setRepeatEveryKm] = useState('')
+
     const [fieldErrors, setFieldErrors] = useState<ReminderErrors>({})
     const [deleteId, setDeleteId] = useState<string | null>(null)
     const [editingId, setEditingId] = useState<string | null>(null)
@@ -70,7 +72,7 @@ export default function RemindersPage() {
     }
  
     const resetForm = () => {
-        setTitle(''); setDueOdometer(''); setDueDate('')
+        setTitle(''); setDueOdometer(''); setDueDate(''); setRepeatEveryKm('')
         setFieldErrors({})
         setEditingId(null)
     }
@@ -84,8 +86,9 @@ export default function RemindersPage() {
         const next: ReminderErrors = {}
         if (title.trim() === '') next.title = 'Enter a title.'
         else if (title.trim().length > 100) next.title = 'Keep it under 100 letters.'
-        if (dueOdometer === '' && dueDate === '') next.due = 'Set a due km, a due date, or both.'
+        if (dueOdometer === '' && dueDate === '' && repeatEveryKm === '') next.due = 'Set a due km, a due date, or a repeat.'
         else if (dueOdometer !== '' && Number(dueOdometer) < 0) next.due = 'The km can\'t be below 0.'
+        else if (repeatEveryKm !== '' && (Number(repeatEveryKm) < 1 || Number(repeatEveryKm) > 100000)) next.due = 'Repeat every 1 to 100,000 km.'
         setFieldErrors(next)
         if (Object.keys(next).length > 0) return
  
@@ -95,6 +98,7 @@ export default function RemindersPage() {
                 title: title.trim(),
                 dueOdometer: dueOdometer === '' ? null : Number(dueOdometer),
                 dueDate: dueDate === '' ? null : dueDate,
+                repeatEveryKm: repeatEveryKm === '' ? null : Number(repeatEveryKm),
             }
             if (editingId) {
                 await updateReminder(editingId, data)
@@ -118,14 +122,18 @@ export default function RemindersPage() {
         setTitle(r.title)
         setDueOdometer(r.dueOdometer !== null ? String(r.dueOdometer) : '')
         setDueDate(r.dueDate ?? '')
+        setRepeatEveryKm(r.repeatEveryKm !== null ? String(r.repeatEveryKm) : '')
         setFieldErrors({})
         setShowForm(true)
     }
  
     const onDone = async (id: string) => {
         try {
-            await markReminderDone(id)
-            setToast('Marked as done')
+            const updated = await markReminderDone(id)
+            // A repeating reminder stays open with its next due km.
+            setToast(updated.isDone || updated.dueOdometer === null
+                ? 'Marked as done'
+                : `Done · next one at ${km(updated.dueOdometer)}`)
             await reload()
         } catch (err) {
             setErrors(err instanceof Error ? err.message : 'Something went wrong.')
@@ -280,9 +288,21 @@ export default function RemindersPage() {
                                 setFieldErrors({ ...fieldErrors, due: undefined })
                             }} />
                     </div>
+                    <Field label="Repeat every km (optional)" icon="clock" placeholder="1500"
+                        name="repeatEveryKm" type="number" min={1} max={100000}
+                        value={repeatEveryKm}
+                        onChange={(e) => {
+                            setRepeatEveryKm(e.target.value)
+                            setFieldErrors({ ...fieldErrors, due: undefined })
+                        }} />
                     {fieldErrors.due
                         ? <p className="text-[11px] text-warn -mt-1">{fieldErrors.due}</p>
-                        : <p className="text-[11px] text-muted -mt-1">Your bike is at {km(vehicle.odometer)}. Set km, date, or both. The first one reached counts.</p>}
+                        : <p className="text-[11px] text-muted -mt-1">
+                            Your bike is at {km(vehicle.odometer)}. Set km, date, or both. The first one reached counts.
+                            {' '}With a repeat, marking it done sets the next due km from your odometer then
+                            {repeatEveryKm !== '' && dueOdometer === '' && Number(repeatEveryKm) > 0
+                                ? ` (first one due at ${km(vehicle.odometer + Number(repeatEveryKm))}).` : '.'}
+                        </p>}
                     <button type="submit" disabled={saving}
                         className="h-10 mt-2 rounded-md bg-accent text-on-accent text-[13px] font-medium
                              hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-60">
