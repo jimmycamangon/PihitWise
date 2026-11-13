@@ -648,4 +648,19 @@ export const fil: Dictionary = {
     'common.cancel': "Kanselahin",
     'theme.toLight': "Lumipat sa light theme",
     'theme.toDark': "Lumipat sa dark theme",
+
+    // Setup finished summary
+    'setup.doneTitle': "Handa ka na!",
+    'setup.gotIt': "Sige",
+
+    // Setup finished scenario
+    'setup.flowIntro': "Ganito gumagana ang pag-track, hakbang-hakbang:",
+    'setup.flow1': "Sa gasolinahan",
+    'setup.flow1Do': "I-tap ang + Log → Karga. Magpa-full tank at i-tsek ang Full tank.",
+    'setup.flow2': "Sa susunod na full tank",
+    'setup.flow2Do': "I-log ulit sa parehong paraan. Lalabas ang km/L mo sa Dashboard.",
+    'setup.flow3': "Kapag Malapit na ang paalala",
+    'setup.flow3Do': "Magpaserbisyo, i-log sa Maintenance, tapos i-tap ang Tapos na sa paalala.",
+    'setup.flow4': "Katapusan ng buwan",
+    'setup.flow4Do': "Buksan ang Dashboard o Analytics para makita ang nagastos sa motor mo.",
 }

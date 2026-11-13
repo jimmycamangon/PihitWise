@@ -3,7 +3,8 @@ import { useSyncExternalStore } from 'react'
 // First-visit guide state, saved on this device:
 // - welcomeSeen: the one-time welcome pop-up was closed
 // - checklistHidden: the "Get started" card was hidden from the Dashboard (Settings can bring it back)
-interface OnboardingState { welcomeSeen: boolean; checklistHidden: boolean }
+// - doneSeen: the one-time "You're all set" summary was closed
+interface OnboardingState { welcomeSeen: boolean; checklistHidden: boolean; doneSeen: boolean }
 
 const KEY = 'pihitwise-onboarding'
 const listeners = new Set<() => void>()
@@ -13,7 +14,7 @@ function read(): OnboardingState {
     let raw: string | null = null
     try { raw = localStorage.getItem(KEY) } catch { /* storage blocked */ }
     if (cache && cache.raw === raw) return cache.state
-    let state: OnboardingState = { welcomeSeen: false, checklistHidden: false }
+    let state: OnboardingState = { welcomeSeen: false, checklistHidden: false, doneSeen: false }
     try { if (raw) state = { ...state, ...JSON.parse(raw) } } catch { /* ignore bad value */ }
     cache = { raw, state }
     return state
@@ -26,8 +27,9 @@ function write(change: Partial<OnboardingState>) {
 
 export const markWelcomeSeen = () => write({ welcomeSeen: true })
 export const hideChecklist = () => write({ checklistHidden: true })
-/** Brings the guide back: the checklist shows on the Dashboard again. */
-export const showChecklistAgain = () => write({ checklistHidden: false })
+export const markDoneSeen = () => write({ doneSeen: true })
+/** Brings the guide back: the checklist (or the "all set" summary) shows on the Dashboard again. */
+export const showChecklistAgain = () => write({ checklistHidden: false, doneSeen: false })
 
 function subscribe(onChange: () => void) {
     listeners.add(onChange)
