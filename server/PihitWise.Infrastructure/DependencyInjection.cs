@@ -11,6 +11,7 @@ using PihitWise.Application.FuelLogs;
 using PihitWise.Application.Reminders;
 using PihitWise.Application.Expenses;
 using PihitWise.Application.Email;
+using PihitWise.Application.Contact;
 
 using PihitWise.Infrastructure.Persistence;
 using PihitWise.Infrastructure.Auth;
@@ -20,6 +21,7 @@ using PihitWise.Infrastructure.FuelLogs;
 using PihitWise.Infrastructure.Reminders;
 using PihitWise.Infrastructure.Expenses;
 using PihitWise.Infrastructure.Email;
+using PihitWise.Infrastructure.Contact;
 
 namespace PihitWise.Infrastructure;
 
@@ -51,6 +53,7 @@ public static class DependencyInjection
         // Email goes out through Resend; Email:ApiKey lives in user-secrets.
         services.Configure<EmailSettings>(configuration.GetSection(EmailSettings.SectionName));
         services.AddHttpClient<IEmailSender, ResendEmailSender>();
+        services.AddScoped<IContactService, ContactService>();
 
         return services;
     }

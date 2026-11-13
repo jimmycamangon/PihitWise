@@ -3,6 +3,8 @@ import type { FormEvent } from 'react'
 import { Field } from '../components/AuthLayout'
 import Icon from '../components/Icon'
 import PublicLayout from '../components/PublicLayout'
+import { FormMessage } from '../components/ui'
+import { sendContactMessage } from '../api/contact'
 
 interface ContactErrors { name?: string; email?: string; message?: string }
 
@@ -13,19 +15,42 @@ export default function ContactPage() {
     const [email, setEmail] = useState('')
     const [message, setMessage] = useState('')
     const [errors, setErrors] = useState<ContactErrors>({})
-    const [notice, setNotice] = useState('')
+    const [website, setWebsite] = useState('')   // honeypot, hidden from people
+    const [failure, setFailure] = useState('')
+    const [sent, setSent] = useState(false)
+    const [sending, setSending] = useState(false)
 
-    const onSubmit = (e: FormEvent) => {
+    const onSubmit = async (e: FormEvent) => {
         e.preventDefault()
         const next: ContactErrors = {}
         if (!name.trim()) next.name = 'Enter your name.'
         if (!emailPattern.test(email.trim())) next.email = 'Enter a valid email address.'
         if (!message.trim()) next.message = 'Write a message.'
         setErrors(next)
-        if (Object.keys(next).length > 0) return setNotice('')
+        setFailure('')
+        if (Object.keys(next).length > 0) return
 
-        // TODO: send the message once the backend exposes a contact endpoint
-        setNotice('Messages aren\'t connected to the server yet.')
+        setSending(true)
+        try {
+            await sendContactMessage(name.trim(), email.trim(), message.trim(), website)
+            setSent(true)
+            setMessage('')
+        } catch (err) {
+            setFailure(err instanceof Error && err.message ? err.message : 'Your message couldn\'t be sent. Please try again later.')
+        } finally {
+            setSending(false)
+        }
+    }
+
+    if (sent) {
+        return (
+            <PublicLayout eyebrow="Contact" title="Message sent." intro={`Thanks, ${name.trim()}. We'll reply to ${email.trim()}.`}>
+                <button type="button" onClick={() => setSent(false)}
+                    className="text-xs text-accent hover:opacity-80 cursor-pointer">
+                    Send another message
+                </button>
+            </PublicLayout>
+        )
     }
 
     return (
@@ -54,14 +79,19 @@ export default function ContactPage() {
                     {errors.message && <p className="text-[11px] text-warn mt-1.5">{errors.message}</p>}
                 </div>
 
-                <button type="submit"
+                {/* Honeypot: off-screen and skipped by keyboard and screen readers; only bots fill it. */}
+                <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true"
+                    value={website} onChange={(e) => setWebsite(e.target.value)}
+                    className="absolute -left-[9999px] w-px h-px opacity-0" />
+
+                <button type="submit" disabled={sending}
                     className="inline-flex items-center justify-center gap-2 h-10 rounded-md bg-accent text-on-accent
-                         text-[13px] font-medium hover:opacity-90 transition-opacity cursor-pointer">
-                    Send message
-                    <Icon name="arrow" size={14} />
+                         text-[13px] font-medium hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-60">
+                    {sending ? 'Sending...' : 'Send message'}
+                    {!sending && <Icon name="arrow" size={14} />}
                 </button>
 
-                {notice && <p role="status" className="text-[11px] text-muted text-center">{notice}</p>}
+                <FormMessage text={failure} />
             </form>
         </PublicLayout>
     )

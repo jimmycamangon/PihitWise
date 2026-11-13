@@ -19,7 +19,7 @@ public class ResendEmailSender : IEmailSender
         _logger = logger;
     }
 
-    public async Task<bool> SendAsync(string to, string subject, string html, string text)
+    public async Task<bool> SendAsync(string to, string subject, string html, string text, string? replyTo = null)
     {
         if (string.IsNullOrWhiteSpace(_settings.ApiKey))
         {
@@ -30,7 +30,7 @@ public class ResendEmailSender : IEmailSender
 
         using var request = new HttpRequestMessage(HttpMethod.Post, "https://api.resend.com/emails")
         {
-            Content = JsonContent.Create(new { from = _settings.From, to = new[] { to }, subject, html, text })
+            Content = JsonContent.Create(new { from = _settings.From, to = new[] { to }, subject, html, text, reply_to = replyTo })
         };
         request.Headers.Authorization = new("Bearer", _settings.ApiKey);
 
