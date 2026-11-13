@@ -7,6 +7,7 @@ import Toast from '../components/Toast'
 import { Field } from '../components/AuthLayout'
 import { Card, FormMessage, Label, PageHeader } from '../components/ui'
 import { useBike } from '../hooks/useBike'
+import { navStyles, setNavStyle, useNavStyle } from '../lib/navStyle'
 import { changePassword, updateProfile } from '../api/auth'
 
 const MIN_PASSWORD = 8
@@ -33,6 +34,7 @@ const submitButton = `h-10 mt-2 rounded-md bg-accent text-on-accent text-[13px] 
 export default function SettingsPage() {
     const { me, setMe, vehicles, vehiclesLoading, signOut } = useBike()
     const [toast, setToast] = useState('')
+    const navStyle = useNavStyle()
 
     // Edit profile
     const [profileOpen, setProfileOpen] = useState(false)
@@ -140,6 +142,30 @@ export default function SettingsPage() {
                     <Row label="Distance" value="Kilometers" />
                     <Row label="Fuel economy" value="km/L" />
                     <Row label="Theme" value="Use the toggle in the top bar" />
+                </Card>
+
+                <Card title="Navigation on phones" className="lg:col-span-2">
+                    <p className="text-[11px] text-muted mb-3">
+                        How pages are listed on small screens. Saved on this device. Computers always use the sidebar.
+                    </p>
+                    <div role="radiogroup" aria-label="Navigation on phones" className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        {navStyles.map((option) => {
+                            const selected = navStyle === option.value
+                            return (
+                                <button key={option.value} type="button" role="radio" aria-checked={selected}
+                                    onClick={() => setNavStyle(option.value)}
+                                    className={`text-left p-3 rounded-lg border transition-colors cursor-pointer
+                                        ${selected ? 'border-accent bg-accent/10' : 'border-line hover:bg-raised'}`}>
+                                    <div className="flex items-center gap-2">
+                                        <span className={`w-3.5 h-3.5 rounded-full border-2 shrink-0
+                                            ${selected ? 'border-accent bg-accent' : 'border-line'}`} />
+                                        <span className="text-xs font-medium text-ink">{option.label}</span>
+                                    </div>
+                                    <p className="text-[11px] text-muted mt-1.5 leading-relaxed">{option.description}</p>
+                                </button>
+                            )
+                        })}
+                    </div>
                 </Card>
             </div>
 

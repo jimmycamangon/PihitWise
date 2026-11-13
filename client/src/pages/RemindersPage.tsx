@@ -224,37 +224,62 @@ export default function RemindersPage() {
                         </button>
                     </div>
                 ) : (
+                    // Phones: a stacked card (title + status, due, km/days left, then full-width buttons).
+                    // Wider screens: one row with the same details side by side.
                     reminders.map((r) => (
                         <div key={r.id}
-                            className={`flex flex-wrap sm:flex-nowrap items-center gap-3 py-3 border-t border-line first:border-0 first:pt-0 last:pb-0
+                            className={`flex items-start sm:items-center gap-3 py-3.5 border-t border-line first:border-0 first:pt-0 last:pb-0
                                 ${r.isDone ? 'opacity-60' : ''}`}>
                             <div className="w-8 h-8 rounded-md border border-line bg-raised flex items-center justify-center shrink-0 text-accent">
                                 <Icon name={r.isDone ? 'check' : r.dueOdometer !== null ? 'gauge' : 'calendar'} size={14} />
                             </div>
-                            <div className="flex-1 min-w-0">
-                                <div className={`text-xs font-medium text-ink truncate ${r.isDone ? 'line-through' : ''}`}>{r.title}</div>
-                                <div className="text-[11px] text-faint">{dueText(r)}</div>
-                            </div>
-                            {!r.isDone && <div className="hidden sm:block font-mono text-[11px] text-muted">{leftText(r)}</div>}
-                            <Badge tone={statusTone[r.status]}>{statusLabel[r.status]}</Badge>
-                            <div className="flex gap-1.5 ml-auto sm:ml-0">
+
+                            <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center gap-x-3 gap-y-2.5">
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-start justify-between gap-2">
+                                        <div className={`text-[13px] sm:text-xs font-medium text-ink break-words sm:truncate
+                                            ${r.isDone ? 'line-through' : ''}`}>
+                                            {r.title}
+                                        </div>
+                                        <span className="sm:hidden shrink-0">
+                                            <Badge tone={statusTone[r.status]}>{statusLabel[r.status]}</Badge>
+                                        </span>
+                                    </div>
+                                    <div className="text-[11px] text-faint mt-0.5">{dueText(r)}</div>
+                                    {!r.isDone && (
+                                        <div className={`sm:hidden font-mono text-xs mt-1
+                                            ${r.status === 'overdue' ? 'text-warn' : r.status === 'soon' ? 'text-accent' : 'text-muted'}`}>
+                                            {leftText(r)}
+                                        </div>
+                                    )}
+                                </div>
+
                                 {!r.isDone && (
-                                    <button type="button" onClick={() => onDone(r.id)}
-                                        className="h-7 px-2.5 rounded-md border border-line text-[11px] text-ok
-                                             hover:bg-raised transition-colors cursor-pointer">
-                                        Done
-                                    </button>
+                                    <div className="hidden sm:block font-mono text-[11px] text-muted whitespace-nowrap">{leftText(r)}</div>
                                 )}
-                                <button type="button" onClick={() => onEdit(r)}
-                                    className="h-7 px-2.5 rounded-md border border-line text-[11px] text-ink
-                                         hover:bg-raised transition-colors cursor-pointer">
-                                    Edit
-                                </button>
-                                <button type="button" onClick={() => setDeleteId(r.id)}
-                                    className="h-7 px-2.5 rounded-md border border-line text-[11px] text-warn
-                                         hover:bg-raised transition-colors cursor-pointer">
-                                    Delete
-                                </button>
+                                <span className="hidden sm:inline-flex">
+                                    <Badge tone={statusTone[r.status]}>{statusLabel[r.status]}</Badge>
+                                </span>
+
+                                <div className="flex gap-1.5">
+                                    {!r.isDone && (
+                                        <button type="button" onClick={() => onDone(r.id)}
+                                            className="flex-1 sm:flex-none h-8 sm:h-7 px-2.5 rounded-md border border-line text-xs sm:text-[11px] text-ok
+                                                 hover:bg-raised transition-colors cursor-pointer">
+                                            Done
+                                        </button>
+                                    )}
+                                    <button type="button" onClick={() => onEdit(r)}
+                                        className="flex-1 sm:flex-none h-8 sm:h-7 px-2.5 rounded-md border border-line text-xs sm:text-[11px] text-ink
+                                             hover:bg-raised transition-colors cursor-pointer">
+                                        Edit
+                                    </button>
+                                    <button type="button" onClick={() => setDeleteId(r.id)}
+                                        className="flex-1 sm:flex-none h-8 sm:h-7 px-2.5 rounded-md border border-line text-xs sm:text-[11px] text-warn
+                                             hover:bg-raised transition-colors cursor-pointer">
+                                        Delete
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     ))

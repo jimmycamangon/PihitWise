@@ -4,7 +4,7 @@ export default function AboutPage() {
     return (
         <PublicLayout
             eyebrow="About"
-            title="A digital garage for Filipino riders."
+            title="Your digital garage."
             intro="PihitWise helps riders stay organized, informed, and in control of motorcycle ownership — so you can spend less time worrying and more time riding."
         >
             <Section title="Why we built it">

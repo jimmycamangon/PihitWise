@@ -6,7 +6,6 @@ export default function TermsPage() {
         <PublicLayout
             eyebrow="Terms"
             title="Terms of Service"
-            intro="This page is a draft. The final terms will be published here before PihitWise opens for sign-ups."
         >
             <Section title="Using PihitWise">
                 <p>PihitWise is a record-keeping and reminder tool for your motorcycle. You're responsible for the accuracy of what you log.</p>
