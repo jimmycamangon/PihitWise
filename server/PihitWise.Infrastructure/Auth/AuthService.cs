@@ -65,7 +65,7 @@ namespace PihitWise.Infrastructure.Auth
 
             return new LoginResponse
             (
-                _jwtTokenGenerator.GenerateToken(user),
+                _jwtTokenGenerator.GenerateToken(user, request.RememberMe),
                 new UserResponse(user.Id, user.FullName, user.Email)
             );
         }
@@ -85,7 +85,7 @@ namespace PihitWise.Infrastructure.Auth
 
             return new AccountResult(AccountError.None, new LoginResponse
             (
-                _jwtTokenGenerator.GenerateToken(user),
+                _jwtTokenGenerator.GenerateToken(user, request.RememberMe),
                 new UserResponse(user.Id, user.FullName, user.Email)
             ));
         }

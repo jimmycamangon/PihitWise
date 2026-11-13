@@ -1,8 +1,9 @@
+import { getToken } from '../lib/token'
 import type { FuelLog, FuelLogRequest, FuelEconomy } from "../types/fuelLogs";
 import { checkSession } from "./session";
 
 export async function getFuelLogs(vehicleId: string): Promise<FuelLog[]> {
-    const token = localStorage.getItem('token')
+    const token = getToken()
 
     const response = await fetch(`/api/vehicles/${vehicleId}/fuel`, {
         method: 'GET',
@@ -16,7 +17,7 @@ export async function getFuelLogs(vehicleId: string): Promise<FuelLog[]> {
 }
 
 export async function createFuelLog(vehicleId: string, data: FuelLogRequest): Promise<FuelLog> {
-    const token = localStorage.getItem('token')
+    const token = getToken()
 
     const response = await fetch(`/api/vehicles/${vehicleId}/fuel`, {
         method: 'POST',
@@ -34,7 +35,7 @@ export async function createFuelLog(vehicleId: string, data: FuelLogRequest): Pr
 }
 
 export async function updateFuelLog(id: string, data: FuelLogRequest): Promise<FuelLog> {
-    const token = localStorage.getItem('token')
+    const token = getToken()
 
     const response = await fetch(`/api/fuel/${id}`, {
         method: 'PUT',
@@ -52,7 +53,7 @@ export async function updateFuelLog(id: string, data: FuelLogRequest): Promise<F
 }
 
 export async function deleteFuelLog(id: string): Promise<void> {
-    const token = localStorage.getItem('token')
+    const token = getToken()
 
     const response = await fetch(`/api/fuel/${id}`, {
         method: 'DELETE',
@@ -65,7 +66,7 @@ export async function deleteFuelLog(id: string): Promise<void> {
 }
 
 export async function getFuelEconomy(vehicleId: string): Promise<FuelEconomy> {
-    const token = localStorage.getItem('token')
+    const token = getToken()
 
     const response = await fetch(`/api/vehicles/${vehicleId}/fuel/economy`, {
         method: 'GET',

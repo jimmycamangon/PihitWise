@@ -1,3 +1,4 @@
+import { clearToken } from '../lib/token'
 import { useState, useEffect } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import Icon from './Icon'
@@ -65,11 +66,11 @@ export default function AppLayout() {
     useEffect(() => {
         getMe()
             .then((data) => setMe(data))
-            .catch(() => { localStorage.removeItem('token'); navigate('/login', { replace: true }) })
+            .catch(() => { clearToken(); navigate('/login', { replace: true }) })
     }, [navigate])
 
     const signOut = () => {
-        localStorage.removeItem('token')
+        clearToken()
         navigate('/login', { replace: true })
     }
 

@@ -17,7 +17,7 @@ public class JwtTokenGenerator : IJwtTokenGenerator
         _settings = settings.Value;
     }
 
-    public string GenerateToken(User user)
+    public string GenerateToken(User user, bool remember = false)
     {
         // Claims are facts about the user that travel inside the token.
         var claims = new[]
@@ -35,7 +35,9 @@ public class JwtTokenGenerator : IJwtTokenGenerator
             issuer: _settings.Issuer,
             audience: _settings.Audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(_settings.ExpiryMinutes),
+            expires: remember
+                ? DateTime.UtcNow.AddDays(_settings.RememberDays)
+                : DateTime.UtcNow.AddMinutes(_settings.ExpiryMinutes),
             signingCredentials: credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);

@@ -1,8 +1,9 @@
+import { getToken } from '../lib/token'
 import type { ServiceLog, ServiceLogRequest } from "../types/serviceLogs";
 import { checkSession } from "./session";
 
 export async function getServiceLogs(vehicleId: string): Promise<ServiceLog[]> {
-    const token = localStorage.getItem('token')
+    const token = getToken()
 
     const response = await fetch(`/api/vehicles/${vehicleId}/services`, {
         method: 'GET',
@@ -16,7 +17,7 @@ export async function getServiceLogs(vehicleId: string): Promise<ServiceLog[]> {
 }
 
 export async function createServiceLog(vehicleId: string, data: ServiceLogRequest): Promise<ServiceLog> {
-    const token = localStorage.getItem('token')
+    const token = getToken()
 
     const response = await fetch(`/api/vehicles/${vehicleId}/services`, {
         method: 'POST',
@@ -34,7 +35,7 @@ export async function createServiceLog(vehicleId: string, data: ServiceLogReques
 }
 
 export async function updateServiceLog(id: string, data: ServiceLogRequest): Promise<ServiceLog> {
-    const token = localStorage.getItem('token')
+    const token = getToken()
 
     const response = await fetch(`/api/services/${id}`, {
         method: 'PUT',
@@ -52,7 +53,7 @@ export async function updateServiceLog(id: string, data: ServiceLogRequest): Pro
 }
 
 export async function deleteServiceLog(id: string): Promise<void> {
-    const token = localStorage.getItem('token')
+    const token = getToken()
 
     const response = await fetch(`/api/services/${id}`, {
         method: 'DELETE',

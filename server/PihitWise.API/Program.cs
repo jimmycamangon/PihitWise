@@ -7,6 +7,7 @@ using PihitWise.Infrastructure.Auth;
 using PihitWise.Infrastructure.Persistence;
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,6 +46,15 @@ builder.Services.AddCors(options =>
         .WithOrigins("http://localhost:5173")
         .AllowAnyHeader()
         .AllowAnyMethod());
+});
+
+// The public Contact form: at most 5 messages a minute from one address.
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy("contact", context => RateLimitPartition.GetFixedWindowLimiter(
+        context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+        _ => new FixedWindowRateLimiterOptions { PermitLimit = 5, Window = TimeSpan.FromMinutes(1) }));
 });
 
 builder.Services.AddControllers()
@@ -91,6 +101,7 @@ app.UseCors("Client");
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 
 app.MapControllers();
 

@@ -1,3 +1,4 @@
+import { isRemembered, setToken } from '../lib/token'
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import Icon from '../components/Icon'
@@ -78,9 +79,9 @@ export default function SettingsPage() {
         setSavingProfile(true)
         setProfileMessage('')
         try {
-            const result = await updateProfile(name.trim(), email.trim())
+            const result = await updateProfile(name.trim(), email.trim(), isRemembered())
             // The old token still carries the old name and email, so keep the new one.
-            localStorage.setItem('token', result.token)
+            setToken(result.token)
             setMe({ id: result.user.id, name: result.user.fullName, email: result.user.email })
             setProfileOpen(false)
             setToast('Profile updated')

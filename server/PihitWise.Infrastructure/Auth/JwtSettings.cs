@@ -9,4 +9,6 @@ public class JwtSettings
     public string Audience { get; set; } = string.Empty;
     public string Key { get; set; } = string.Empty;
     public int ExpiryMinutes { get; set; } = 60;
+    // How long "Remember me" keeps the rider signed in.
+    public int RememberDays { get; set; } = 30;
 }
