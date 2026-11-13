@@ -6,6 +6,7 @@ import Modal from '../components/Modal'
 import ConfirmDialog from '../components/ConfirmDialog'
 import Toast from '../components/Toast'
 import Icon from '../components/Icon'
+import SyncBadge from '../components/SyncBadge'
 import { createOtherExpense, deleteOtherExpense, getOtherExpenses, updateOtherExpense } from '../api/expenses'
 import { getFuelLogs } from '../api/fuelLogs'
 import { getServiceLogs } from '../api/serviceLogs'
@@ -83,11 +84,11 @@ export default function ExpensesPage() {
         try {
             const request = { label: label.trim(), cost: Number(cost), date, notes: editing?.notes ?? null }
             if (editing) {
-                await updateOtherExpense(editing.id, request)
-                setToast('Expense updated')
+                const saved = await updateOtherExpense(editing.id, request)
+                setToast(saved.pending ? "Saved on this device. It syncs when you're back online." : 'Expense updated')
             } else {
-                await createOtherExpense(vehicle.id, request)
-                setToast('Expense added')
+                const saved = await createOtherExpense(vehicle.id, request)
+                setToast(saved.pending ? "Saved on this device. It syncs when you're back online." : 'Expense added')
             }
             setShowForm(false)
             setSaveError('')
@@ -199,7 +200,7 @@ export default function ExpensesPage() {
                             ? 'No expenses yet. Log a fill-up, a service, or add an expense.'
                             : 'No expenses in this category.'}
                         columns={[
-                            { head: 'Date', cell: (e) => formatDate(e.date) },
+                            { head: 'Date', cell: (e) => <>{formatDate(e.date)}<SyncBadge row={e} /></> },
                             { head: 'Item', cell: (e) => <span className="font-medium">{e.label}</span> },
                             { head: 'Category', cell: (e) => <span className="text-muted">{e.category}</span> },
                             { head: 'Cost', cell: (e) => peso(e.cost), align: 'right', mono: true },

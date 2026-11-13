@@ -6,6 +6,7 @@ import Modal from '../components/Modal'
 import ConfirmDialog from '../components/ConfirmDialog'
 import Toast from '../components/Toast'
 import Icon from '../components/Icon'
+import SyncBadge from '../components/SyncBadge'
 import { useBike } from '../hooks/useBike'
 import { useQuickAdd } from '../hooks/useQuickAdd'
 import { createFuelLog, deleteFuelLog, getFuelEconomy, getFuelLogs, updateFuelLog } from '../api/fuelLogs'
@@ -118,10 +119,10 @@ export default function FuelPage() {
             let saved: FuelLog
             if (editingId) {
                 saved = await updateFuelLog(editingId, data)
-                setToast('Fill-up updated')
+                setToast(saved.pending ? "Saved on this device. It syncs when you're back online." : 'Fill-up updated')
             } else {
                 saved = await createFuelLog(vehicle.id, data)
-                setToast('Fill-up added')
+                setToast(saved.pending ? "Saved on this device. It syncs when you're back online." : 'Fill-up added')
             }
             // Put the saved fill-up in the list, then keep the list newest first.
             const others = logs.filter((l) => l.id !== saved.id)
@@ -249,7 +250,7 @@ export default function FuelPage() {
                         rows={logs}
                         empty="No fill-ups logged yet."
                         columns={[
-                            { head: 'Date', cell: (f) => formatDate(f.date) },
+                            { head: 'Date', cell: (f) => <>{formatDate(f.date)}<SyncBadge row={f} /></> },
                             { head: 'Odometer', cell: (f) => km(f.odometer), align: 'right', mono: true },
                             { head: 'Liters', cell: (f) => f.liters.toFixed(2), align: 'right', mono: true },
                             { head: 'Full', cell: (f) => f.isFullTank ? <span className="text-ok">Yes</span> : <span className="text-faint">No</span> },

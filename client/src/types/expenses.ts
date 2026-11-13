@@ -1,5 +1,7 @@
 // An "Other" expense: anything that is not a fill-up or a service.
-export interface OtherExpense {
+import type { PendingFields } from "../lib/outbox"
+
+export interface OtherExpense extends PendingFields {
     id: string
     vehicleId: string
     date: string

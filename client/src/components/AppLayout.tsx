@@ -1,5 +1,5 @@
 import { clearToken } from '../lib/token'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import Icon from './Icon'
 import type { IconName } from './Icon'
@@ -8,6 +8,7 @@ import ThemeToggle from './ThemeToggle'
 import QuickAdd from './QuickAdd'
 import ReminderBell from './ReminderBell'
 import { useOnline } from '../hooks/useOnline'
+import { clearOutbox, syncOutbox, useOutbox } from '../lib/outbox'
 import type { BikeContext } from '../hooks/useBike'
 import { getMe } from '../api/auth'
 import type { Me } from '../types/auth'
@@ -76,7 +77,36 @@ export default function AppLayout() {
             })
     }, [navigate])
 
+    // Logs made offline wait in the outbox. Send them on start and whenever the signal comes back.
+    const outbox = useOutbox()
+    const waiting = outbox.filter((i) => !i.error).length
+    const refused = outbox.length - waiting
+    const [syncing, setSyncing] = useState(false)
+    const [pageVersion, setPageVersion] = useState(0)
+
+    const sync = () => {
+        setSyncing(true)
+        syncOutbox()
+            .then((sent) => {
+                if (sent === 0) return
+                // Reload the bike (odometer) and the open page so synced logs show their real data.
+                reloadVehicles()
+                setPageVersion((v) => v + 1)
+            })
+            .finally(() => setSyncing(false))
+    }
+    const syncRef = useRef(sync)
+    useEffect(() => { syncRef.current = sync })
+
+    useEffect(() => {
+        if (online) syncRef.current()
+    }, [online])
+
     const signOut = () => {
+        if (outbox.length > 0 && !window.confirm(
+            `${outbox.length} log${outbox.length === 1 ? ' hasn\'t' : 's haven\'t'} synced yet. ` +
+            'Signing out deletes them from this device. Sign out anyway?')) return
+        clearOutbox()
         clearToken()
         navigate('/login', { replace: true })
     }
@@ -151,14 +181,48 @@ export default function AppLayout() {
                 </header>
 
                 {!online && (
-                    <div role="status" className="flex items-center gap-2 px-4 md:px-8 py-2 border-b border-line bg-raised text-[11px] text-muted">
-                        <Icon name="alert" size={12} className="text-warn" />
-                        You're offline. Showing the last data loaded on this device; saving needs a connection.
+                    <div role="status" className="flex items-start gap-3 px-4 md:px-8 py-3 border-b-2 border-warn bg-warn/15">
+                        <Icon name="alert" size={18} className="text-warn shrink-0 mt-px" />
+                        <div className="min-w-0">
+                            <div className="text-[13px] font-semibold text-warn">You're offline</div>
+                            <div className="text-xs text-ink">
+                                Showing the last data loaded on this device. New fill-ups, services and expenses
+                                are saved here and sync when you're back online.
+                                {waiting > 0 && <span className="font-medium"> {waiting} waiting to sync.</span>}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {online && waiting > 0 && (
+                    <div role="status" className="flex items-center gap-3 px-4 md:px-8 py-2.5 border-b-2 border-accent bg-accent/10">
+                        <Icon name="clock" size={16} className="text-accent shrink-0" />
+                        <div className="flex-1 text-xs text-ink">
+                            {syncing ? 'Syncing' : 'Waiting to sync'} {waiting} log{waiting === 1 ? '' : 's'} saved offline…
+                        </div>
+                        {!syncing && (
+                            <button type="button" onClick={sync}
+                                className="h-7 px-3 rounded-md bg-accent text-on-accent text-[11px] font-medium hover:opacity-90 cursor-pointer">
+                                Sync now
+                            </button>
+                        )}
+                    </div>
+                )}
+
+                {refused > 0 && (
+                    <div role="alert" className="flex items-start gap-3 px-4 md:px-8 py-2.5 border-b-2 border-warn bg-warn/10">
+                        <Icon name="alert" size={16} className="text-warn shrink-0 mt-px" />
+                        <div className="text-xs text-ink">
+                            <span className="font-semibold text-warn">
+                                {refused} log{refused === 1 ? '' : 's'} couldn't sync.
+                            </span>{' '}
+                            Look for "Couldn't sync" in Fuel, Maintenance or Expenses, then edit it to try again or delete it.
+                        </div>
                     </div>
                 )}
 
                 <main className="px-4 md:px-8 py-6 md:py-8 max-w-6xl">
-                    <Outlet context={context} />
+                    <Outlet key={pageVersion} context={context} />
                 </main>
             </div>
         </div>

@@ -1,4 +1,6 @@
-export interface ServiceLog {
+import type { PendingFields } from "../lib/outbox"
+
+export interface ServiceLog extends PendingFields {
     id: string
     vehicleId: string
     date: string

@@ -1,4 +1,6 @@
-export interface FuelLog {
+import type { PendingFields } from "../lib/outbox"
+
+export interface FuelLog extends PendingFields {
     id: string
     vehicleId: string
     date: string
