@@ -6,5 +6,7 @@ namespace PihitWise.Application.Auth
         Task<LoginResponse?> LoginAsync(LoginRequest request);
         Task<AccountResult> UpdateProfileAsync(Guid userId, UpdateProfileRequest request);
         Task<AccountError> ChangePasswordAsync(Guid userId, ChangePasswordRequest request);
+        Task RequestPasswordResetAsync(ForgotPasswordRequest request);
+        Task<bool> ResetPasswordAsync(ResetPasswordRequest request);
     }
 }

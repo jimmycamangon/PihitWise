@@ -3,21 +3,34 @@ using PihitWise.Application.Auth;
 using PihitWise.Domain.Entities;
 using PihitWise.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using System.Net;
+using System.Security.Cryptography;
+using System.Text;
+using PihitWise.Application.Email;
+using PihitWise.Infrastructure.Email;
 
 
 namespace PihitWise.Infrastructure.Auth
 {
     public class AuthService : IAuthService
     {
+        private static readonly TimeSpan ResetTokenLifetime = TimeSpan.FromHours(1);
+
         private readonly AppDbContext _db;
         private readonly IPasswordHasher<User> _hasher;
         private readonly IJwtTokenGenerator _jwtTokenGenerator;
+        private readonly IEmailSender _email;
+        private readonly EmailSettings _emailSettings;
 
-        public AuthService(AppDbContext db, IPasswordHasher<User> hasher, IJwtTokenGenerator jwtTokenGenerator)
+        public AuthService(AppDbContext db, IPasswordHasher<User> hasher, IJwtTokenGenerator jwtTokenGenerator,
+            IEmailSender email, IOptions<EmailSettings> emailSettings)
         {
             _db = db;
             _hasher = hasher;
             _jwtTokenGenerator = jwtTokenGenerator;
+            _email = email;
+            _emailSettings = emailSettings.Value;
         }
         public async Task<UserResponse?> RegisterAsync(RegisterRequest request)
         {
@@ -90,5 +103,60 @@ namespace PihitWise.Infrastructure.Auth
             await _db.SaveChangesAsync();
             return AccountError.None;
         }
+
+        public async Task RequestPasswordResetAsync(ForgotPasswordRequest request)
+        {
+            // Unknown emails get the same quiet "ok" so nobody can test which emails have accounts.
+            var email = request.Email.Trim();
+            if (await _db.Users.FirstOrDefaultAsync(u => u.Email == email) is not User user)
+                return;
+
+            var token = ToUrlSafe(RandomNumberGenerator.GetBytes(32));
+            user.PasswordResetTokenHash = Hash(token);
+            user.PasswordResetExpiresAt = DateTime.UtcNow.Add(ResetTokenLifetime);
+            await _db.SaveChangesAsync();
+
+            var link = $"{_emailSettings.ClientUrl.TrimEnd('/')}/reset-password" +
+                $"?email={Uri.EscapeDataString(user.Email)}&token={Uri.EscapeDataString(token)}";
+            var name = WebUtility.HtmlEncode(user.FullName);
+
+            await _email.SendAsync(
+                user.Email,
+                "Reset your PihitWise password",
+                $"<p>Hi {name},</p><p>Someone asked to reset your PihitWise password. " +
+                $"<a href=\"{WebUtility.HtmlEncode(link)}\">Choose a new password</a>.</p>" +
+                "<p>The link works for 1 hour. If it wasn't you, ignore this email and your password stays the same.</p>",
+                $"Hi {user.FullName},\n\nReset your PihitWise password here (works for 1 hour):\n{link}\n\n" +
+                "If it wasn't you, ignore this email and your password stays the same.");
+        }
+
+        public async Task<bool> ResetPasswordAsync(ResetPasswordRequest request)
+        {
+            var email = request.Email.Trim();
+            if (await _db.Users.FirstOrDefaultAsync(u => u.Email == email) is not User user
+                || user.PasswordResetTokenHash is null
+                || user.PasswordResetExpiresAt is null
+                || user.PasswordResetExpiresAt < DateTime.UtcNow)
+                return false;
+
+            var given = Encoding.ASCII.GetBytes(Hash(request.Token));
+            var stored = Encoding.ASCII.GetBytes(user.PasswordResetTokenHash);
+            if (!CryptographicOperations.FixedTimeEquals(given, stored))
+                return false;
+
+            user.PasswordHash = _hasher.HashPassword(user, request.NewPassword);
+            // One use only.
+            user.PasswordResetTokenHash = null;
+            user.PasswordResetExpiresAt = null;
+            await _db.SaveChangesAsync();
+            return true;
+        }
+
+        private static string Hash(string token) =>
+            Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(token)));
+
+        // URL-safe base64 without padding.
+        private static string ToUrlSafe(byte[] bytes) =>
+            Convert.ToBase64String(bytes).TrimEnd('=').Replace('+', '-').Replace('/', '_');
     }
 }

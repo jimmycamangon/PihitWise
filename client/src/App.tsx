@@ -15,6 +15,7 @@ import NotFoundPage from './pages/NotFoundPage'
 import PrivacyPage from './pages/PrivacyPage'
 import RegisterPage from './pages/RegisterPage'
 import RemindersPage from './pages/RemindersPage'
+import ResetPasswordPage from './pages/ResetPasswordPage'
 import SettingsPage from './pages/SettingsPage'
 import TermsPage from './pages/TermsPage'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -30,6 +31,7 @@ export default function App() {
           <Route path="/register" element={<RegisterPage />} />
         </Route>
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/terms" element={<TermsPage />} />
