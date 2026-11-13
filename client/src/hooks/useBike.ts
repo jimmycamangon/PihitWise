@@ -8,6 +8,7 @@ export interface BikeContext {
     vehiclesLoading: boolean
     reloadVehicles: () => void
     me: Me | null
+    setMe: (me: Me) => void
     signOut: () => void
 }
 

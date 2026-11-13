@@ -39,3 +39,30 @@ export async function getMe() : Promise<Me> {
     }
     return response.json()
 }
+
+export async function updateProfile(fullName: string, email: string) : Promise<LoginResult> {
+    const token = localStorage.getItem('token')
+    const response = await fetch('/api/auth/me', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ fullName, email })
+    })
+    checkSession(response)
+    if(!response.ok) {
+        throw new Error(await response.text())
+    }
+    return response.json()
+}
+
+export async function changePassword(currentPassword: string, newPassword: string) : Promise<void> {
+    const token = localStorage.getItem('token')
+    const response = await fetch('/api/auth/password', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ currentPassword, newPassword })
+    })
+    checkSession(response)
+    if(!response.ok) {
+        throw new Error(await response.text())
+    }
+}
