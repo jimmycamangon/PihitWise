@@ -109,9 +109,9 @@ function ActivityRow({ icon, tone, name, sub, time }: ActivityRowProps) {
     )
 }
 
-const btnPrimary = `inline-flex items-center gap-2 rounded-md bg-accent text-on-accent font-medium
+const btnPrimary = `inline-flex items-center justify-center gap-2 rounded-md whitespace-nowrap shrink-0 bg-accent text-on-accent font-medium
     hover:opacity-90 transition-opacity no-underline`
-const btnGhost = `inline-flex items-center gap-2 rounded-md border border-line text-ink font-medium
+const btnGhost = `inline-flex items-center justify-center gap-2 rounded-md whitespace-nowrap shrink-0 border border-line text-ink font-medium
     hover:bg-raised transition-colors no-underline`
 
 // ── Main Component ─────────────────────────────────────────────────────────
@@ -133,7 +133,7 @@ export default function LandingPage() {
 
             {/* ── NAV ─────────────────────────────────────────────────────────── */}
             <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between
-                      px-6 md:px-16 h-14
+                      gap-3 px-4 sm:px-6 md:px-16 h-14
                       backdrop-blur-xl border-b border-line bg-canvas/80
                       transition-colors duration-300">
                 <Logo />
@@ -147,13 +147,13 @@ export default function LandingPage() {
                     ))}
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                     <LanguageToggle />
                     <ThemeToggle />
-                    <Link to="/login" className={`${btnGhost} hidden sm:inline-flex h-8 px-3.5 text-xs`}>
+                    <Link to="/login" className={`${btnGhost} hidden md:inline-flex h-8 px-3.5 text-xs`}>
                         {t('public.signIn')}
                     </Link>
-                    <Link to="/register" className={`${btnPrimary} h-8 px-3.5 text-xs`}>
+                    <Link to="/register" className={`${btnPrimary} h-8 px-3 sm:px-3.5 text-xs`}>
                         {t('public.getStarted')}
                     </Link>
                 </div>

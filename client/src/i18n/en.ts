@@ -646,4 +646,19 @@ export const en = {
     'common.cancel': "Cancel",
     'theme.toLight': "Switch to light theme",
     'theme.toDark': "Switch to dark theme",
+
+    // Setup finished summary
+    'setup.doneTitle': "You're good to go!",
+    'setup.gotIt': "Got it",
+
+    // Setup finished scenario
+    'setup.flowIntro': "Here's how tracking works, step by step:",
+    'setup.flow1': "At the gas station",
+    'setup.flow1Do': "Tap + Log → Fill-up. Fill to full and tick Full tank.",
+    'setup.flow2': "Your next full tank",
+    'setup.flow2Do': "Log it the same way. Your km/L appears on the Dashboard.",
+    'setup.flow3': "When a reminder says Due soon",
+    'setup.flow3Do': "Get the service, log it in Maintenance, then tap Done on the reminder.",
+    'setup.flow4': "End of the month",
+    'setup.flow4Do': "Open the Dashboard or Analytics to see what your bike cost you.",
 }
