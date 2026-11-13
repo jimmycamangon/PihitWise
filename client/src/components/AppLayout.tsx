@@ -17,6 +17,7 @@ const navItems: { to: string; label: string; icon: IconName }[] = [
     { to: '/maintenance', label: 'Maintenance', icon: 'wrench' },
     { to: '/fuel', label: 'Fuel', icon: 'fuel' },
     { to: '/expenses', label: 'Expenses', icon: 'wallet' },
+    { to: '/analytics', label: 'Analytics', icon: 'chart' },
     { to: '/reminders', label: 'Reminders', icon: 'bell' },
     { to: '/settings', label: 'Settings', icon: 'settings' },
 ]
