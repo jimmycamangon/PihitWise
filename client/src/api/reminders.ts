@@ -1,8 +1,9 @@
+import { getToken } from '../lib/token'
 import type { Reminder, ReminderRequest } from "../types/reminders";
 import { checkSession } from "./session";
 
 export async function getReminders(vehicleId: string): Promise<Reminder[]> {
-    const token = localStorage.getItem('token')
+    const token = getToken()
 
     const response = await fetch(`/api/vehicles/${vehicleId}/reminders`, {
         method: 'GET',
@@ -17,7 +18,7 @@ export async function getReminders(vehicleId: string): Promise<Reminder[]> {
 
 
 export async function createReminder(vehicleId: string, data: ReminderRequest): Promise<Reminder> {
-    const token = localStorage.getItem('token')
+    const token = getToken()
 
     const response = await fetch(`/api/vehicles/${vehicleId}/reminders`, {
         method: 'POST',
@@ -35,7 +36,7 @@ export async function createReminder(vehicleId: string, data: ReminderRequest): 
 }
 
 export async function updateReminder(id: string, data: ReminderRequest): Promise<Reminder> {
-    const token = localStorage.getItem('token')
+    const token = getToken()
 
     const response = await fetch(`/api/reminders/${id}`, {
         method: 'PUT',
@@ -54,7 +55,7 @@ export async function updateReminder(id: string, data: ReminderRequest): Promise
 
 
 export async function deleteReminder(id: string): Promise<void> {
-    const token = localStorage.getItem('token')
+    const token = getToken()
 
     const response = await fetch(`/api/reminders/${id}`, {
         method: 'DELETE',
@@ -67,7 +68,7 @@ export async function deleteReminder(id: string): Promise<void> {
 }
 
 export async function markReminderDone(id: string): Promise<Reminder> {
-    const token = localStorage.getItem('token')
+    const token = getToken()
 
     const response = await fetch(`/api/reminders/${id}/done`, {
         method: 'PATCH',

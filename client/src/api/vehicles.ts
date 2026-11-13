@@ -1,8 +1,9 @@
+import { getToken } from '../lib/token'
 import type { Vehicle, VehicleRequest } from "../types/vehicles";
 import { checkSession } from './session'
 
 export async function getVehicles(): Promise<Vehicle[]> {
-    const token = localStorage.getItem('token')
+    const token = getToken()
 
     const response = await fetch('/api/vehicles', {
         method: 'GET',
@@ -17,7 +18,7 @@ export async function getVehicles(): Promise<Vehicle[]> {
 
 
 export async function createVehicle(data: VehicleRequest): Promise<Vehicle> {
-    const token = localStorage.getItem('token')
+    const token = getToken()
 
     const response = await fetch('/api/vehicles', {
         method: 'POST',
@@ -39,7 +40,7 @@ export async function createVehicle(data: VehicleRequest): Promise<Vehicle> {
 }
 
 export async function updateVehicle(id: string, data: VehicleRequest): Promise<Vehicle> {
-    const token = localStorage.getItem('token')
+    const token = getToken()
 
     const response = await fetch(`/api/vehicles/${id}`, {
         method: 'PUT',
@@ -61,7 +62,7 @@ export async function updateVehicle(id: string, data: VehicleRequest): Promise<V
 }
 
 export async function deleteVehicle(id: string): Promise<void> {
-    const token = localStorage.getItem('token')
+    const token = getToken()
 
     const response = await fetch(`/api/vehicles/${id}`, {
         method: 'DELETE',

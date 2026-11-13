@@ -1,3 +1,4 @@
+import { setToken } from '../lib/token'
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
@@ -35,8 +36,8 @@ export default function LoginPage() {
 
         setLoading(true)
         try {
-            const result = await login(email, password)
-            localStorage.setItem('token', result.token)
+            const result = await login(email, password, remember)
+            setToken(result.token, remember)
             navigate('/dashboard', { replace: true })
         } catch (err) {
             setNotice((err as Error).message)

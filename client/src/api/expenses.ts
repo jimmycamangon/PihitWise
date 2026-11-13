@@ -1,8 +1,9 @@
+import { getToken } from '../lib/token'
 import type { OtherExpense, OtherExpenseRequest } from "../types/expenses";
 import { checkSession } from "./session";
 
 export async function getOtherExpenses(vehicleId: string): Promise<OtherExpense[]> {
-    const token = localStorage.getItem('token')
+    const token = getToken()
 
     const response = await fetch(`/api/vehicles/${vehicleId}/expenses`, {
         method: 'GET',
@@ -16,7 +17,7 @@ export async function getOtherExpenses(vehicleId: string): Promise<OtherExpense[
 }
 
 export async function createOtherExpense(vehicleId: string, data: OtherExpenseRequest): Promise<OtherExpense> {
-    const token = localStorage.getItem('token')
+    const token = getToken()
 
     const response = await fetch(`/api/vehicles/${vehicleId}/expenses`, {
         method: 'POST',
@@ -34,7 +35,7 @@ export async function createOtherExpense(vehicleId: string, data: OtherExpenseRe
 }
 
 export async function updateOtherExpense(id: string, data: OtherExpenseRequest): Promise<OtherExpense> {
-    const token = localStorage.getItem('token')
+    const token = getToken()
 
     const response = await fetch(`/api/expenses/${id}`, {
         method: 'PUT',
@@ -52,7 +53,7 @@ export async function updateOtherExpense(id: string, data: OtherExpenseRequest):
 }
 
 export async function deleteOtherExpense(id: string): Promise<void> {
-    const token = localStorage.getItem('token')
+    const token = getToken()
 
     const response = await fetch(`/api/expenses/${id}`, {
         method: 'DELETE',

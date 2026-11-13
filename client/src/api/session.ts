@@ -1,6 +1,7 @@
+import { clearToken } from '../lib/token'
 export function checkSession(response: Response) {
     if (response.status === 401) {
-        localStorage.removeItem('token')
+        clearToken()
         window.location.href = '/login?expired=1'
     }
 }

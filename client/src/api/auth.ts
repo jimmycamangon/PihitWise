@@ -1,3 +1,4 @@
+import { getToken } from '../lib/token'
 import type { User, LoginResult, Me } from "../types/auth"
 import { checkSession } from './session'
 
@@ -14,11 +15,11 @@ export async function register(fullName: string, email: string, password: string
     return response.json()
 }
 
-export async function login(email: string, password: string) : Promise<LoginResult> {
+export async function login(email: string, password: string, rememberMe = false) : Promise<LoginResult> {
     const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password, rememberMe })
     })
     if(!response.ok) {
         throw new Error(await response.text())
@@ -27,7 +28,7 @@ export async function login(email: string, password: string) : Promise<LoginResu
 }
 
 export async function getMe() : Promise<Me> {
-    const token = localStorage.getItem('token')
+    const token = getToken()
     
     const response = await fetch('/api/auth/me', {
         method: 'GET',
@@ -40,12 +41,12 @@ export async function getMe() : Promise<Me> {
     return response.json()
 }
 
-export async function updateProfile(fullName: string, email: string) : Promise<LoginResult> {
-    const token = localStorage.getItem('token')
+export async function updateProfile(fullName: string, email: string, rememberMe = false) : Promise<LoginResult> {
+    const token = getToken()
     const response = await fetch('/api/auth/me', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ fullName, email })
+        body: JSON.stringify({ fullName, email, rememberMe })
     })
     checkSession(response)
     if(!response.ok) {
@@ -55,7 +56,7 @@ export async function updateProfile(fullName: string, email: string) : Promise<L
 }
 
 export async function changePassword(currentPassword: string, newPassword: string) : Promise<void> {
-    const token = localStorage.getItem('token')
+    const token = getToken()
     const response = await fetch('/api/auth/password', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
