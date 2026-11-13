@@ -8,6 +8,7 @@ import Toast from '../components/Toast'
 import Icon from '../components/Icon'
 import SyncBadge from '../components/SyncBadge'
 import { useBike } from '../hooks/useBike'
+import { useT } from '../lib/i18n'
 import { useQuickAdd } from '../hooks/useQuickAdd'
 import { createServiceLog, deleteServiceLog, getServiceLogs, updateServiceLog } from '../api/serviceLogs'
 import type { ServiceLog } from '../types/serviceLogs'
@@ -29,6 +30,7 @@ const today = () => {
 
 export default function MaintenancePage() {
     const { vehicle, vehiclesLoading, reloadVehicles } = useBike()
+    const t = useT()
     const vehicleId = vehicle?.id
 
     const [logs, setLogs] = useState<ServiceLog[]>([])
@@ -77,11 +79,11 @@ export default function MaintenancePage() {
         if (!vehicle) return
 
         const next: ServiceLogErrors = {}
-        if (!date) next.date = 'Pick a date.'
-        else if (date > today()) next.date = 'The date can\'t be in the future.'
-        if (!type.trim()) next.type = 'Enter the service.'
-        if (odometer === '' || Number(odometer) < 0) next.odometer = 'Enter the odometer.'
-        if (cost === '' || Number(cost) < 0) next.cost = 'Enter the cost (0 if free).'
+        if (!date) next.date = t('common.err.date')
+        else if (date > today()) next.date = t('common.err.future')
+        if (!type.trim()) next.type = t('service.err.type')
+        if (odometer === '' || Number(odometer) < 0) next.odometer = t('common.err.odometer')
+        if (cost === '' || Number(cost) < 0) next.cost = t('service.err.cost')
         setFieldErrors(next)
         if (Object.keys(next).length > 0) return
 
@@ -98,10 +100,10 @@ export default function MaintenancePage() {
             let saved: ServiceLog
             if (editingId) {
                 saved = await updateServiceLog(editingId, data)
-                setToast(saved.pending ? "Saved on this device. It syncs when you're back online." : 'Service updated')
+                setToast(saved.pending ? t('common.savedOffline') : t('service.updated'))
             } else {
                 saved = await createServiceLog(vehicle.id, data)
-                setToast(saved.pending ? "Saved on this device. It syncs when you're back online." : 'Service added')
+                setToast(saved.pending ? t('common.savedOffline') : t('service.added'))
             }
             // Put the saved log in the list, then keep the list newest first.
             const others = logs.filter((l) => l.id !== saved.id)
@@ -111,7 +113,7 @@ export default function MaintenancePage() {
             // The API may have raised the bike's odometer. Get the new one.
             reloadVehicles()
         } catch (err) {
-            setErrors(err instanceof Error ? err.message : 'Something went wrong.')
+            setErrors(err instanceof Error ? err.message : t('common.somethingWrong'))
         } finally {
             setSaving(false)
         }
@@ -133,7 +135,7 @@ export default function MaintenancePage() {
         try {
             await deleteServiceLog(id)
             setLogs(logs.filter((l) => l.id !== id))
-            setToast('Service deleted')
+            setToast(t('service.deleted'))
         } catch (err) {
             setErrors((err as Error).message)
         }
@@ -143,7 +145,7 @@ export default function MaintenancePage() {
     if (vehiclesLoading && !vehicle) {
         return (
             <>
-                <PageHeader title="Maintenance" subtitle="Service history of your bike." />
+                <PageHeader title={t('service.title')} subtitle={t('service.subtitle')} />
                 <div className="h-40 bg-surface border border-line rounded-xl animate-pulse" />
             </>
         )
@@ -153,17 +155,17 @@ export default function MaintenancePage() {
     if (!vehicle) {
         return (
             <>
-                <PageHeader title="Maintenance" subtitle="Service history of your bike." />
+                <PageHeader title={t('service.title')} subtitle={t('service.subtitle')} />
                 <div className="flex flex-col items-center text-center py-16 border border-dashed border-line rounded-xl">
                     <div className="w-14 h-14 rounded-full bg-raised flex items-center justify-center mb-4">
                         <Icon name="bike" size={24} className="text-muted" />
                     </div>
-                    <div className="text-sm font-medium text-ink">No bike yet</div>
-                    <p className="text-xs text-muted mt-1 mb-5">Add a bike in your Garage first. Then log its services here.</p>
+                    <div className="text-sm font-medium text-ink">{t('common.noBike')}</div>
+                    <p className="text-xs text-muted mt-1 mb-5">{t('service.noBikeHelp')}</p>
                     <Link to="/garage"
                         className="h-8 px-3.5 inline-flex items-center rounded-md bg-accent text-on-accent text-xs font-medium
                              no-underline hover:opacity-90 transition-opacity">
-                        Go to Garage
+                        {t('common.goToGarage')}
                     </Link>
                 </div>
             </>
@@ -176,23 +178,23 @@ export default function MaintenancePage() {
     return (
         <>
             <div className="flex items-start justify-between gap-3">
-                <PageHeader title="Maintenance" subtitle={`Service history of your ${vehicle.name}.`} />
+                <PageHeader title={t('service.title')} subtitle={t('service.subtitleBike', { bike: vehicle.name })} />
                 <button type="button" onClick={openAdd}
                     className="h-8 px-3.5 rounded-md bg-accent text-on-accent text-xs font-medium
                          hover:opacity-90 transition-opacity cursor-pointer whitespace-nowrap">
-                    + Add service
+                    {t('service.add')}
                 </button>
             </div>
             <FormMessage text={errors} />
 
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-3">
-                <Stat label="Services logged" value={loading ? '…' : String(logs.length)} sub="all time" />
-                <Stat label="Total spent" value={loading ? '…' : peso(totalSpent)} sub="on maintenance" tone="accent" />
-                <Stat label="Last service" value={loading ? '…' : last ? last.type : '—'}
-                    sub={last ? `${formatDate(last.date)} · ${km(Math.max(0, vehicle.odometer - last.odometer))} ago` : undefined} />
+                <Stat label={t('service.logged')} value={loading ? '…' : String(logs.length)} sub={t('service.allTime')} />
+                <Stat label={t('service.totalSpent')} value={loading ? '…' : peso(totalSpent)} sub={t('service.onMaintenance')} tone="accent" />
+                <Stat label={t('service.last')} value={loading ? '…' : last ? last.type : '—'}
+                    sub={last ? t('service.ago', { date: formatDate(last.date), km: km(Math.max(0, vehicle.odometer - last.odometer)) }) : undefined} />
             </div>
 
-            <Card title="Service history">
+            <Card title={t('service.history')}>
                 {loading ? (
                     <div className="flex flex-col gap-2 animate-pulse">
                         <div className="h-8 bg-raised rounded" />
@@ -204,43 +206,43 @@ export default function MaintenancePage() {
                         <div className="w-12 h-12 rounded-full bg-raised flex items-center justify-center mb-3">
                             <Icon name="wrench" size={20} className="text-muted" />
                         </div>
-                        <div className="text-sm font-medium text-ink">No services logged yet</div>
-                        <p className="text-xs text-muted mt-1 mb-4">Log your last oil change to start the history.</p>
+                        <div className="text-sm font-medium text-ink">{t('service.none')}</div>
+                        <p className="text-xs text-muted mt-1 mb-4">{t('service.noneHelp')}</p>
                         <button type="button" onClick={openAdd}
                             className="h-8 px-3.5 rounded-md bg-accent text-on-accent text-xs font-medium
                                  hover:opacity-90 transition-opacity cursor-pointer">
-                            + Add your first service
+                            {t('service.addFirst')}
                         </button>
                     </div>
                 ) : (
                     <DataTable
                         rows={logs}
-                        empty="No services logged yet."
+                        empty={t('service.noneShort')}
                         columns={[
-                            { head: 'Date', cell: (l) => <>{formatDate(l.date)}<SyncBadge row={l} /></> },
+                            { head: t('common.date'), cell: (l) => <>{formatDate(l.date)}<SyncBadge row={l} /></> },
                             {
-                                head: 'Service', cell: (l) => (
+                                head: t('service.service'), cell: (l) => (
                                     <div>
                                         <div className="font-medium">{l.type}</div>
                                         {l.notes && <div className="text-[11px] text-faint max-w-56 truncate">{l.notes}</div>}
                                     </div>
                                 ),
                             },
-                            { head: 'Shop', cell: (l) => <span className="text-muted">{l.shop ?? '—'}</span> },
-                            { head: 'Odometer', cell: (l) => km(l.odometer), align: 'right', mono: true },
-                            { head: 'Cost', cell: (l) => peso(l.cost), align: 'right', mono: true },
+                            { head: t('service.shop'), cell: (l) => <span className="text-muted">{l.shop ?? '—'}</span> },
+                            { head: t('common.odometer'), cell: (l) => km(l.odometer), align: 'right', mono: true },
+                            { head: t('common.cost'), cell: (l) => peso(l.cost), align: 'right', mono: true },
                             {
                                 head: '', align: 'right', cell: (l) => (
                                     <div className="flex justify-end gap-1.5">
                                         <button type="button" onClick={() => onEdit(l)}
                                             className="h-7 px-2.5 rounded-md border border-line text-[11px] text-ink
                                                  hover:bg-raised transition-colors cursor-pointer">
-                                            Edit
+                                            {t('common.edit')}
                                         </button>
                                         <button type="button" onClick={() => setDeleteId(l.id)}
                                             className="h-7 px-2.5 rounded-md border border-line text-[11px] text-warn
                                                  hover:bg-raised transition-colors cursor-pointer">
-                                            Delete
+                                            {t('common.delete')}
                                         </button>
                                     </div>
                                 ),
@@ -250,9 +252,9 @@ export default function MaintenancePage() {
                 )}
             </Card>
 
-            <Modal open={showForm} title={editingId ? 'Edit service' : 'Add service'} onClose={() => setShowForm(false)}>
+            <Modal open={showForm} title={editingId ? t('service.formEdit') : t('service.formAdd')} onClose={() => setShowForm(false)}>
                 <form onSubmit={onSubmit} className="flex flex-col gap-3 mb-4">
-                    <Field label="Service" icon="wrench" placeholder="Oil change" name="type" list="service-types"
+                    <Field label={t('service.service')} icon="wrench" placeholder={t('rem.titlePlaceholder')} name="type" list="service-types"
                         value={type}
                         onChange={(e) => {
                             setType(e.target.value)
@@ -263,14 +265,14 @@ export default function MaintenancePage() {
                         {serviceTypes.map((t) => <option key={t} value={t} />)}
                     </datalist>
                     <div className="grid grid-cols-2 gap-3">
-                        <Field label="Date" icon="calendar" name="date" type="date" max={today()}
+                        <Field label={t('common.date')} icon="calendar" name="date" type="date" max={today()}
                             value={date}
                             onChange={(e) => {
                                 setDate(e.target.value)
                                 setFieldErrors({ ...fieldErrors, date: undefined })
                             }}
                             error={fieldErrors.date} />
-                        <Field label="Odometer (km)" icon="gauge" placeholder="12000" name="odometer" type="number" min={0}
+                        <Field label={t('common.odometerKm')} icon="gauge" placeholder="12000" name="odometer" type="number" min={0}
                             value={odometer}
                             onChange={(e) => {
                                 setOdometer(e.target.value)
@@ -279,19 +281,19 @@ export default function MaintenancePage() {
                             error={fieldErrors.odometer} />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
-                        <Field label="Cost (₱)" icon="wallet" placeholder="350" name="cost" type="number" min={0} step="0.01"
+                        <Field label={t('common.costPeso')} icon="wallet" placeholder="350" name="cost" type="number" min={0} step="0.01"
                             value={cost}
                             onChange={(e) => {
                                 setCost(e.target.value)
                                 setFieldErrors({ ...fieldErrors, cost: undefined })
                             }}
                             error={fieldErrors.cost} />
-                        <Field label="Shop (optional)" icon="tag" placeholder="Motoshop" name="shop" maxLength={100}
+                        <Field label={t('service.shopOptional')} icon="tag" placeholder="Motoshop" name="shop" maxLength={100}
                             value={shop}
                             onChange={(e) => setShop(e.target.value)} />
                     </div>
                     <div>
-                        <label htmlFor="notes" className="block text-[11px] font-medium text-muted mb-1.5">Notes (optional)</label>
+                        <label htmlFor="notes" className="block text-[11px] font-medium text-muted mb-1.5">{t('service.notes')}</label>
                         <textarea id="notes" name="notes" rows={3} maxLength={500} placeholder="Used Motul 10W-40"
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}
@@ -302,16 +304,16 @@ export default function MaintenancePage() {
                     <button type="submit" disabled={saving}
                         className="h-10 mt-2 rounded-md bg-accent text-on-accent text-[13px] font-medium
                              hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-60">
-                        {saving ? 'Saving...' : editingId ? 'Save changes' : 'Save service'}
+                        {saving ? t('common.saving') : editingId ? t('common.saveChanges') : t('service.save')}
                     </button>
                 </form>
             </Modal>
 
             <ConfirmDialog
                 open={deleteId !== null}
-                title="Delete service"
-                message="This service log will be removed. This can't be undone."
-                confirmText="Delete"
+                title={t('service.deleteTitle')}
+                message={t('service.deleteMessage')}
+                confirmText={t('common.delete')}
                 danger
                 onConfirm={() => { onDelete(deleteId!); setDeleteId(null) }}
                 onCancel={() => setDeleteId(null)}

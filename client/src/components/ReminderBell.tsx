@@ -4,6 +4,7 @@ import Icon from './Icon'
 import { getReminders } from '../api/reminders'
 import { dueReminders, leftText, statusLabel } from '../lib/reminders'
 import type { Reminder } from '../types/reminders'
+import { useT } from '../lib/i18n'
 
 /**
  * Bell in the top bar with a count of reminders that are overdue or due soon.
@@ -13,6 +14,7 @@ export default function ReminderBell({ vehicleId }: { vehicleId: string }) {
     const { pathname } = useLocation()
     const [due, setDue] = useState<{ vehicleId: string; items: Reminder[] } | null>(null)
     const [open, setOpen] = useState(false)
+    const t = useT()
     const [check, setCheck] = useState(0)
     const ref = useRef<HTMLDivElement>(null)
 
@@ -50,7 +52,7 @@ export default function ReminderBell({ vehicleId }: { vehicleId: string }) {
     return (
         <div ref={ref} data-tour="bell" className="relative">
             <button type="button" onClick={toggle} aria-haspopup="menu" aria-expanded={open}
-                aria-label={items.length ? `${items.length} reminder${items.length === 1 ? '' : 's'} need attention` : 'Reminders'}
+                aria-label={items.length ? (items.length === 1 ? t('bell.needAttentionOne') : t('bell.needAttention', { count: items.length })) : t('bell.label')}
                 className="relative w-8 h-8 rounded-md border border-line text-muted flex items-center justify-center
                      hover:text-ink hover:bg-raised transition-colors cursor-pointer">
                 <Icon name="bell" size={16} />
@@ -65,7 +67,7 @@ export default function ReminderBell({ vehicleId }: { vehicleId: string }) {
                 <div role="menu"
                     className="absolute right-0 top-full mt-1.5 w-64 p-1 rounded-lg border border-line bg-surface shadow-lg z-50">
                     {items.length === 0
-                        ? <p className="px-2.5 py-3 text-xs text-faint">Nothing due soon.</p>
+                        ? <p className="px-2.5 py-3 text-xs text-faint">{t('bell.nothingDue')}</p>
                         : items.slice(0, 5).map((r) => (
                             <Link key={r.id} to="/reminders" role="menuitem" onClick={() => setOpen(false)}
                                 className="block px-2.5 py-2 rounded-md no-underline hover:bg-raised transition-colors">
@@ -81,7 +83,7 @@ export default function ReminderBell({ vehicleId }: { vehicleId: string }) {
                         ))}
                     <Link to="/reminders" role="menuitem" onClick={() => setOpen(false)}
                         className="flex items-center gap-1 px-2.5 py-2 mt-0.5 border-t border-line text-[11px] text-accent no-underline">
-                        All reminders <Icon name="arrow" size={11} />
+                        {t('bell.all')} <Icon name="arrow" size={11} />
                     </Link>
                 </div>
             )}

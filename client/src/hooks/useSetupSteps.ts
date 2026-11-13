@@ -4,6 +4,7 @@ import { isInstalled } from '../lib/onboarding'
 import type { IconName } from '../components/Icon'
 import type { Vehicle } from '../types/vehicles'
 import { useVehicleData } from './useVehicleData'
+import { useT } from '../lib/i18n'
 
 export interface SetupStep {
     id: string
@@ -24,27 +25,28 @@ const loadCounts = async (vehicleId: string) => {
 /** The "Get started" steps, ticked from the rider's real data. */
 export function useSetupSteps(vehicle: Vehicle | null, vehiclesLoading: boolean) {
     const { data, loading } = useVehicleData(vehicle?.id, loadCounts)
+    const t = useT()
     const hasBike = vehicle !== null
 
     const steps: SetupStep[] = [
         {
-            id: 'bike', title: 'Add your bike', icon: 'bike', done: hasBike, to: '/garage', action: 'Go to Garage',
-            description: 'Its name and the odometer reading on your panel. Everything else is logged against it.',
+            id: 'bike', title: t('setup.bike'), icon: 'bike', done: hasBike, to: '/garage', action: t('setup.bikeAction'),
+            description: t('setup.bikeHelp'),
         },
         {
-            id: 'fill-up', title: 'Log your first fill-up', icon: 'fuel', done: hasBike && (data?.fillUps ?? 0) > 0,
-            to: '/fuel?add=1', action: 'Log a fill-up',
-            description: 'Date, odometer, liters and cost. Two full-tank fill-ups give your first km/L.',
+            id: 'fill-up', title: t('setup.fillUp'), icon: 'fuel', done: hasBike && (data?.fillUps ?? 0) > 0,
+            to: '/fuel?add=1', action: t('setup.fillUpAction'),
+            description: t('setup.fillUpHelp'),
         },
         {
-            id: 'reminder', title: 'Set a reminder', icon: 'bell', done: hasBike && (data?.reminders ?? 0) > 0,
-            to: '/reminders?add=1', action: 'Add a reminder',
-            description: 'For example: oil change every 1,500 km. It counts down as your odometer goes up.',
+            id: 'reminder', title: t('setup.reminder'), icon: 'bell', done: hasBike && (data?.reminders ?? 0) > 0,
+            to: '/reminders?add=1', action: t('setup.reminderAction'),
+            description: t('setup.reminderHelp'),
         },
         {
-            id: 'install', title: 'Install the app on your phone', icon: 'phone', done: isInstalled(), optional: true,
-            to: '/guide#offline', action: 'How to install',
-            description: 'Opens from your home screen and keeps working without signal.',
+            id: 'install', title: t('setup.install'), icon: 'phone', done: isInstalled(), optional: true,
+            to: '/guide#offline', action: t('setup.installAction'),
+            description: t('setup.installHelp'),
         },
     ]
 

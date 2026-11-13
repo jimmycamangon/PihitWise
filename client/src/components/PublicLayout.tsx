@@ -2,10 +2,13 @@ import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import Logo from './Logo'
 import ThemeToggle from './ThemeToggle'
+import LanguageToggle from './LanguageToggle'
+import { useT } from '../lib/i18n'
+import type { TKey } from '../lib/i18n'
 
 interface PublicLayoutProps { eyebrow: string; title: string; intro?: string; children: ReactNode }
 
-const footerLinks = [['About', '/about'], ['Privacy', '/privacy'], ['Terms', '/terms'], ['Contact', '/contact']]
+const footerLinks: [TKey, string][] = [['public.about', '/about'], ['public.privacy', '/privacy'], ['public.terms', '/terms'], ['public.contact', '/contact']]
 
 export function Section({ title, children }: { title: string; children: ReactNode }) {
     return (
@@ -17,22 +20,24 @@ export function Section({ title, children }: { title: string; children: ReactNod
 }
 
 export default function PublicLayout({ eyebrow, title, intro, children }: PublicLayoutProps) {
+    const t = useT()
     return (
         <div className="min-h-screen flex flex-col bg-canvas text-ink font-sans antialiased transition-colors duration-300">
             <nav className="sticky top-0 z-50 flex items-center justify-between px-6 md:px-16 h-14
                       backdrop-blur-xl border-b border-line bg-canvas/80">
                 <Logo />
                 <div className="flex items-center gap-2">
+                    <LanguageToggle />
                     <ThemeToggle />
                     <Link to="/login"
                         className="hidden sm:inline-flex items-center h-8 px-3.5 rounded-md border border-line
                              text-xs font-medium text-ink no-underline hover:bg-raised transition-colors">
-                        Sign in
+                        {t('public.signIn')}
                     </Link>
                     <Link to="/register"
                         className="inline-flex items-center h-8 px-3.5 rounded-md bg-accent text-on-accent
                              text-xs font-medium no-underline hover:opacity-90 transition-opacity">
-                        Get Started
+                        {t('public.getStarted')}
                     </Link>
                 </div>
             </nav>
@@ -48,7 +53,7 @@ export default function PublicLayout({ eyebrow, title, intro, children }: Public
                 <div className="max-w-6xl mx-auto px-6 md:px-16 py-8 flex items-center justify-between flex-wrap gap-5">
                     <div className="flex gap-6 flex-wrap">
                         {footerLinks.map(([label, to]) => (
-                            <Link key={to} to={to} className="text-xs text-muted hover:text-ink transition-colors no-underline">{label}</Link>
+                            <Link key={to} to={to} className="text-xs text-muted hover:text-ink transition-colors no-underline">{t(label)}</Link>
                         ))}
                     </div>
                     <div className="text-[11px] text-faint">© {new Date().getFullYear()} PihitWise</div>

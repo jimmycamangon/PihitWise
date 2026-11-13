@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom'
 import Icon from '../components/Icon'
 import Logo from '../components/Logo'
 import ThemeToggle from '../components/ThemeToggle'
+import LanguageToggle from '../components/LanguageToggle'
+import { t, useT } from '../lib/i18n'
 import type { IconName } from '../components/Icon'
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -50,16 +52,16 @@ function DashBikeCard({ name, sub, odo, kml }: DashBikeCardProps) {
             <div>
                 <div className="flex items-center gap-1.5 mb-2">
                     <span className="w-1 h-1 rounded-full bg-accent" />
-                    <Label>Active ride</Label>
+                    <Label>{t('lp.mock.activeRide')}</Label>
                 </div>
                 <div className="text-sm font-medium text-ink">{name}</div>
                 <div className="text-[11px] text-faint mb-3">{sub}</div>
-                <Label>Odometer</Label>
+                <Label>{t('lp.mock.odometer')}</Label>
                 <div className="font-mono text-lg text-ink tracking-tight mt-0.5">{odo}</div>
             </div>
             <div className="text-right">
                 <div className="font-mono text-xl text-ok tracking-tight">{kml}</div>
-                <Label>km/L avg</Label>
+                <Label>{t('lp.mock.kmlAvg')}</Label>
             </div>
         </div>
     )
@@ -111,10 +113,11 @@ const btnPrimary = `inline-flex items-center gap-2 rounded-md bg-accent text-on-
     hover:opacity-90 transition-opacity no-underline`
 const btnGhost = `inline-flex items-center gap-2 rounded-md border border-line text-ink font-medium
     hover:bg-raised transition-colors no-underline`
-const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
 
 // ── Main Component ─────────────────────────────────────────────────────────
 export default function LandingPage() {
+    useT()   // re-render everything (sub-components too) when the language changes
+    const months = t('lp.months').split(',')
     // Scroll reveal
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -136,7 +139,7 @@ export default function LandingPage() {
                 <Logo />
 
                 <div className="hidden md:flex items-center gap-8">
-                    {['Features', 'Dashboard', 'Mobile'].map((l, i) => (
+                    {[t('lp.nav.features'), t('lp.nav.dashboard'), t('lp.nav.mobile')].map((l, i) => (
                         <a key={l} href={`#${['features', 'showcase', 'mobile'][i]}`}
                             className="text-xs text-muted hover:text-ink transition-colors no-underline">
                             {l}
@@ -145,12 +148,13 @@ export default function LandingPage() {
                 </div>
 
                 <div className="flex items-center gap-2">
+                    <LanguageToggle />
                     <ThemeToggle />
                     <Link to="/login" className={`${btnGhost} hidden sm:inline-flex h-8 px-3.5 text-xs`}>
-                        Sign in
+                        {t('public.signIn')}
                     </Link>
                     <Link to="/register" className={`${btnPrimary} h-8 px-3.5 text-xs`}>
-                        Get Started
+                        {t('public.getStarted')}
                     </Link>
                 </div>
             </nav>
@@ -167,24 +171,21 @@ export default function LandingPage() {
                         {/* Left */}
                         <div className="lp-reveal">
                             <h1 className="font-semibold tracking-tighter leading-[1.08] text-4xl md:text-5xl text-ink mb-5">
-                                Your digital<br />
-                                <span className="text-accent">garage.</span>
+                                {t('lp.hero.title1')}<br />
+                                <span className="text-accent">{t('lp.hero.title2')}</span>
                             </h1>
 
                             <p className="text-sm text-muted leading-relaxed max-w-sm mb-8">
-                                Track <span className="text-ink">maintenance</span>,{' '}
-                                <span className="text-ink">fuel economy</span>,{' '}
-                                <span className="text-ink">expenses</span>, and service
-                                history — all in one modern rider dashboard.
+                                {t('lp.hero.body')}
                             </p>
 
                             <div className="flex items-center gap-2.5 flex-wrap">
                                 <a href="/register" className={`${btnPrimary} h-10 px-5 text-[13px]`}>
-                                    Get started — free
+                                    {t('lp.hero.cta')}
                                     <Icon name="arrow" size={14} />
                                 </a>
                                 <a href="#showcase" className={`${btnGhost} h-10 px-5 text-[13px]`}>
-                                    View dashboard
+                                    {t('lp.hero.view')}
                                 </a>
                             </div>
                         </div>
@@ -201,19 +202,19 @@ export default function LandingPage() {
                                             <div key={c} className="w-2 h-2 rounded-full bg-bar" />
                                         ))}
                                     </div>
-                                    <Label>PihitWise dashboard</Label>
+                                    <Label>{t('lp.mock.dashboard')}</Label>
                                     <div className="w-10" />
                                 </div>
 
                                 <DashBikeCard name="Yamaha NMAX 155" sub="2023 · ABC 1234" odo="12,480 km" kml="42.6" />
 
                                 <div className="grid grid-cols-3 gap-2.5 mb-2.5">
-                                    <StatCard label="This month" value="₱2,840" tone="accent" sub="total spent" />
-                                    <StatCard label="Fuel cost" value="₱68.4" sub="per liter" />
-                                    <StatCard label="Next PMS" value="340 km" tone="warn" sub="remaining" />
+                                    <StatCard label={t('lp.mock.thisMonth')} value="₱2,840" tone="accent" sub={t('lp.mock.totalSpent')} />
+                                    <StatCard label={t('lp.mock.fuelCost')} value="₱68.4" sub={t('lp.mock.perLiter')} />
+                                    <StatCard label={t('lp.mock.nextPms')} value="340 km" tone="warn" sub={t('lp.mock.remaining')} />
                                 </div>
 
-                                <Panel title="Fuel economy — last 6 fill-ups" className="mb-2.5">
+                                <Panel title={t('lp.mock.economyChart')} className="mb-2.5">
                                     <ChartBars
                                         bars={[
                                             { h: '55%' }, { h: '68%' }, { h: '75%', tone: 'ok' },
@@ -223,10 +224,10 @@ export default function LandingPage() {
                                     />
                                 </Panel>
 
-                                <Panel title="Recent activity">
-                                    <ActivityRow icon="fuel" tone="accent" name="Fuel fill-up" sub="12,480 km · 4.2 L · ₱280" time="Today" />
-                                    <ActivityRow icon="wrench" tone="ok" name="Oil change" sub="Moto World QC · ₱380" time="3d ago" />
-                                    <ActivityRow icon="bell" tone="warn" name="PMS reminder" sub="Due in 340 km" time="Auto" />
+                                <Panel title={t('lp.mock.recent')}>
+                                    <ActivityRow icon="fuel" tone="accent" name={t('lp.mock.fillUp')} sub="12,480 km · 4.2 L · ₱280" time={t('lp.mock.today')} />
+                                    <ActivityRow icon="wrench" tone="ok" name={t('lp.mock.oilChange')} sub="Moto World QC · ₱380" time={t('lp.mock.daysAgo', { count: 3 })} />
+                                    <ActivityRow icon="bell" tone="warn" name={t('lp.mock.pmsReminder')} sub={t('lp.mock.dueIn', { km: '340 km' })} time={t('lp.mock.auto')} />
                                 </Panel>
                             </div>
 
@@ -234,16 +235,16 @@ export default function LandingPage() {
                             <div className="absolute -bottom-5 -left-8 bg-surface border border-line
                               rounded-lg px-3.5 py-2.5 shadow-xl
                               animate-[float_4s_ease-in-out_infinite_0.5s]">
-                                <Label>Monthly savings</Label>
+                                <Label>{t('lp.mock.savings')}</Label>
                                 <div className="font-mono text-sm text-ok mt-1">+₱620</div>
-                                <div className="text-[10px] text-faint">vs last month</div>
+                                <div className="text-[10px] text-faint">{t('lp.mock.vsLast')}</div>
                             </div>
                             <div className="absolute -top-6 -right-6 bg-surface border border-line
                               rounded-lg px-3.5 py-2.5 shadow-xl
                               animate-[float_4s_ease-in-out_infinite_1.5s]">
-                                <Label>Next oil change</Label>
+                                <Label>{t('lp.mock.nextOil')}</Label>
                                 <div className="font-mono text-sm text-accent mt-1">340 km</div>
-                                <div className="text-[10px] text-faint">PMS reminder</div>
+                                <div className="text-[10px] text-faint">{t('lp.mock.pmsReminder')}</div>
                             </div>
                         </div>
                     </div>
@@ -254,10 +255,10 @@ export default function LandingPage() {
             <div className="border-t border-b border-line bg-surface py-7">
                 <div className="max-w-6xl mx-auto px-6 md:px-16">
                     <div className="flex items-center justify-center gap-x-9 gap-y-3 flex-wrap">
-                        {['Track every kilometer', 'Never miss maintenance again', 'Free to get started', 'Mobile-first experience', 'Works offline'].map((t) => (
-                            <div key={t} className="flex items-center gap-2 text-xs text-muted">
+                        {[t('lp.strip.km'), t('lp.strip.never'), t('lp.strip.free'), t('lp.strip.mobile'), t('lp.strip.offline')].map((item) => (
+                            <div key={item} className="flex items-center gap-2 text-xs text-muted">
                                 <span className="w-1 h-1 rounded-full bg-accent shrink-0" />
-                                {t}
+                                {item}
                             </div>
                         ))}
                     </div>
@@ -268,22 +269,22 @@ export default function LandingPage() {
             <section id="problem" className="py-24">
                 <div className="max-w-6xl mx-auto px-6 md:px-16">
                     <div className="lp-reveal">
-                        <Eyebrow>The problem</Eyebrow>
+                        <Eyebrow>{t('lp.problem.eyebrow')}</Eyebrow>
                         <h2 className="font-semibold tracking-tight text-2xl md:text-3xl text-ink mb-3">
-                            Motorcycle ownership<br />gets messy.
+                            {t('lp.problem.title1')}<br />{t('lp.problem.title2')}
                         </h2>
                         <p className="text-sm text-muted max-w-md leading-relaxed mb-12">
-                            Most riders rely on memory, receipts, and group chats to manage their bikes. There's a better way.
+                            {t('lp.problem.body')}
                         </p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-line border border-line rounded-xl overflow-hidden lp-reveal"
                         style={{ transitionDelay: '.1s' }}>
                         {([
-                            { icon: 'clock', title: 'Forgotten PMS', desc: 'Missed oil changes and maintenance schedules slowly damage your engine without you even noticing.' },
-                            { icon: 'wallet', title: 'No expense visibility', desc: 'No idea how much your motorcycle actually costs you per month — fuel, parts, and repairs add up fast.' },
-                            { icon: 'file', title: 'Scattered records', desc: 'Maintenance history buried in receipts and chats. No clean record when it\'s time to sell your bike.' },
-                            { icon: 'fuel', title: 'Invisible fuel trends', desc: 'Fuel economy changes go unnoticed. A slow drop in km/L can signal engine issues before they get serious.' },
+                            { icon: 'clock', title: t('lp.problem.pmsTitle'), desc: t('lp.problem.pms') },
+                            { icon: 'wallet', title: t('lp.problem.expenseTitle'), desc: t('lp.problem.expense') },
+                            { icon: 'file', title: t('lp.problem.recordsTitle'), desc: t('lp.problem.records') },
+                            { icon: 'fuel', title: t('lp.problem.fuelTitle'), desc: t('lp.problem.fuel') },
                         ] as { icon: IconName; title: string; desc: string }[]).map((p) => (
                             <div key={p.title} className="p-7 bg-surface hover:bg-raised transition-colors">
                                 <Icon name={p.icon} size={18} className="text-accent mb-4" />
@@ -299,21 +300,21 @@ export default function LandingPage() {
             <section id="features" className="py-24 bg-surface border-t border-b border-line">
                 <div className="max-w-6xl mx-auto px-6 md:px-16">
                     <div className="lp-reveal">
-                        <Eyebrow>Features</Eyebrow>
+                        <Eyebrow>{t('lp.features.eyebrow')}</Eyebrow>
                         <h2 className="font-semibold tracking-tight text-2xl md:text-3xl text-ink mb-3">
-                            Everything organized<br />in one place.
+                            {t('lp.features.title1')}<br />{t('lp.features.title2')}
                         </h2>
                         <p className="text-sm text-muted max-w-md leading-relaxed mb-12">
-                            PihitWise brings your entire motorcycle ownership experience into a single intelligent dashboard.
+                            {t('lp.features.body')}
                         </p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lp-reveal" style={{ transitionDelay: '.1s' }}>
                         {([
-                            { num: '01', icon: 'wrench', title: 'Maintenance Tracking', desc: 'Log and track every service — oil changes, CVT cleaning, brake replacements, tire swaps, and more. Your full service history, always accessible.', tags: ['Oil change', 'CVT cleaning', 'Brakes', 'Tires'] },
-                            { num: '02', icon: 'fuel', title: 'Fuel Analytics', desc: 'Log every fill-up and watch your km/L trend over time. Spot fuel economy drops early. Know exactly how much you\'re spending on fuel per month.', tags: ['km/L tracking', 'Monthly reports', 'Trend charts'] },
-                            { num: '03', icon: 'bell', title: 'Smart Reminders', desc: 'Set reminders by date or by odometer. Get notified before your PMS, LTO registration, and insurance lapse — so you never get caught off guard again.', tags: ['Date-based', 'km-based', 'LTO renewal'] },
-                            { num: '04', icon: 'chart', title: 'Ownership Insights', desc: 'Understand your real total cost of ownership. Monthly expense breakdowns, service history timelines, and resale-ready records all in one place.', tags: ['Expense breakdown', 'History export', 'Resale docs'] },
+                            { num: '01', icon: 'wrench', title: t('lp.f1.title'), desc: t('lp.f1.desc'), tags: t('lp.f1.tags').split(',') },
+                            { num: '02', icon: 'fuel', title: t('lp.f2.title'), desc: t('lp.f2.desc'), tags: t('lp.f2.tags').split(',') },
+                            { num: '03', icon: 'bell', title: t('lp.f3.title'), desc: t('lp.f3.desc'), tags: t('lp.f3.tags').split(',') },
+                            { num: '04', icon: 'chart', title: t('lp.f4.title'), desc: t('lp.f4.desc'), tags: t('lp.f4.tags').split(',') },
                         ] as { num: string; icon: IconName; title: string; desc: string; tags: string[] }[]).map((f) => (
                             <div key={f.num}
                                 className="bg-canvas border border-line rounded-xl p-7
@@ -325,10 +326,10 @@ export default function LandingPage() {
                                 <div className="font-medium text-sm text-ink mb-1.5">{f.title}</div>
                                 <div className="text-[13px] text-muted leading-relaxed mb-5">{f.desc}</div>
                                 <div className="flex flex-wrap gap-1.5">
-                                    {f.tags.map((t) => (
-                                        <span key={t}
+                                    {f.tags.map((tag) => (
+                                        <span key={tag}
                                             className="px-2 py-0.5 rounded-full border border-line text-[10px] text-muted">
-                                            {t}
+                                            {tag}
                                         </span>
                                     ))}
                                 </div>
@@ -347,15 +348,15 @@ export default function LandingPage() {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
                         <div className="lp-reveal">
-                            <Eyebrow>Dashboard</Eyebrow>
+                            <Eyebrow>{t('lp.showcase.eyebrow')}</Eyebrow>
                             <h2 className="font-semibold tracking-tight text-2xl md:text-3xl text-ink mb-3">
-                                The dashboard<br />is the product.
+                                {t('lp.showcase.title1')}<br />{t('lp.showcase.title2')}
                             </h2>
                             <p className="text-sm text-muted leading-relaxed max-w-md mb-7">
-                                A premium analytics experience designed specifically for motorcycle riders — not a generic tracker. Real intelligence, clean design.
+                                {t('lp.showcase.body')}
                             </p>
                             <div className="flex flex-col gap-2.5">
-                                {['Real-time odometer and km/L tracking', 'Monthly fuel and expense breakdowns', 'Upcoming maintenance at a glance', 'Full activity timeline for every bike', 'Multi-bike garage support'].map((item) => (
+                                {t('lp.showcase.list').split('|').map((item) => (
                                     <div key={item} className="flex items-center gap-2.5 text-[13px] text-muted">
                                         <Icon name="check" size={14} className="text-accent shrink-0" />
                                         {item}
@@ -369,11 +370,11 @@ export default function LandingPage() {
                             style={{ transitionDelay: '.15s' }}>
                             <DashBikeCard name="Honda ADV 160" sub="2022 · XYZ 5678" odo="8,220 km" kml="38.4" />
                             <div className="grid grid-cols-3 gap-2.5 mb-2.5">
-                                <StatCard label="Spent (Jun)" value="₱3,120" tone="accent" />
-                                <StatCard label="Avg km/L" value="38.4" tone="ok" />
-                                <StatCard label="Next PMS" value="780 km" tone="warn" />
+                                <StatCard label={t('lp.mock.spentJun')} value="₱3,120" tone="accent" />
+                                <StatCard label={t('lp.mock.avgKml')} value="38.4" tone="ok" />
+                                <StatCard label={t('lp.mock.nextPms')} value="780 km" tone="warn" />
                             </div>
-                            <Panel title="6-month expense breakdown" className="mb-2.5">
+                            <Panel title={t('lp.mock.expenseChart')} className="mb-2.5">
                                 <ChartBars
                                     bars={[
                                         { h: '40%' }, { h: '60%' }, { h: '55%' },
@@ -382,9 +383,9 @@ export default function LandingPage() {
                                     labels={months}
                                 />
                             </Panel>
-                            <Panel title="Maintenance timeline">
-                                <ActivityRow icon="wrench" tone="ok" name="CVT cleaning" sub="8,000 km · Shop Moto Cubao" time="2w ago" />
-                                <ActivityRow icon="fuel" tone="accent" name="Fuel fill-up" sub="8,220 km · 3.8 L · ₱260" time="5d ago" />
+                            <Panel title={t('lp.mock.timeline')}>
+                                <ActivityRow icon="wrench" tone="ok" name={t('lp.mock.cvt')} sub="8,000 km · Shop Moto Cubao" time={t('lp.mock.weeksAgo', { count: 2 })} />
+                                <ActivityRow icon="fuel" tone="accent" name={t('lp.mock.fillUp')} sub="8,220 km · 3.8 L · ₱260" time={t('lp.mock.daysAgo', { count: 5 })} />
                             </Panel>
                         </div>
                     </div>
@@ -414,16 +415,16 @@ export default function LandingPage() {
                                     </div>
                                     <div className="grid grid-cols-2 gap-1.5 mb-1.5">
                                         <div className="bg-raised rounded-lg p-2">
-                                            <div className="text-[8px] text-faint mb-0.5">This month</div>
+                                            <div className="text-[8px] text-faint mb-0.5">{t('lp.mock.thisMonth')}</div>
                                             <div className="font-mono text-xs text-accent">₱2,840</div>
                                         </div>
                                         <div className="bg-raised rounded-lg p-2">
-                                            <div className="text-[8px] text-faint mb-0.5">Avg km/L</div>
+                                            <div className="text-[8px] text-faint mb-0.5">{t('lp.mock.avgKml')}</div>
                                             <div className="font-mono text-xs text-ok">42.6</div>
                                         </div>
                                     </div>
                                     <div className="bg-raised rounded-lg p-2 mb-1.5">
-                                        <div className="text-[8px] text-faint mb-1.5">Fuel trend</div>
+                                        <div className="text-[8px] text-faint mb-1.5">{t('lp.mock.fuelTrend')}</div>
                                         <div className="flex items-end gap-1 h-8">
                                             {([{ h: '50%' }, { h: '65%' }, { h: '80%', tone: 'ok' }, { h: '60%' }, { h: '90%', tone: 'ok' }, { h: '75%', tone: 'accent' }] as Bar[]).map((b, i) => (
                                                 <div key={i} className={`flex-1 rounded-sm ${barBg[b.tone ?? 'dim']}`} style={{ height: b.h }} />
@@ -433,8 +434,8 @@ export default function LandingPage() {
                                     <div className="flex items-center gap-2 p-2 rounded-lg border border-warn/25 bg-warn/8">
                                         <Icon name="alert" size={13} className="text-warn shrink-0" />
                                         <div>
-                                            <div className="text-[9px] font-medium text-ink">PMS due in 340 km</div>
-                                            <div className="text-[8px] text-faint">Oil change reminder</div>
+                                            <div className="text-[9px] font-medium text-ink">{t('lp.mock.pmsDue', { km: '340 km' })}</div>
+                                            <div className="text-[8px] text-faint">{t('lp.mock.oilReminder')}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -442,19 +443,19 @@ export default function LandingPage() {
                         </div>
 
                         <div className="lp-reveal" style={{ transitionDelay: '.15s' }}>
-                            <Eyebrow>Mobile first</Eyebrow>
+                            <Eyebrow>{t('lp.mobile.eyebrow')}</Eyebrow>
                             <h2 className="font-semibold tracking-tight text-2xl md:text-3xl text-ink mb-3">
-                                Your garage,<br />on the go.
+                                {t('lp.mobile.title1')}<br />{t('lp.mobile.title2')}
                             </h2>
                             <p className="text-sm text-muted leading-relaxed max-w-md mb-7">
-                                Log a fill-up in under a minute. Check your next PMS at a stoplight. PihitWise is designed for how riders actually use their phones.
+                                {t('lp.mobile.body')}
                             </p>
                             <div className="flex flex-col border-t border-line">
                                 {([
-                                    { icon: 'zap', title: '1-minute logging', desc: 'Log fuel and maintenance fast. No friction, no long forms.' },
-                                    { icon: 'phone', title: 'Responsive dashboard', desc: 'Full analytics on any screen — phone, tablet, or desktop.' },
-                                    { icon: 'bell', title: 'Smart notifications', desc: 'PMS and registration alerts before they\'re overdue.' },
-                                    { icon: 'wifiOff', title: 'Works offline', desc: 'Lost signal on a long ride? Log fill-ups, services and expenses anyway. They sync by themselves when you\'re back online.' },
+                                    { icon: 'zap', title: t('lp.m1.title'), desc: t('lp.m1.desc') },
+                                    { icon: 'phone', title: t('lp.m2.title'), desc: t('lp.m2.desc') },
+                                    { icon: 'bell', title: t('lp.m3.title'), desc: t('lp.m3.desc') },
+                                    { icon: 'wifiOff', title: t('lp.m4.title'), desc: t('lp.m4.desc') },
                                 ] as { icon: IconName; title: string; desc: string }[]).map((f) => (
                                     <div key={f.title} className="flex gap-3.5 items-start py-4 border-b border-line">
                                         <Icon name={f.icon} size={16} className="text-accent shrink-0 mt-0.5" />
@@ -477,13 +478,13 @@ export default function LandingPage() {
                         bg-[radial-gradient(ellipse,var(--accent),transparent_70%)]" />
                 <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-16">
                     <div className="lp-reveal">
-                        <Eyebrow>More than tracking</Eyebrow>
+                        <Eyebrow>{t('lp.more.eyebrow')}</Eyebrow>
                         <h2 className="font-semibold tracking-tighter text-3xl md:text-4xl text-ink max-w-xl mx-auto leading-[1.1]">
-                            More than<br />maintenance tracking.
+                            {t('lp.more.title1')}<br />{t('lp.more.title2')}
                         </h2>
                         <div className="w-8 h-px bg-accent mx-auto my-8" />
                         <p className="text-sm text-muted max-w-md mx-auto leading-relaxed">
-                            PihitWise helps riders stay organized, informed, and in control of motorcycle ownership — so you can spend less time worrying and more time riding.
+                            {t('about.intro')}
                         </p>
                     </div>
                 </div>
@@ -496,22 +497,22 @@ export default function LandingPage() {
                         <div className="inline-flex items-center gap-2 h-7 px-3 rounded-full
                             border border-line bg-canvas text-[11px] text-muted mb-6">
                             <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-                            Free for all riders
+                            {t('lp.cta.badge')}
                         </div>
                         <h2 className="font-semibold tracking-tight text-2xl md:text-3xl text-ink mb-3">
-                            Start building your<br />digital garage.
+                            {t('lp.cta.title1')}<br />{t('lp.cta.title2')}
                         </h2>
                         <p className="text-sm text-muted leading-relaxed mb-8">
-                            Join riders who are already tracking smarter. No credit card required — get started in seconds.
+                            {t('lp.cta.body')}
                         </p>
                         <a href="/register" className={`${btnPrimary} h-10 px-6 text-[13px]`}>
-                            Create free account
+                            {t('lp.cta.button')}
                             <Icon name="arrow" size={14} />
                         </a>
                         <div className="text-xs text-faint mt-5">
-                            Already have an account?{' '}
+                            {t('register.haveAccount')}{' '}
                             <a href="/login" className="inline-flex items-center gap-1 text-accent no-underline hover:opacity-80">
-                                Sign in <Icon name="arrow" size={12} />
+                                {t('public.signIn')} <Icon name="arrow" size={12} />
                             </a>
                         </div>
                     </div>
@@ -524,7 +525,7 @@ export default function LandingPage() {
                     <div className="flex items-center justify-between flex-wrap gap-5">
                         <Logo />
                         <div className="flex gap-6 flex-wrap">
-                            {[['Features', '#features'], ['Dashboard', '#showcase'], ['About', '/about'], ['Privacy', '/privacy'], ['Contact', '/contact']].map(([l, h]) => (
+                            {[[t('lp.nav.features'), '#features'], [t('lp.nav.dashboard'), '#showcase'], [t('public.about'), '/about'], [t('public.privacy'), '/privacy'], [t('public.contact'), '/contact']].map(([l, h]) => (
                                 <a key={l} href={h} className="text-xs text-muted hover:text-ink transition-colors no-underline">{l}</a>
                             ))}
                         </div>

@@ -8,6 +8,7 @@ import Toast from '../components/Toast'
 import Icon from '../components/Icon'
 import SyncBadge from '../components/SyncBadge'
 import { useBike } from '../hooks/useBike'
+import { useT } from '../lib/i18n'
 import { useQuickAdd } from '../hooks/useQuickAdd'
 import { createFuelLog, deleteFuelLog, getFuelEconomy, getFuelLogs, updateFuelLog } from '../api/fuelLogs'
 import type { FuelEconomy, FuelLog } from '../types/fuelLogs'
@@ -25,6 +26,7 @@ const emptyEconomy: FuelEconomy = { averageKmPerLiter: null, points: [] }
 
 export default function FuelPage() {
     const { vehicle, vehiclesLoading, reloadVehicles } = useBike()
+    const t = useT()
     const vehicleId = vehicle?.id
 
     const [logs, setLogs] = useState<FuelLog[]>([])
@@ -67,7 +69,7 @@ export default function FuelPage() {
         try {
             setEconomy(await getFuelEconomy(vehicleId))
         } catch (err) {
-            setErrors(err instanceof Error ? err.message : 'Something went wrong.')
+            setErrors(err instanceof Error ? err.message : t('common.somethingWrong'))
         }
     }
 
@@ -89,21 +91,21 @@ export default function FuelPage() {
         if (!vehicle) return
 
         const next: FuelLogErrors = {}
-        if (!date) next.date = 'Pick a date.'
-        else if (date > today()) next.date = 'The date can\'t be in the future.'
-        if (odometer === '' || Number(odometer) < 0) next.odometer = 'Enter the odometer.'
+        if (!date) next.date = t('common.err.date')
+        else if (date > today()) next.date = t('common.err.future')
+        if (odometer === '' || Number(odometer) < 0) next.odometer = t('common.err.odometer')
         else {
             // km only goes up. Check the new km against the other fill-ups.
             const newKm = Number(odometer)
             const others = logs.filter((l) => l.id !== editingId)
             const before = others.find((l) => l.date < date && l.odometer > newKm)
             const after = others.find((l) => l.date > date && l.odometer < newKm)
-            if (before) next.odometer = `Lower than your fill-up on ${formatDate(before.date)} (${km(before.odometer)}).`
-            else if (after) next.odometer = `Higher than your fill-up on ${formatDate(after.date)} (${km(after.odometer)}).`
+            if (before) next.odometer = t('fuel.err.lower', { date: formatDate(before.date), km: km(before.odometer) })
+            else if (after) next.odometer = t('fuel.err.higher', { date: formatDate(after.date), km: km(after.odometer) })
         }
-        if (liters === '' || Number(liters) <= 0) next.liters = 'Enter the liters.'
-        else if (Number(liters) > 1000) next.liters = 'That is too many liters.'
-        if (cost === '' || Number(cost) < 0) next.cost = 'Enter the cost.'
+        if (liters === '' || Number(liters) <= 0) next.liters = t('fuel.err.liters')
+        else if (Number(liters) > 1000) next.liters = t('fuel.err.tooMany')
+        if (cost === '' || Number(cost) < 0) next.cost = t('common.err.cost')
         setFieldErrors(next)
         if (Object.keys(next).length > 0) return
 
@@ -119,10 +121,10 @@ export default function FuelPage() {
             let saved: FuelLog
             if (editingId) {
                 saved = await updateFuelLog(editingId, data)
-                setToast(saved.pending ? "Saved on this device. It syncs when you're back online." : 'Fill-up updated')
+                setToast(saved.pending ? t('common.savedOffline') : t('fuel.updated'))
             } else {
                 saved = await createFuelLog(vehicle.id, data)
-                setToast(saved.pending ? "Saved on this device. It syncs when you're back online." : 'Fill-up added')
+                setToast(saved.pending ? t('common.savedOffline') : t('fuel.added'))
             }
             // Put the saved fill-up in the list, then keep the list newest first.
             const others = logs.filter((l) => l.id !== saved.id)
@@ -133,7 +135,7 @@ export default function FuelPage() {
             // The API may have raised the bike's odometer. Get the new one.
             reloadVehicles()
         } catch (err) {
-            setErrors(err instanceof Error ? err.message : 'Something went wrong.')
+            setErrors(err instanceof Error ? err.message : t('common.somethingWrong'))
         } finally {
             setSaving(false)
         }
@@ -154,7 +156,7 @@ export default function FuelPage() {
         try {
             await deleteFuelLog(id)
             setLogs(logs.filter((l) => l.id !== id))
-            setToast('Fill-up deleted')
+            setToast(t('fuel.deleted'))
             reloadEconomy()
         } catch (err) {
             setErrors((err as Error).message)
@@ -165,7 +167,7 @@ export default function FuelPage() {
     if (vehiclesLoading && !vehicle) {
         return (
             <>
-                <PageHeader title="Fuel" subtitle="Fill-ups and fuel economy of your bike." />
+                <PageHeader title={t('fuel.title')} subtitle={t('fuel.subtitle')} />
                 <div className="h-40 bg-surface border border-line rounded-xl animate-pulse" />
             </>
         )
@@ -175,17 +177,17 @@ export default function FuelPage() {
     if (!vehicle) {
         return (
             <>
-                <PageHeader title="Fuel" subtitle="Fill-ups and fuel economy of your bike." />
+                <PageHeader title={t('fuel.title')} subtitle={t('fuel.subtitle')} />
                 <div className="flex flex-col items-center text-center py-16 border border-dashed border-line rounded-xl">
                     <div className="w-14 h-14 rounded-full bg-raised flex items-center justify-center mb-4">
                         <Icon name="bike" size={24} className="text-muted" />
                     </div>
-                    <div className="text-sm font-medium text-ink">No bike yet</div>
-                    <p className="text-xs text-muted mt-1 mb-5">Add a bike in your Garage first. Then log its fill-ups here.</p>
+                    <div className="text-sm font-medium text-ink">{t('common.noBike')}</div>
+                    <p className="text-xs text-muted mt-1 mb-5">{t('fuel.noBikeHelp')}</p>
                     <Link to="/garage"
                         className="h-8 px-3.5 inline-flex items-center rounded-md bg-accent text-on-accent text-xs font-medium
                              no-underline hover:opacity-90 transition-opacity">
-                        Go to Garage
+                        {t('common.goToGarage')}
                     </Link>
                 </div>
             </>
@@ -201,31 +203,31 @@ export default function FuelPage() {
     return (
         <>
             <div className="flex items-start justify-between gap-3">
-                <PageHeader title="Fuel" subtitle={`Fill-ups and fuel economy of your ${vehicle.name}.`} />
+                <PageHeader title={t('fuel.title')} subtitle={t('fuel.subtitleBike', { bike: vehicle.name })} />
                 <button type="button" onClick={openAdd}
                     className="h-8 px-3.5 rounded-md bg-accent text-on-accent text-xs font-medium
                          hover:opacity-90 transition-opacity cursor-pointer whitespace-nowrap">
-                    + Add fill-up
+                    {t('fuel.add')}
                 </button>
             </div>
             <FormMessage text={errors} />
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
-                <Stat label="Avg km/L" tone="ok"
+                <Stat label={t('fuel.avg')} tone="ok"
                     value={loading ? '…' : economy.averageKmPerLiter !== null ? economy.averageKmPerLiter.toFixed(1) : '—'}
-                    sub={economy.averageKmPerLiter !== null ? 'full tank to full tank' : 'needs 2 full tanks'} />
-                <Stat label="Best km/L" value={loading ? '…' : best !== null ? best.toFixed(1) : '—'} sub="single full tank" />
-                <Stat label="Fuel spent" value={loading ? '…' : peso(totalSpent)} sub={`${logs.length} fill-ups`} tone="accent" />
-                <Stat label="Liters" value={loading ? '…' : `${totalLiters.toFixed(1)} L`} sub="total filled" />
+                    sub={economy.averageKmPerLiter !== null ? t('fuel.avgSub') : t('fuel.avgNeeds')} />
+                <Stat label={t('fuel.best')} value={loading ? '…' : best !== null ? best.toFixed(1) : '—'} sub={t('fuel.bestSub')} />
+                <Stat label={t('fuel.spent')} value={loading ? '…' : peso(totalSpent)} sub={t('fuel.fillUps', { count: logs.length })} tone="accent" />
+                <Stat label={t('common.liters')} value={loading ? '…' : `${totalLiters.toFixed(1)} L`} sub={t('fuel.totalFilled')} />
             </div>
 
-            <Card title="Fuel economy per full tank (km/L)" className="mb-3">
+            <Card title={t('fuel.chart')} className="mb-3">
                 <BarChart bars={economy.points.map((p) => ({
                     label: formatDate(p.date).split(',')[0], value: p.kmPerLiter, display: p.kmPerLiter.toFixed(1),
                 }))} />
             </Card>
 
-            <Card title="Fill-up log">
+            <Card title={t('fuel.log')}>
                 {loading ? (
                     <div className="flex flex-col gap-2 animate-pulse">
                         <div className="h-8 bg-raised rounded" />
@@ -237,38 +239,38 @@ export default function FuelPage() {
                         <div className="w-12 h-12 rounded-full bg-raised flex items-center justify-center mb-3">
                             <Icon name="fuel" size={20} className="text-muted" />
                         </div>
-                        <div className="text-sm font-medium text-ink">No fill-ups logged yet</div>
-                        <p className="text-xs text-muted mt-1 mb-4">Fill your tank to full and log it. That is your start point.</p>
+                        <div className="text-sm font-medium text-ink">{t('fuel.none')}</div>
+                        <p className="text-xs text-muted mt-1 mb-4">{t('fuel.noneHelp')}</p>
                         <button type="button" onClick={openAdd}
                             className="h-8 px-3.5 rounded-md bg-accent text-on-accent text-xs font-medium
                                  hover:opacity-90 transition-opacity cursor-pointer">
-                            + Add your first fill-up
+                            {t('fuel.addFirst')}
                         </button>
                     </div>
                 ) : (
                     <DataTable
                         rows={logs}
-                        empty="No fill-ups logged yet."
+                        empty={t('fuel.noneShort')}
                         columns={[
-                            { head: 'Date', cell: (f) => <>{formatDate(f.date)}<SyncBadge row={f} /></> },
-                            { head: 'Odometer', cell: (f) => km(f.odometer), align: 'right', mono: true },
-                            { head: 'Liters', cell: (f) => f.liters.toFixed(2), align: 'right', mono: true },
-                            { head: 'Full', cell: (f) => f.isFullTank ? <span className="text-ok">Yes</span> : <span className="text-faint">No</span> },
+                            { head: t('common.date'), cell: (f) => <>{formatDate(f.date)}<SyncBadge row={f} /></> },
+                            { head: t('common.odometer'), cell: (f) => km(f.odometer), align: 'right', mono: true },
+                            { head: t('common.liters'), cell: (f) => f.liters.toFixed(2), align: 'right', mono: true },
+                            { head: t('fuel.full'), cell: (f) => f.isFullTank ? <span className="text-ok">{t('fuel.yes')}</span> : <span className="text-faint">No</span> },
                             { head: '₱ / L', cell: (f) => (f.cost / f.liters).toFixed(2), align: 'right', mono: true },
                             { head: 'km/L', cell: (f) => kmlById.get(f.id)?.toFixed(1) ?? '—', align: 'right', mono: true },
-                            { head: 'Cost', cell: (f) => peso(f.cost), align: 'right', mono: true },
+                            { head: t('common.cost'), cell: (f) => peso(f.cost), align: 'right', mono: true },
                             {
                                 head: '', align: 'right', cell: (f) => (
                                     <div className="flex justify-end gap-1.5">
                                         <button type="button" onClick={() => onEdit(f)}
                                             className="h-7 px-2.5 rounded-md border border-line text-[11px] text-ink
                                                  hover:bg-raised transition-colors cursor-pointer">
-                                            Edit
+                                            {t('common.edit')}
                                         </button>
                                         <button type="button" onClick={() => setDeleteId(f.id)}
                                             className="h-7 px-2.5 rounded-md border border-line text-[11px] text-warn
                                                  hover:bg-raised transition-colors cursor-pointer">
-                                            Delete
+                                            {t('common.delete')}
                                         </button>
                                     </div>
                                 ),
@@ -278,17 +280,17 @@ export default function FuelPage() {
                 )}
             </Card>
 
-            <Modal open={showForm} title={editingId ? 'Edit fill-up' : 'Add fill-up'} onClose={() => setShowForm(false)}>
+            <Modal open={showForm} title={editingId ? t('fuel.formEdit') : t('fuel.formAdd')} onClose={() => setShowForm(false)}>
                 <form onSubmit={onSubmit} className="flex flex-col gap-3 mb-4">
                     <div className="grid grid-cols-2 gap-3">
-                        <Field label="Date" icon="calendar" name="date" type="date" max={today()}
+                        <Field label={t('common.date')} icon="calendar" name="date" type="date" max={today()}
                             value={date}
                             onChange={(e) => {
                                 setDate(e.target.value)
                                 setFieldErrors({ ...fieldErrors, date: undefined })
                             }}
                             error={fieldErrors.date} />
-                        <Field label="Odometer (km)" icon="gauge" placeholder="12000" name="odometer" type="number" min={0}
+                        <Field label={t('common.odometerKm')} icon="gauge" placeholder="12000" name="odometer" type="number" min={0}
                             value={odometer}
                             onChange={(e) => {
                                 setOdometer(e.target.value)
@@ -297,14 +299,14 @@ export default function FuelPage() {
                             error={fieldErrors.odometer} />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
-                        <Field label="Liters" icon="fuel" placeholder="3.5" name="liters" type="number" min={0} step="0.01"
+                        <Field label={t('common.liters')} icon="fuel" placeholder="3.5" name="liters" type="number" min={0} step="0.01"
                             value={liters}
                             onChange={(e) => {
                                 setLiters(e.target.value)
                                 setFieldErrors({ ...fieldErrors, liters: undefined })
                             }}
                             error={fieldErrors.liters} />
-                        <Field label="Cost (₱)" icon="wallet" placeholder="230" name="cost" type="number" min={0} step="0.01"
+                        <Field label={t('common.costPeso')} icon="wallet" placeholder="230" name="cost" type="number" min={0} step="0.01"
                             value={cost}
                             onChange={(e) => {
                                 setCost(e.target.value)
@@ -318,23 +320,23 @@ export default function FuelPage() {
                             onChange={(e) => setIsFullTank(e.target.checked)}
                             className="mt-0.5 w-4 h-4 accent-accent cursor-pointer" />
                         <span>
-                            <span className="block text-[13px] text-ink">Full tank</span>
-                            <span className="block text-[11px] text-muted">km/L is measured from one full tank to the next.</span>
+                            <span className="block text-[13px] text-ink">{t('fuel.fullTank')}</span>
+                            <span className="block text-[11px] text-muted">{t('fuel.fullTankHelp')}</span>
                         </span>
                     </label>
                     <button type="submit" disabled={saving}
                         className="h-10 mt-2 rounded-md bg-accent text-on-accent text-[13px] font-medium
                              hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-60">
-                        {saving ? 'Saving...' : editingId ? 'Save changes' : 'Save fill-up'}
+                        {saving ? t('common.saving') : editingId ? t('common.saveChanges') : t('fuel.save')}
                     </button>
                 </form>
             </Modal>
 
             <ConfirmDialog
                 open={deleteId !== null}
-                title="Delete fill-up"
-                message="This fill-up will be removed. This can't be undone."
-                confirmText="Delete"
+                title={t('fuel.deleteTitle')}
+                message={t('fuel.deleteMessage')}
+                confirmText={t('common.delete')}
                 danger
                 onConfirm={() => { onDelete(deleteId!); setDeleteId(null) }}
                 onCancel={() => setDeleteId(null)}

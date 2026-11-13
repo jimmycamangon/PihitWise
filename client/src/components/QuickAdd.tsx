@@ -2,16 +2,19 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Icon from './Icon'
 import type { IconName } from './Icon'
+import { useT } from '../lib/i18n'
+import type { TKey } from '../lib/i18n'
 
-const items: { to: string; label: string; icon: IconName }[] = [
-    { to: '/fuel?add=1', label: 'Fill-up', icon: 'fuel' },
-    { to: '/maintenance?add=1', label: 'Service', icon: 'wrench' },
-    { to: '/expenses?add=1', label: 'Other expense', icon: 'wallet' },
+const items: { to: string; labelKey: TKey; icon: IconName }[] = [
+    { to: '/fuel?add=1', labelKey: 'quickAdd.fillUp', icon: 'fuel' },
+    { to: '/maintenance?add=1', labelKey: 'quickAdd.service', icon: 'wrench' },
+    { to: '/expenses?add=1', labelKey: 'quickAdd.other', icon: 'wallet' },
 ]
 
 /** "+ Log" in the top bar: jumps to a page with its add form already open. */
 export default function QuickAdd() {
     const [open, setOpen] = useState(false)
+    const t = useT()
     const ref = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -33,7 +36,7 @@ export default function QuickAdd() {
             <button type="button" onClick={() => setOpen(!open)} aria-haspopup="menu" aria-expanded={open}
                 className="h-8 px-3 inline-flex items-center gap-1 rounded-md bg-accent text-on-accent
                      text-xs font-medium hover:opacity-90 transition-opacity cursor-pointer">
-                <span className="text-sm leading-none">+</span> Log
+                <span className="text-sm leading-none">+</span> {t('quickAdd.log')}
             </button>
             {open && (
                 <div role="menu"
@@ -43,7 +46,7 @@ export default function QuickAdd() {
                             className="flex items-center gap-2.5 h-8 px-2.5 rounded-md text-xs text-ink no-underline
                                  hover:bg-raised transition-colors">
                             <Icon name={item.icon} size={14} className="text-muted" />
-                            {item.label}
+                            {t(item.labelKey)}
                         </Link>
                     ))}
                 </div>

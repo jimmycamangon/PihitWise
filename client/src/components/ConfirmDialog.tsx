@@ -1,4 +1,5 @@
 import Modal from './Modal'
+import { useT } from '../lib/i18n'
 
 interface ConfirmDialogProps {
     open: boolean
@@ -14,6 +15,7 @@ interface ConfirmDialogProps {
 export default function ConfirmDialog({
     open, title, message, confirmText = 'Confirm', danger = false, onConfirm, onCancel,
 }: ConfirmDialogProps) {
+    const t = useT()
     return (
         <Modal open={open} title={title} onClose={onCancel}>
             <p className="text-[13px] text-muted mb-5">{message}</p>
@@ -21,7 +23,7 @@ export default function ConfirmDialog({
                 <button type="button" onClick={onCancel}
                     className="h-9 px-4 rounded-md border border-line text-xs font-medium text-ink
                          hover:bg-raised transition-colors cursor-pointer">
-                    Cancel
+                    {t('common.cancel')}
                 </button>
                 <button type="button" onClick={onConfirm}
                     className={`h-9 px-4 rounded-md text-xs font-medium hover:opacity-90 transition-opacity cursor-pointer

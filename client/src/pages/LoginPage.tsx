@@ -6,6 +6,7 @@ import AuthLayout, { Field } from '../components/AuthLayout'
 import Icon from '../components/Icon'
 import { login } from '../api/auth'
 import { FormMessage } from '../components/ui'
+import { useT } from '../lib/i18n'
 
 interface LoginErrors { email?: string; password?: string }
 
@@ -15,6 +16,7 @@ export default function LoginPage() {
 
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
+    const t = useT()
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -22,15 +24,15 @@ export default function LoginPage() {
     const [errors, setErrors] = useState<LoginErrors>({})
     const [searchParams] = useSearchParams()
     const [notice, setNotice] = useState(
-        searchParams.get('expired') ? 'Your session ended. Please log in again.'
-            : searchParams.get('reset') ? 'Password changed. Sign in with your new password.' : ''
+        searchParams.get('expired') ? t('login.expired')
+            : searchParams.get('reset') ? t('login.resetDone') : ''
 )
 
     const onSubmit = async (e: FormEvent) => {
         e.preventDefault()
         const next: LoginErrors = {}
-        if (!emailPattern.test(email.trim())) next.email = 'Enter a valid email address.'
-        if (!password) next.password = 'Enter your password.'
+        if (!emailPattern.test(email.trim())) next.email = t('auth.err.email')
+        if (!password) next.password = t('login.err.password')
         setErrors(next)
         if (Object.keys(next).length > 0) return setNotice('')
 
@@ -48,20 +50,20 @@ export default function LoginPage() {
 
     return (
         <AuthLayout
-            title="Welcome back"
-            subtitle="Sign in to your garage."
-            footer={<>New to PihitWise?{' '}
-                <Link to="/register" className="text-accent no-underline hover:opacity-80">Create an account</Link></>}
+            title={t('login.title')}
+            subtitle={t('login.subtitle')}
+            footer={<>{t('login.newHere')}{' '}
+                <Link to="/register" className="text-accent no-underline hover:opacity-80">{t('login.createAccount')}</Link></>}
         >
             <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
-                <Field label="Email" icon="mail" type="email" name="email" autoComplete="email"
+                <Field label={t('auth.email')} icon="mail" type="email" name="email" autoComplete="email"
                     placeholder="you@example.com" value={email} error={errors.email}
                     onChange={(e) => {
                         setEmail(e.target.value)
                         setErrors({ ...errors, email: undefined })
                     }} />
-                <Field label="Password" icon="lock" type="password" name="password" autoComplete="current-password"
-                    placeholder="Your password" value={password} error={errors.password}
+                <Field label={t('auth.password')} icon="lock" type="password" name="password" autoComplete="current-password"
+                    placeholder={t('login.passwordPlaceholder')} value={password} error={errors.password}
                     onChange={(e) => {
                         setPassword(e.target.value)
                         setErrors({ ...errors, password: undefined })
@@ -71,17 +73,17 @@ export default function LoginPage() {
                     <label className="flex items-center gap-2 text-xs text-muted cursor-pointer">
                         <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)}
                             className="w-3.5 h-3.5 accent-(--accent)" />
-                        Remember me
+                        {t('login.remember')}
                     </label>
                     <Link to="/forgot-password" className="text-xs text-accent no-underline hover:opacity-80">
-                        Forgot password?
+                        {t('login.forgot')}
                     </Link>
                 </div>
 
                 <button type="submit" disabled={loading}
                     className="inline-flex items-center justify-center gap-2 h-10 rounded-md bg-accent text-on-accent
                          text-[13px] font-medium hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
-                    Sign in
+                    {t('login.submit')}
                     <Icon name="arrow" size={14} />
                 </button>
                 <FormMessage text={notice} />

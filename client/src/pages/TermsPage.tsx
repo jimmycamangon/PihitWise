@@ -1,21 +1,14 @@
 import PublicLayout, { Section } from '../components/PublicLayout'
+import { useT } from '../lib/i18n'
 
 // Placeholder copy — replace with the reviewed terms before launch.
 export default function TermsPage() {
+    const t = useT()
     return (
-        <PublicLayout
-            eyebrow="Terms"
-            title="Terms of Service"
-        >
-            <Section title="Using PihitWise">
-                <p>PihitWise is a record-keeping and reminder tool for your motorcycle. You're responsible for the accuracy of what you log.</p>
-            </Section>
-            <Section title="Not a substitute for a mechanic">
-                <p>Reminders and fuel economy trends are guides only. Follow your owner's manual and consult a qualified mechanic for service decisions.</p>
-            </Section>
-            <Section title="Your account">
-                <p>Keep your sign-in details private. The final terms will cover account closure and acceptable use.</p>
-            </Section>
+        <PublicLayout eyebrow={t('public.terms')} title={t('terms.title')}>
+            <Section title={t('terms.useTitle')}><p>{t('terms.use')}</p></Section>
+            <Section title={t('terms.mechanicTitle')}><p>{t('terms.mechanic')}</p></Section>
+            <Section title={t('terms.accountTitle')}><p>{t('terms.account')}</p></Section>
         </PublicLayout>
     )
 }

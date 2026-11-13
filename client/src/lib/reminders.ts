@@ -1,18 +1,29 @@
 import type { Tone } from '../components/ui'
 import type { Reminder, ReminderStatus } from '../types/reminders'
 import { km } from './format'
+import { t } from './i18n'
 
 export const statusTone: Record<ReminderStatus, Tone> = { overdue: 'warn', soon: 'accent', ok: 'ok', done: 'muted' }
-export const statusLabel: Record<ReminderStatus, string> = { overdue: 'Overdue', soon: 'Due soon', ok: 'On track', done: 'Done' }
+
+// Getters so the label follows the current language each time it's read.
+export const statusLabel: Record<ReminderStatus, string> = {
+    get overdue() { return t('status.overdue') },
+    get soon() { return t('status.soon') },
+    get ok() { return t('status.ok') },
+    get done() { return t('status.done') },
+}
 
 // "400 km left", "3 days overdue". Shows km and days when the reminder has both.
 export function leftText(r: Reminder) {
     const parts: string[] = []
-    if (r.kmLeft !== null) parts.push(r.kmLeft < 0 ? `${km(-r.kmLeft)} overdue` : `${km(r.kmLeft)} left`)
+    if (r.kmLeft !== null) parts.push(r.kmLeft < 0 ? t('left.kmOverdue', { km: km(-r.kmLeft) }) : t('left.kmLeft', { km: km(r.kmLeft) }))
     if (r.daysLeft !== null) {
         const days = Math.abs(r.daysLeft)
-        const word = days === 1 ? 'day' : 'days'
-        parts.push(r.daysLeft < 0 ? `${days} ${word} overdue` : r.daysLeft === 0 ? 'due today' : `${days} ${word} left`)
+        parts.push(
+            r.daysLeft === 0 ? t('left.dueToday')
+                : r.daysLeft < 0 ? (days === 1 ? t('left.dayOverdue') : t('left.daysOverdue', { days }))
+                    : (days === 1 ? t('left.dayLeft') : t('left.daysLeft', { days })),
+        )
     }
     return parts.join(' · ')
 }

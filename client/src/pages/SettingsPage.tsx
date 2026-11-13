@@ -8,6 +8,7 @@ import { Field } from '../components/AuthLayout'
 import { Card, FormMessage, Label, PageHeader } from '../components/ui'
 import { useBike } from '../hooks/useBike'
 import { navStyles, setNavStyle, useNavStyle } from '../lib/navStyle'
+import { languages, setLang, useLang, useT } from '../lib/i18n'
 import { showChecklistAgain } from '../lib/onboarding'
 import { startTourOnDashboard } from '../lib/tour'
 import { Link, useNavigate } from 'react-router-dom'
@@ -38,6 +39,8 @@ export default function SettingsPage() {
     const { me, setMe, vehicles, vehiclesLoading, signOut } = useBike()
     const [toast, setToast] = useState('')
     const navStyle = useNavStyle()
+    const t = useT()
+    const lang = useLang()
     const navigate = useNavigate()
 
     // Edit profile
@@ -77,8 +80,8 @@ export default function SettingsPage() {
     const onSaveProfile = async (e: FormEvent) => {
         e.preventDefault()
         const errors: ProfileErrors = {}
-        if (!name.trim()) errors.name = 'Enter your name.'
-        if (!EMAIL_PATTERN.test(email.trim())) errors.email = 'Enter a valid email.'
+        if (!name.trim()) errors.name = t('settings.err.name')
+        if (!EMAIL_PATTERN.test(email.trim())) errors.email = t('settings.err.email')
         setProfileErrors(errors)
         if (Object.keys(errors).length) return
 
@@ -90,9 +93,9 @@ export default function SettingsPage() {
             setToken(result.token)
             setMe({ id: result.user.id, name: result.user.fullName, email: result.user.email })
             setProfileOpen(false)
-            setToast('Profile updated')
+            setToast(t('settings.profileUpdated'))
         } catch (err) {
-            setProfileMessage(err instanceof Error && err.message ? err.message : 'Could not save your profile.')
+            setProfileMessage(err instanceof Error && err.message ? err.message : t('settings.err.profile'))
         } finally {
             setSavingProfile(false)
         }
@@ -101,9 +104,9 @@ export default function SettingsPage() {
     const onSavePassword = async (e: FormEvent) => {
         e.preventDefault()
         const errors: PasswordErrors = {}
-        if (!current) errors.current = 'Enter your current password.'
-        if (next.length < MIN_PASSWORD) errors.next = `Use at least ${MIN_PASSWORD} characters.`
-        if (confirm !== next) errors.confirm = 'Passwords don\'t match.'
+        if (!current) errors.current = t('settings.err.current')
+        if (next.length < MIN_PASSWORD) errors.next = t('settings.err.short', { count: MIN_PASSWORD })
+        if (confirm !== next) errors.confirm = t('settings.err.match')
         setPasswordErrors(errors)
         if (Object.keys(errors).length) return
 
@@ -112,9 +115,9 @@ export default function SettingsPage() {
         try {
             await changePassword(current, next)
             setPasswordOpen(false)
-            setToast('Password changed')
+            setToast(t('settings.passwordChanged'))
         } catch (err) {
-            setPasswordMessage(err instanceof Error && err.message ? err.message : 'Could not change your password.')
+            setPasswordMessage(err instanceof Error && err.message ? err.message : t('settings.err.password'))
         } finally {
             setSavingPassword(false)
         }
@@ -122,59 +125,73 @@ export default function SettingsPage() {
 
     return (
         <>
-            <PageHeader title="Settings" subtitle="Your account and preferences." />
+            <PageHeader title={t('settings.title')} subtitle={t('settings.subtitle')} />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 max-w-3xl">
-                <Card title="Account">
-                    <Row label="Name" value={me?.name ?? '…'} />
-                    <Row label="Email" value={me?.email ?? '…'} />
-                    <Row label="Bikes" value={vehiclesLoading ? '…' : String(vehicles.length)} />
+                <Card title={t('settings.account')}>
+                    <Row label={t('settings.name')} value={me?.name ?? '…'} />
+                    <Row label={t('settings.email')} value={me?.email ?? '…'} />
+                    <Row label={t('settings.bikes')} value={vehiclesLoading ? '…' : String(vehicles.length)} />
                     <div className="flex flex-wrap gap-2 pt-3">
                         <button type="button" onClick={openProfile} disabled={!me} className={outlineButton}>
                             <Icon name="user" size={14} />
-                            Edit profile
+                            {t('settings.editProfile')}
                         </button>
                         <button type="button" onClick={openPassword} className={outlineButton}>
                             <Icon name="lock" size={14} />
-                            Change password
+                            {t('settings.changePassword')}
                         </button>
                     </div>
                 </Card>
 
-                <Card title="Preferences">
-                    <Row label="Currency" value="Philippine peso (₱)" />
-                    <Row label="Distance" value="Kilometers" />
-                    <Row label="Fuel economy" value="km/L" />
-                    <Row label="Theme" value="Use the toggle in the top bar" />
+                <Card title={t('settings.preferences')}>
+                    <Row label={t('settings.currency')} value={t('settings.currencyValue')} />
+                    <Row label={t('settings.distance')} value={t('settings.distanceValue')} />
+                    <Row label={t('settings.economy')} value="km/L" />
+                    <Row label={t('settings.theme')} value={t('settings.themeValue')} />
                 </Card>
 
-                <Card title="Guide" className="lg:col-span-2">
+                <Card title={t('lang.title')} className="lg:col-span-2">
+                    <p className="text-[11px] text-muted mb-3">{t('lang.description')}</p>
+                    <div role="radiogroup" aria-label={t('lang.title')} className="flex gap-2">
+                        {languages.map((option) => (
+                            <button key={option.value} type="button" role="radio" aria-checked={lang === option.value}
+                                onClick={() => setLang(option.value)}
+                                className={`h-9 px-4 rounded-md border text-xs font-medium transition-colors cursor-pointer
+                                    ${lang === option.value ? 'border-accent bg-accent/10 text-ink' : 'border-line text-muted hover:bg-raised'}`}>
+                                {option.label}
+                            </button>
+                        ))}
+                    </div>
+                </Card>
+
+                <Card title={t('settings.guide')} className="lg:col-span-2">
                     <p className="text-[11px] text-muted mb-3">
-                        Forgot how something works? Show the setup steps on your Dashboard again, or open the full guide.
+                        {t('settings.guideHelp')}
                     </p>
                     <div className="flex flex-wrap gap-2">
                         <button type="button"
                             onClick={() => { showChecklistAgain(); navigate('/dashboard') }}
                             className={outlineButton}>
                             <Icon name="check" size={14} />
-                            Show setup guide again
+                            {t('settings.showSetup')}
                         </button>
                         <button type="button" onClick={() => startTourOnDashboard(navigate)} className={outlineButton}>
                             <Icon name="zap" size={14} />
-                            Replay tour
+                            {t('settings.replayTour')}
                         </button>
                         <Link to="/guide" className={`${outlineButton} no-underline`}>
                             <Icon name="help" size={14} />
-                            Open guide
+                            {t('settings.openGuide')}
                         </Link>
                     </div>
                 </Card>
 
-                <Card title="Navigation on phones" className="lg:col-span-2">
+                <Card title={t('settings.navTitle')} className="lg:col-span-2">
                     <p className="text-[11px] text-muted mb-3">
-                        How pages are listed on small screens. Saved on this device. Computers always use the sidebar.
+                        {t('settings.navHelp')}
                     </p>
-                    <div role="radiogroup" aria-label="Navigation on phones" className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div role="radiogroup" aria-label={t('settings.navTitle')} className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                         {navStyles.map((option) => {
                             const selected = navStyle === option.value
                             return (
@@ -185,9 +202,9 @@ export default function SettingsPage() {
                                     <div className="flex items-center gap-2">
                                         <span className={`w-3.5 h-3.5 rounded-full border-2 shrink-0
                                             ${selected ? 'border-accent bg-accent' : 'border-line'}`} />
-                                        <span className="text-xs font-medium text-ink">{option.label}</span>
+                                        <span className="text-xs font-medium text-ink">{t(`settings.nav.${option.value}`)}</span>
                                     </div>
-                                    <p className="text-[11px] text-muted mt-1.5 leading-relaxed">{option.description}</p>
+                                    <p className="text-[11px] text-muted mt-1.5 leading-relaxed">{t(`settings.nav.${option.value}Help`)}</p>
                                 </button>
                             )
                         })}
@@ -197,39 +214,39 @@ export default function SettingsPage() {
 
             <button type="button" onClick={signOut} className={`${outlineButton} mt-5`}>
                 <Icon name="logout" size={14} />
-                Sign out
+                {t('nav.signOut')}
             </button>
 
-            <Modal open={profileOpen} title="Edit profile" onClose={() => setProfileOpen(false)}>
+            <Modal open={profileOpen} title={t('settings.editProfile')} onClose={() => setProfileOpen(false)}>
                 <form onSubmit={onSaveProfile} noValidate className="flex flex-col gap-3">
-                    <Field label="Full name" icon="user" name="fullName" autoComplete="name" maxLength={100}
+                    <Field label={t('settings.fullName')} icon="user" name="fullName" autoComplete="name" maxLength={100}
                         value={name} error={profileErrors.name}
                         onChange={(e) => { setName(e.target.value); setProfileErrors({ ...profileErrors, name: undefined }) }} />
-                    <Field label="Email" icon="mail" name="email" type="email" autoComplete="email" maxLength={200}
+                    <Field label={t('settings.email')} icon="mail" name="email" type="email" autoComplete="email" maxLength={200}
                         value={email} error={profileErrors.email}
                         onChange={(e) => { setEmail(e.target.value); setProfileErrors({ ...profileErrors, email: undefined }) }} />
                     <FormMessage text={profileMessage} />
                     <button type="submit" disabled={savingProfile} className={submitButton}>
-                        {savingProfile ? 'Saving...' : 'Save changes'}
+                        {savingProfile ? t('settings.saving') : t('settings.save')}
                     </button>
                 </form>
             </Modal>
 
-            <Modal open={passwordOpen} title="Change password" onClose={() => setPasswordOpen(false)}>
+            <Modal open={passwordOpen} title={t('settings.changePassword')} onClose={() => setPasswordOpen(false)}>
                 <form onSubmit={onSavePassword} noValidate className="flex flex-col gap-3">
-                    <Field label="Current password" icon="lock" type="password" name="currentPassword"
+                    <Field label={t('settings.currentPassword')} icon="lock" type="password" name="currentPassword"
                         autoComplete="current-password" value={current} error={passwordErrors.current}
                         onChange={(e) => { setCurrent(e.target.value); setPasswordErrors({ ...passwordErrors, current: undefined }) }} />
-                    <Field label="New password" icon="lock" type="password" name="newPassword"
-                        autoComplete="new-password" placeholder={`At least ${MIN_PASSWORD} characters`}
+                    <Field label={t('settings.newPassword')} icon="lock" type="password" name="newPassword"
+                        autoComplete="new-password" placeholder={t('settings.atLeast', { count: MIN_PASSWORD })}
                         value={next} error={passwordErrors.next}
                         onChange={(e) => { setNext(e.target.value); setPasswordErrors({ ...passwordErrors, next: undefined }) }} />
-                    <Field label="Confirm new password" icon="lock" type="password" name="confirmPassword"
+                    <Field label={t('settings.confirmPassword')} icon="lock" type="password" name="confirmPassword"
                         autoComplete="new-password" value={confirm} error={passwordErrors.confirm}
                         onChange={(e) => { setConfirm(e.target.value); setPasswordErrors({ ...passwordErrors, confirm: undefined }) }} />
                     <FormMessage text={passwordMessage} />
                     <button type="submit" disabled={savingPassword} className={submitButton}>
-                        {savingPassword ? 'Saving...' : 'Change password'}
+                        {savingPassword ? t('settings.saving') : t('settings.changePassword')}
                     </button>
                 </form>
             </Modal>

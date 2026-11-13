@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import type { ReactNode } from 'react'
+import { t } from '../lib/i18n'
 
 interface ModalProps { open: boolean; title: string; onClose: () => void; children: ReactNode }
 
@@ -30,7 +31,7 @@ export default function Modal({ open, title, onClose, children }: ModalProps) {
                 {/* header stays put; only the body below scrolls */}
                 <div className="flex items-center justify-between px-5 py-3 border-b border-line shrink-0">
                     <h2 className="text-sm font-medium text-ink">{title}</h2>
-                    <button type="button" onClick={onClose} aria-label="Close"
+                    <button type="button" onClick={onClose} aria-label={t('nav.close')}
                         className="w-8 h-8 rounded-md flex items-center justify-center text-faint
                              hover:text-ink hover:bg-raised transition-colors cursor-pointer text-lg leading-none">
                         ×
