@@ -1,2 +1,5 @@
 # Visual Studio files
 .vs/
+
+# graphify knowledge graph output
+graphify-out/
