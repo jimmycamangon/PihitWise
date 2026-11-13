@@ -6,6 +6,7 @@ import Modal from '../components/Modal'
 import ConfirmDialog from '../components/ConfirmDialog'
 import Toast from '../components/Toast'
 import Icon from '../components/Icon'
+import SyncBadge from '../components/SyncBadge'
 import { useBike } from '../hooks/useBike'
 import { useQuickAdd } from '../hooks/useQuickAdd'
 import { createServiceLog, deleteServiceLog, getServiceLogs, updateServiceLog } from '../api/serviceLogs'
@@ -97,10 +98,10 @@ export default function MaintenancePage() {
             let saved: ServiceLog
             if (editingId) {
                 saved = await updateServiceLog(editingId, data)
-                setToast('Service updated')
+                setToast(saved.pending ? "Saved on this device. It syncs when you're back online." : 'Service updated')
             } else {
                 saved = await createServiceLog(vehicle.id, data)
-                setToast('Service added')
+                setToast(saved.pending ? "Saved on this device. It syncs when you're back online." : 'Service added')
             }
             // Put the saved log in the list, then keep the list newest first.
             const others = logs.filter((l) => l.id !== saved.id)
@@ -216,7 +217,7 @@ export default function MaintenancePage() {
                         rows={logs}
                         empty="No services logged yet."
                         columns={[
-                            { head: 'Date', cell: (l) => formatDate(l.date) },
+                            { head: 'Date', cell: (l) => <>{formatDate(l.date)}<SyncBadge row={l} /></> },
                             {
                                 head: 'Service', cell: (l) => (
                                     <div>

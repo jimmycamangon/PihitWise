@@ -1,77 +1,21 @@
 import { getToken } from '../lib/token'
-import type { FuelLog, FuelLogRequest, FuelEconomy } from "../types/fuelLogs";
-import { checkSession } from "./session";
+import { send } from '../lib/outbox'
+import type { FuelLog, FuelLogRequest, FuelEconomy } from '../types/fuelLogs'
+import { checkSession } from './session'
+import { NOT_CACHED, loggable } from './loggable'
 
-export async function getFuelLogs(vehicleId: string): Promise<FuelLog[]> {
-    const token = getToken()
+const fuel = loggable<FuelLog, FuelLogRequest>('fuel', (v) => `/api/vehicles/${v}/fuel`, (id) => `/api/fuel/${id}`)
 
-    const response = await fetch(`/api/vehicles/${vehicleId}/fuel`, {
-        method: 'GET',
-        headers: { Authorization: `Bearer ${token}` },
-    })
-    checkSession(response)
-    if(!response.ok) {
-        throw new Error(await response.text())
-    }
-    return response.json()
-}
+export const getFuelLogs = fuel.list
+export const createFuelLog = fuel.create
+export const updateFuelLog = fuel.update
+export const deleteFuelLog = fuel.remove
 
-export async function createFuelLog(vehicleId: string, data: FuelLogRequest): Promise<FuelLog> {
-    const token = getToken()
-
-    const response = await fetch(`/api/vehicles/${vehicleId}/fuel`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}` 
-        },
-        body: JSON.stringify(data),
-    })
-    checkSession(response)
-    if(!response.ok) {
-        throw new Error(await response.text())
-    }
-    return response.json()
-}
-
-export async function updateFuelLog(id: string, data: FuelLogRequest): Promise<FuelLog> {
-    const token = getToken()
-
-    const response = await fetch(`/api/fuel/${id}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(data),
-    })
-    checkSession(response)
-    if(!response.ok) {
-        throw new Error(await response.text())
-    }
-    return response.json()
-}
-
-export async function deleteFuelLog(id: string): Promise<void> {
-    const token = getToken()
-
-    const response = await fetch(`/api/fuel/${id}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
-    })
-    checkSession(response)
-    if(!response.ok) {
-        throw new Error(await response.text())
-    }
-}
-
+// km/L is worked out by the server, so fill-ups still waiting to sync aren't counted yet.
 export async function getFuelEconomy(vehicleId: string): Promise<FuelEconomy> {
-    const token = getToken()
-
-    const response = await fetch(`/api/vehicles/${vehicleId}/fuel/economy`, {
-        method: 'GET',
-        headers: { Authorization: `Bearer ${token}` },
-    })
+    const response = await send(`/api/vehicles/${vehicleId}/fuel/economy`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+    }, NOT_CACHED)
     checkSession(response)
     if(!response.ok) {
         throw new Error(await response.text())
