@@ -254,7 +254,7 @@ export default function LandingPage() {
             <div className="border-t border-b border-line bg-surface py-7">
                 <div className="max-w-6xl mx-auto px-6 md:px-16">
                     <div className="flex items-center justify-center gap-x-9 gap-y-3 flex-wrap">
-                        {['Track every kilometer', 'Never miss maintenance again', 'Free to get started', 'Mobile-first experience'].map((t) => (
+                        {['Track every kilometer', 'Never miss maintenance again', 'Free to get started', 'Mobile-first experience', 'Works offline'].map((t) => (
                             <div key={t} className="flex items-center gap-2 text-xs text-muted">
                                 <span className="w-1 h-1 rounded-full bg-accent shrink-0" />
                                 {t}
@@ -454,6 +454,7 @@ export default function LandingPage() {
                                     { icon: 'zap', title: '1-minute logging', desc: 'Log fuel and maintenance fast. No friction, no long forms.' },
                                     { icon: 'phone', title: 'Responsive dashboard', desc: 'Full analytics on any screen — phone, tablet, or desktop.' },
                                     { icon: 'bell', title: 'Smart notifications', desc: 'PMS and registration alerts before they\'re overdue.' },
+                                    { icon: 'wifiOff', title: 'Works offline', desc: 'Lost signal on a long ride? Log fill-ups, services and expenses anyway. They sync by themselves when you\'re back online.' },
                                 ] as { icon: IconName; title: string; desc: string }[]).map((f) => (
                                     <div key={f.title} className="flex gap-3.5 items-start py-4 border-b border-line">
                                         <Icon name={f.icon} size={16} className="text-accent shrink-0 mt-0.5" />
