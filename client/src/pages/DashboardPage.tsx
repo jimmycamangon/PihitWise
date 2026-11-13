@@ -7,6 +7,8 @@ import { getFuelEconomy, getFuelLogs } from '../api/fuelLogs'
 import { getReminders } from '../api/reminders'
 import { getServiceLogs } from '../api/serviceLogs'
 import { useBike } from '../hooks/useBike'
+import SetupChecklist from '../components/SetupChecklist'
+import { hideChecklist, useOnboarding } from '../lib/onboarding'
 import { useVehicleData } from '../hooks/useVehicleData'
 import { monthOf, sumCost, toExpenses, today } from '../lib/expenses'
 import type { ExpenseCategory } from '../lib/expenses'
@@ -49,6 +51,7 @@ function Skeleton({ rows = 3 }: { rows?: number }) {
 export default function DashboardPage() {
     const { vehicle, vehiclesLoading } = useBike()
     const { data, loading, error } = useVehicleData(vehicle?.id, loadDashboard)
+    const { checklistHidden } = useOnboarding()
 
     // Bikes are still loading (the free API server can take a while to wake up).
     if (vehiclesLoading && !vehicle) {
@@ -64,6 +67,7 @@ export default function DashboardPage() {
         return (
             <>
                 <PageHeader title="Dashboard" subtitle="Overview of your bike." />
+                {!checklistHidden && <div data-tour="checklist" className="mb-3"><SetupChecklist onHide={hideChecklist} /></div>}
                 <div className="flex flex-col items-center text-center py-16 border border-dashed border-line rounded-xl">
                     <div className="w-14 h-14 rounded-full bg-raised flex items-center justify-center mb-4">
                         <Icon name="bike" size={24} className="text-muted" />
@@ -95,6 +99,9 @@ export default function DashboardPage() {
         <>
             <PageHeader title="Dashboard" subtitle={`Overview of your ${vehicle.name}.`} />
             <FormMessage text={error} />
+
+            {/* First-visit checklist; Settings can bring it back after it's hidden */}
+            {!checklistHidden && <div data-tour="checklist" className="mb-3"><SetupChecklist onHide={hideChecklist} /></div>}
 
             {/* Reminders that need attention now */}
             {due.length > 0 && (

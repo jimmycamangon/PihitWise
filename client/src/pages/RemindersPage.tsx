@@ -7,6 +7,7 @@ import ConfirmDialog from '../components/ConfirmDialog'
 import Toast from '../components/Toast'
 import Icon from '../components/Icon'
 import { useBike } from '../hooks/useBike'
+import { useQuickAdd } from '../hooks/useQuickAdd'
 import { createReminder, deleteReminder, getReminders, markReminderDone, updateReminder } from '../api/reminders'
 import type { Reminder, ReminderRequest, ReminderStatus } from '../types/reminders'
 import { formatDate, km } from '../lib/format'
@@ -78,6 +79,7 @@ export default function RemindersPage() {
     }
  
     const openAdd = () => { resetForm(); setShowForm(true) }
+    useQuickAdd(openAdd, !!vehicle)
  
     const onSubmit = async (e: FormEvent) => {
         e.preventDefault()

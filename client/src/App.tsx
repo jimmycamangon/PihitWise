@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import AppLayout from './components/AppLayout'
 import AboutPage from './pages/AboutPage'
 import AnalyticsPage from './pages/AnalyticsPage'
+import GuidePage from './pages/GuidePage'
 import ContactPage from './pages/ContactPage'
 import DashboardPage from './pages/DashboardPage'
 import ExpensesPage from './pages/ExpensesPage'
@@ -46,6 +47,7 @@ export default function App() {
             <Route path="/expenses" element={<ExpensesPage />} />
             <Route path="/analytics" element={<AnalyticsPage />} />
             <Route path="/reminders" element={<RemindersPage />} />
+            <Route path="/guide" element={<GuidePage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Route>
         </Route>
