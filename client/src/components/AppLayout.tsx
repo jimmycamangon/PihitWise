@@ -4,6 +4,7 @@ import Icon from './Icon'
 import type { IconName } from './Icon'
 import Logo from './Logo'
 import ThemeToggle from './ThemeToggle'
+import QuickAdd from './QuickAdd'
 import type { BikeContext } from '../hooks/useBike'
 import { getMe } from '../api/auth'
 import type { Me } from '../types/auth'
@@ -115,6 +116,7 @@ export default function AppLayout() {
                             {vehicle?.name} <span className="text-faint">· {vehicle?.plateNumber}</span>
                         </div>
                         <div className="flex items-center gap-2.5">
+                            {vehicle && <QuickAdd />}
                             <ThemeToggle />
                             <button className="lg:hidden w-8 h-8 rounded-md border border-line text-muted
                             flex items-center justify-center

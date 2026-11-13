@@ -10,6 +10,7 @@ import { createOtherExpense, deleteOtherExpense, getOtherExpenses, updateOtherEx
 import { getFuelLogs } from '../api/fuelLogs'
 import { getServiceLogs } from '../api/serviceLogs'
 import { useBike } from '../hooks/useBike'
+import { useQuickAdd } from '../hooks/useQuickAdd'
 import { useVehicleData } from '../hooks/useVehicleData'
 import { monthOf, recentMonths, sumCost, toExpenses, today } from '../lib/expenses'
 import type { ExpenseCategory } from '../lib/expenses'
@@ -52,6 +53,7 @@ export default function ExpensesPage() {
         setFieldErrors({})
         setShowForm(true)
     }
+    useQuickAdd(openAdd, !!vehicle)
 
     const onEdit = (id: string) => {
         const expense = data?.other.find((o) => o.id === id)
