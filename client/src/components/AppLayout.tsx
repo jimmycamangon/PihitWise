@@ -4,8 +4,6 @@ import Icon from './Icon'
 import type { IconName } from './Icon'
 import Logo from './Logo'
 import ThemeToggle from './ThemeToggle'
-import { Badge } from './ui'
-import { bikes } from '../data/mock'
 import type { BikeContext } from '../hooks/useBike'
 import { getMe } from '../api/auth'
 import type { Me } from '../types/auth'
@@ -31,9 +29,6 @@ export default function AppLayout() {
     const navigate = useNavigate()
     const [me, setMe] = useState<Me | null>(null)
 
-    const [bikeId, setBikeId] = useState(bikes[0].id)
-    const bike = bikes.find((b) => b.id === bikeId) ?? bikes[0]
-
     const [vehicles, setVehicles] = useState<Vehicle[]>([])
     const [vehicleId, setVehicleId] = useState<string | null>(null)
     const [vehiclesLoading, setVehiclesLoading] = useState(true)
@@ -50,7 +45,6 @@ export default function AppLayout() {
     }
 
     const vehicle = vehicles.find((v) => v.id === vehicleId) ?? null
-    const context: BikeContext = { bike, setBikeId, vehicle, vehiclesLoading, reloadVehicles }
 
 
     const bikeSelect = (
@@ -75,6 +69,8 @@ export default function AppLayout() {
         localStorage.removeItem('token')
         navigate('/login', { replace: true })
     }
+
+    const context: BikeContext = { vehicle, vehicles, vehiclesLoading, reloadVehicles, me, signOut }
 
     return (
         <div className="min-h-screen bg-canvas text-ink font-sans antialiased transition-colors duration-300">
@@ -118,7 +114,6 @@ export default function AppLayout() {
                             {vehicle?.name} <span className="text-faint">· {vehicle?.plateNumber}</span>
                         </div>
                         <div className="flex items-center gap-2.5">
-                            <span className="hidden sm:inline-flex"><Badge>Sample data</Badge></span>
                             <ThemeToggle />
                             <button className="lg:hidden w-8 h-8 rounded-md border border-line text-muted
                             flex items-center justify-center

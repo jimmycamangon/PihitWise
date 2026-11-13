@@ -1,6 +1,6 @@
 import { useState, useEffect, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { Badge, Card, FormMessage, PageHeader, Stat, type Tone } from '../components/ui'
+import { Badge, Card, FormMessage, PageHeader, Stat } from '../components/ui'
 import { Field } from '../components/AuthLayout'
 import Modal from '../components/Modal'
 import ConfirmDialog from '../components/ConfirmDialog'
@@ -10,27 +10,13 @@ import { useBike } from '../hooks/useBike'
 import { createReminder, deleteReminder, getReminders, markReminderDone, updateReminder } from '../api/reminders'
 import type { Reminder, ReminderRequest, ReminderStatus } from '../types/reminders'
 import { formatDate, km } from '../lib/format'
- 
+import { leftText, statusLabel, statusTone } from '../lib/reminders'
+
 interface ReminderErrors { title?: string, due?: string }
- 
-const statusTone: Record<ReminderStatus, Tone> = { overdue: 'warn', soon: 'accent', ok: 'ok', done: 'muted' }
-const statusLabel: Record<ReminderStatus, string> = { overdue: 'Overdue', soon: 'Due soon', ok: 'On track', done: 'Done' }
- 
+
 // Ideas for the title box. The rider can still type anything.
 const titleIdeas = ['Oil change', 'CVT cleaning', 'Brake pads', 'Tire change', 'Chain cleaning', 'LTO registration', 'CTPL insurance']
- 
-// "400 km left", "3 days overdue". Shows km and days when the reminder has both.
-function leftText(r: Reminder) {
-    const parts: string[] = []
-    if (r.kmLeft !== null) parts.push(r.kmLeft < 0 ? `${km(-r.kmLeft)} overdue` : `${km(r.kmLeft)} left`)
-    if (r.daysLeft !== null) {
-        const days = Math.abs(r.daysLeft)
-        const word = days === 1 ? 'day' : 'days'
-        parts.push(r.daysLeft < 0 ? `${days} ${word} overdue` : r.daysLeft === 0 ? 'due today' : `${days} ${word} left`)
-    }
-    return parts.join(' · ')
-}
- 
+
 // "Due at 13,000 km · Dec 18, 2026"
 function dueText(r: Reminder) {
     const parts: string[] = []
