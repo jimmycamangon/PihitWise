@@ -6,12 +6,11 @@ export default function PrivacyPage() {
         <PublicLayout
             eyebrow="Privacy"
             title="Privacy Policy"
-            intro="This page is a draft. The final policy will be published here before PihitWise opens for sign-ups."
         >
-            <Section title="What we plan to collect">
+            <Section title="What we collect">
                 <p>Your account details (name and email) and the records you choose to log: bikes, services, fill-ups, expenses, and reminders.</p>
             </Section>
-            <Section title="How it will be used">
+            <Section title="How we use it">
                 <p>To show your dashboard, calculate your fuel economy and costs, and send the reminders you set up.</p>
             </Section>
             <Section title="Your data">

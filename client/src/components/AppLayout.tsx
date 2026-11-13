@@ -7,6 +7,8 @@ import Logo from './Logo'
 import ThemeToggle from './ThemeToggle'
 import QuickAdd from './QuickAdd'
 import ReminderBell from './ReminderBell'
+import { MobileNavBottom, MobileNavTop } from './MobileNav'
+import { useNavStyle } from '../lib/navStyle'
 import { useOnline } from '../hooks/useOnline'
 import { clearOutbox, syncOutbox, useOutbox } from '../lib/outbox'
 import type { BikeContext } from '../hooks/useBike'
@@ -35,6 +37,8 @@ export default function AppLayout() {
     const navigate = useNavigate()
     const [me, setMe] = useState<Me | null>(null)
     const online = useOnline()
+    const navStyle = useNavStyle()
+    const bottomNav = navStyle === 'bottom'
 
     const [vehicles, setVehicles] = useState<Vehicle[]>([])
     const [vehicleId, setVehicleId] = useState<string | null>(null)
@@ -114,12 +118,13 @@ export default function AppLayout() {
     const context: BikeContext = { vehicle, vehicles, vehiclesLoading, reloadVehicles, me, setMe, signOut }
 
     return (
-        <div className="min-h-screen bg-canvas text-ink font-sans antialiased transition-colors duration-300">
+        <div className={`min-h-screen bg-canvas text-ink font-sans antialiased transition-colors duration-300
+            ${bottomNav ? '[--bottom-nav:4.5rem] lg:[--bottom-nav:0px]' : ''}`}>
 
             {/* ── SIDEBAR (desktop) ───────────────────────────────────────────── */}
             <aside className="hidden lg:flex fixed inset-y-0 left-0 w-56 flex-col bg-surface border-r border-line">
                 <div className="h-14 flex items-center px-4 border-b border-line">
-                    <Logo />
+                    <Logo to="/dashboard" />
                 </div>
                 <div className="p-3 border-b border-line">
                     <div className="font-mono text-[9px] uppercase tracking-[.14em] text-faint mb-1.5">Active bike</div>
@@ -150,7 +155,7 @@ export default function AppLayout() {
                 {/* ── TOP BAR ─────────────────────────────────────────────────── */}
                 <header className="sticky top-0 z-40 bg-canvas/80 backdrop-blur-xl border-b border-line">
                     <div className="h-14 flex items-center justify-between gap-3 px-4 md:px-8">
-                        <div className="lg:hidden"><Logo /></div>
+                        <div className="lg:hidden"><Logo to="/dashboard" /></div>
                         <div className="hidden lg:block text-xs text-muted">
                             {vehicle?.name} <span className="text-faint">· {vehicle?.plateNumber}</span>
                         </div>
@@ -166,18 +171,8 @@ export default function AppLayout() {
                         </div>
                     </div>
 
-                    {/* Mobile nav */}
-                    <div className="lg:hidden border-t border-line">
-                        <nav className="flex gap-1 px-3 py-2 overflow-x-auto">
-                            {navItems.map((item) => (
-                                <NavLink key={item.to} to={item.to} className={navLink}>
-                                    <Icon name={item.icon} size={14} />
-                                    {item.label}
-                                </NavLink>
-                            ))}
-                        </nav>
-                        <div className="px-4 pb-2.5">{bikeSelect}</div>
-                    </div>
+                    {/* Mobile nav: style picked in Settings */}
+                    <MobileNavTop style={navStyle} items={navItems} bikeSelect={bikeSelect} />
                 </header>
 
                 {!online && (
@@ -221,10 +216,12 @@ export default function AppLayout() {
                     </div>
                 )}
 
-                <main className="px-4 md:px-8 py-6 md:py-8 max-w-6xl">
+                <main className={`px-4 md:px-8 py-6 md:py-8 max-w-6xl ${bottomNav ? "pb-28 lg:pb-8" : ""}`}>
                     <Outlet key={pageVersion} context={context} />
                 </main>
             </div>
+
+            {bottomNav && <MobileNavBottom items={navItems} />}
         </div>
     )
 }

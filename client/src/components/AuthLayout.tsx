@@ -64,10 +64,6 @@ export default function AuthLayout({ title, subtitle, children, footer }: AuthLa
                         <div className="text-xs text-faint mt-6 text-center">{footer}</div>
                     </div>
                 </main>
-
-                <footer className="h-14 flex items-center text-[11px] text-faint">
-                    © 2025 PihitWise. Built for Filipino riders.
-                </footer>
             </div>
 
             {/* Brand side */}
@@ -80,22 +76,6 @@ export default function AuthLayout({ title, subtitle, children, footer }: AuthLa
                     <h2 className="font-semibold tracking-tight text-2xl md:text-3xl text-ink leading-[1.15] mb-8">
                         Less time worrying.<br />More time riding.
                     </h2>
-
-                    <div className="bg-canvas border border-line rounded-lg p-4 mb-8">
-                        <div className="flex items-end justify-between">
-                            <div>
-                                <div className="font-mono text-[9px] uppercase tracking-[.14em] text-faint">Next PMS</div>
-                                <div className="font-mono text-lg text-ink tracking-tight mt-0.5">340 km</div>
-                            </div>
-                            <div className="text-right">
-                                <div className="font-mono text-lg text-ok tracking-tight">42.6</div>
-                                <div className="font-mono text-[9px] uppercase tracking-[.14em] text-faint">km/L avg</div>
-                            </div>
-                        </div>
-                        <div className="h-1 rounded-full bg-bar mt-3.5 overflow-hidden">
-                            <div className="h-full w-4/5 rounded-full bg-accent" />
-                        </div>
-                    </div>
 
                     <div className="flex flex-col gap-2.5">
                         {['Maintenance and PMS reminders', 'Fuel economy and expense tracking', 'Resale-ready service history'].map((item) => (

@@ -5,7 +5,7 @@ export type IconName =
     | 'chart' | 'zap' | 'phone' | 'check' | 'arrow' | 'alert' | 'gauge'
     | 'mail' | 'lock' | 'user' | 'eye' | 'eyeOff'
     | 'grid' | 'garage' | 'settings' | 'logout' | 'calendar'
-    | 'tag' | 'bike' | 'hash'
+    | 'tag' | 'bike' | 'hash' | 'menu' | 'more'
 
 interface IconProps { name: IconName; size?: number; className?: string }
 
@@ -126,6 +126,8 @@ const paths: Record<IconName, ReactNode> = {
         </>
     ),
     hash: <path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18" />,
+    menu: <path d="M4 7h16M4 12h16M4 17h16" />,
+    more: <><circle cx="5" cy="12" r="1.5" /><circle cx="12" cy="12" r="1.5" /><circle cx="19" cy="12" r="1.5" /></>,
     garage: <path d="M3 21V9l9-5 9 5v12M7 21v-8h10v8M7 17h10" />,
     settings: (
         <>

@@ -166,12 +166,6 @@ export default function LandingPage() {
 
                         {/* Left */}
                         <div className="lp-reveal">
-                            <div className="inline-flex items-center gap-2 h-7 px-3 rounded-full
-                              border border-line bg-surface mb-7 text-[11px] text-muted">
-                                <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-                                Now available for all Filipino riders
-                            </div>
-
                             <h1 className="font-semibold tracking-tighter leading-[1.08] text-4xl md:text-5xl text-ink mb-5">
                                 Your digital<br />
                                 <span className="text-accent">garage.</span>
@@ -184,7 +178,7 @@ export default function LandingPage() {
                                 history — all in one modern rider dashboard.
                             </p>
 
-                            <div className="flex items-center gap-2.5 flex-wrap mb-10">
+                            <div className="flex items-center gap-2.5 flex-wrap">
                                 <a href="/register" className={`${btnPrimary} h-10 px-5 text-[13px]`}>
                                     Get started — free
                                     <Icon name="arrow" size={14} />
@@ -192,16 +186,6 @@ export default function LandingPage() {
                                 <a href="#showcase" className={`${btnGhost} h-10 px-5 text-[13px]`}>
                                     View dashboard
                                 </a>
-                            </div>
-
-                            <div className="flex items-center gap-1.5 flex-wrap">
-                                <span className="font-mono text-[10px] uppercase tracking-[.14em] text-faint mr-1.5">Built for</span>
-                                {['NMAX 155', 'Honda ADV', 'Aerox', 'Click 160', 'Mio i 125'].map((b) => (
-                                    <span key={b}
-                                        className="px-2.5 py-0.5 rounded-full border border-line text-[11px] text-muted">
-                                        {b}
-                                    </span>
-                                ))}
                             </div>
                         </div>
 
@@ -270,7 +254,7 @@ export default function LandingPage() {
             <div className="border-t border-b border-line bg-surface py-7">
                 <div className="max-w-6xl mx-auto px-6 md:px-16">
                     <div className="flex items-center justify-center gap-x-9 gap-y-3 flex-wrap">
-                        {['Built for Filipino riders', 'Track every kilometer', 'Never miss maintenance again', 'Free to get started', 'Mobile-first experience'].map((t) => (
+                        {['Track every kilometer', 'Never miss maintenance again', 'Free to get started', 'Mobile-first experience'].map((t) => (
                             <div key={t} className="flex items-center gap-2 text-xs text-muted">
                                 <span className="w-1 h-1 rounded-full bg-accent shrink-0" />
                                 {t}
@@ -460,7 +444,7 @@ export default function LandingPage() {
                         <div className="lp-reveal" style={{ transitionDelay: '.15s' }}>
                             <Eyebrow>Mobile first</Eyebrow>
                             <h2 className="font-semibold tracking-tight text-2xl md:text-3xl text-ink mb-3">
-                                Built for riders<br />on the go.
+                                Your garage,<br />on the go.
                             </h2>
                             <p className="text-sm text-muted leading-relaxed max-w-md mb-7">
                                 Log a fill-up in under a minute. Check your next PMS at a stoplight. PihitWise is designed for how riders actually use their phones.
@@ -539,11 +523,11 @@ export default function LandingPage() {
                     <div className="flex items-center justify-between flex-wrap gap-5">
                         <Logo />
                         <div className="flex gap-6 flex-wrap">
-                            {[['Features', '#features'], ['Dashboard', '#showcase'], ['About', '/about'], ['Privacy', '/privacy'], ['Contact', '/contact'], ['GitHub', 'https://github.com']].map(([l, h]) => (
+                            {[['Features', '#features'], ['Dashboard', '#showcase'], ['About', '/about'], ['Privacy', '/privacy'], ['Contact', '/contact']].map(([l, h]) => (
                                 <a key={l} href={h} className="text-xs text-muted hover:text-ink transition-colors no-underline">{l}</a>
                             ))}
                         </div>
-                        <div className="text-[11px] text-faint">© 2025 PihitWise. Built for Filipino riders.</div>
+                        <div className="text-[11px] text-faint">© {new Date().getFullYear()} PihitWise</div>
                     </div>
                 </div>
             </footer>

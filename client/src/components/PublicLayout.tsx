@@ -51,7 +51,7 @@ export default function PublicLayout({ eyebrow, title, intro, children }: Public
                             <Link key={to} to={to} className="text-xs text-muted hover:text-ink transition-colors no-underline">{label}</Link>
                         ))}
                     </div>
-                    <div className="text-[11px] text-faint">© 2025 PihitWise. Built for Filipino riders.</div>
+                    <div className="text-[11px] text-faint">© {new Date().getFullYear()} PihitWise</div>
                 </div>
             </footer>
         </div>
