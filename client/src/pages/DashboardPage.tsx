@@ -11,7 +11,7 @@ import { useVehicleData } from '../hooks/useVehicleData'
 import { monthOf, sumCost, toExpenses, today } from '../lib/expenses'
 import type { ExpenseCategory } from '../lib/expenses'
 import { formatDate, km, peso } from '../lib/format'
-import { leftText, statusLabel, statusTone } from '../lib/reminders'
+import { dueReminders, leftText, statusLabel, statusTone } from '../lib/reminders'
 
 const categoryIcon: Record<ExpenseCategory, IconName> = { Fuel: 'fuel', Maintenance: 'wrench', Other: 'wallet' }
 
@@ -87,12 +87,32 @@ export default function DashboardPage() {
     const lastFill = data?.lastFill
     const upcoming = data?.upcoming ?? []
     const next = upcoming[0]
+    const due = dueReminders(upcoming)
+    const dueOverdue = due.some((r) => r.status === 'overdue')
     const show = (value: string) => (loading ? '…' : value)
 
     return (
         <>
             <PageHeader title="Dashboard" subtitle={`Overview of your ${vehicle.name}.`} />
             <FormMessage text={error} />
+
+            {/* Reminders that need attention now */}
+            {due.length > 0 && (
+                <Link to="/reminders"
+                    className={`flex items-center gap-3 mb-3 p-3.5 rounded-xl border no-underline transition-colors hover:bg-raised
+                        ${dueOverdue ? 'border-warn/40 bg-warn/5' : 'border-accent/40 bg-accent/5'}`}>
+                    <Icon name="alert" size={16} className={dueOverdue ? 'text-warn' : 'text-accent'} />
+                    <div className="flex-1 min-w-0">
+                        <div className="text-xs font-medium text-ink truncate">
+                            {due[0].title} · {statusLabel[due[0].status].toLowerCase()}
+                        </div>
+                        <div className="text-[11px] text-muted truncate">
+                            {leftText(due[0])}{due.length > 1 ? ` · ${due.length - 1} more need attention` : ''}
+                        </div>
+                    </div>
+                    <Icon name="arrow" size={14} className="text-faint" />
+                </Link>
+            )}
 
             {/* Active bike */}
             <div className="flex items-end justify-between gap-4 bg-surface border border-line rounded-xl p-5 mb-3">

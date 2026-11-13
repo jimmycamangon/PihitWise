@@ -16,3 +16,7 @@ export function leftText(r: Reminder) {
     }
     return parts.join(' · ')
 }
+
+/** Reminders that need attention: overdue or due soon. The API puts the most urgent first. */
+export const dueReminders = (reminders: Reminder[]) =>
+    reminders.filter((r) => r.status === 'overdue' || r.status === 'soon')
