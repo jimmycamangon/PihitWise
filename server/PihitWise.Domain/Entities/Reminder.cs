@@ -11,6 +11,9 @@ namespace PihitWise.Domain.Entities
         public int? DueOdometer { get; set; }
         public DateOnly? DueDate { get; set; }
         public bool IsDone { get; set; }
+        // Set = the reminder repeats: marking it done moves DueOdometer to
+        // the bike's odometer + this many km, instead of closing it.
+        public int? RepeatEveryKm { get; set; }
 
     }
 }

@@ -12,6 +12,7 @@ namespace PihitWise.Application.Reminders
         string Status,
         int? KmLeft,
         int? DaysLeft,
-        DateTime CreatedAt
+        DateTime CreatedAt,
+        int? RepeatEveryKm
     );
 }
