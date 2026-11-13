@@ -4,6 +4,8 @@ import Icon from './Icon'
 import type { IconName } from './Icon'
 import Logo from './Logo'
 import ThemeToggle from './ThemeToggle'
+import LanguageToggle from './LanguageToggle'
+import { useT } from '../lib/i18n'
 
 interface AuthLayoutProps { title: string; subtitle: string; children: ReactNode; footer: ReactNode }
 interface FieldProps extends InputHTMLAttributes<HTMLInputElement> { label: string; icon: IconName; error?: string }
@@ -11,6 +13,7 @@ interface FieldProps extends InputHTMLAttributes<HTMLInputElement> { label: stri
 // ── Form field ─────────────────────────────────────────────────────────────
 export function Field({ label, icon, error, type, id, ...rest }: FieldProps) {
     const [show, setShow] = useState(false)
+    const t = useT()
     const isPassword = type === 'password'
     const fieldId = id ?? rest.name
 
@@ -32,7 +35,7 @@ export function Field({ label, icon, error, type, id, ...rest }: FieldProps) {
                 />
                 {isPassword && (
                     <button type="button" onClick={() => setShow(!show)}
-                        aria-label={show ? 'Hide password' : 'Show password'}
+                        aria-label={show ? t('auth.hidePassword') : t('auth.showPassword')}
                         className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 rounded-md
                              flex items-center justify-center text-faint hover:text-ink transition-colors cursor-pointer">
                         <Icon name={show ? 'eyeOff' : 'eye'} size={14} />
@@ -46,6 +49,7 @@ export function Field({ label, icon, error, type, id, ...rest }: FieldProps) {
 
 // ── Layout ─────────────────────────────────────────────────────────────────
 export default function AuthLayout({ title, subtitle, children, footer }: AuthLayoutProps) {
+    const t = useT()
     return (
         <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-canvas text-ink font-sans antialiased transition-colors duration-300">
 
@@ -53,7 +57,10 @@ export default function AuthLayout({ title, subtitle, children, footer }: AuthLa
             <div className="flex flex-col min-h-screen px-6 md:px-16">
                 <header className="flex items-center justify-between h-14">
                     <Logo />
-                    <ThemeToggle />
+                    <div className="flex items-center gap-2">
+                        <LanguageToggle />
+                        <ThemeToggle />
+                    </div>
                 </header>
 
                 <main className="flex-1 flex items-center justify-center py-10">
@@ -72,13 +79,13 @@ export default function AuthLayout({ title, subtitle, children, footer }: AuthLa
                 <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-200 h-150 pointer-events-none opacity-[.08]
                         bg-[radial-gradient(ellipse_at_center,var(--accent),transparent_70%)]" />
                 <div className="relative max-w-sm">
-                    <p className="font-mono text-[10px] uppercase tracking-[.2em] text-accent mb-4">Your digital garage</p>
+                    <p className="font-mono text-[10px] uppercase tracking-[.2em] text-accent mb-4">{t('auth.brandEyebrow')}</p>
                     <h2 className="font-semibold tracking-tight text-2xl md:text-3xl text-ink leading-[1.15] mb-8">
-                        Less time worrying.<br />More time riding.
+                        {t('auth.brandTitle1')}<br />{t('auth.brandTitle2')}
                     </h2>
 
                     <div className="flex flex-col gap-2.5">
-                        {['Maintenance and PMS reminders', 'Fuel economy and expense tracking', 'Resale-ready service history'].map((item) => (
+                        {[t('auth.brand1'), t('auth.brand2'), t('auth.brand3')].map((item) => (
                             <div key={item} className="flex items-center gap-2.5 text-[13px] text-muted">
                                 <Icon name="check" size={14} className="text-accent shrink-0" />
                                 {item}

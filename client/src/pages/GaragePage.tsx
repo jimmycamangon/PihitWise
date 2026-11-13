@@ -6,11 +6,11 @@ import type { Vehicle } from '../types/vehicles'
 import { Field } from '../components/AuthLayout'
 import { createVehicle, deleteVehicle, updateVehicle } from '../api/vehicles'
 import Modal from '../components/Modal'
-import { Badge } from '../components/ui'
 import ConfirmDialog from '../components/ConfirmDialog'
 import Toast from '../components/Toast'
 import Icon from '../components/Icon'
 import { useBike } from '../hooks/useBike'
+import { useT } from '../lib/i18n'
 
 interface VehicleErrors { name?: string, brand?: string, model?: string, year?: string, plateNumber?: string, odometer?: string }
 
@@ -35,6 +35,7 @@ export default function GaragePage() {
     const [saving, setSaving] = useState(false)
 
     const { reloadVehicles } = useBike()
+    const t = useT()
 
     const resetForm = () => {
         setName(''); setBrand(''); setModel('')
@@ -55,13 +56,13 @@ export default function GaragePage() {
         e.preventDefault()
 
         const next: VehicleErrors = {}
-        if (!name.trim()) next.name = 'Enter a name.'
-        if (!brand.trim()) next.brand = 'Enter a brand.'
-        if (!model.trim()) next.model = 'Enter a model.'
+        if (!name.trim()) next.name = t('garage.err.name')
+        if (!brand.trim()) next.brand = t('garage.err.brand')
+        if (!model.trim()) next.model = t('garage.err.model')
         const y = Number(year)
-        if (y < 1950 || y > new Date().getFullYear() + 1) next.year = 'Enter a valid year.'
-        if (plateNumber.trim().length > 10) next.plateNumber = 'Max 10 characters.'
-        if (Number(odometer) < 0) next.odometer = 'Odometer can\'t be negative.'
+        if (y < 1950 || y > new Date().getFullYear() + 1) next.year = t('garage.err.year')
+        if (plateNumber.trim().length > 10) next.plateNumber = t('garage.err.plate')
+        if (Number(odometer) < 0) next.odometer = t('garage.err.odometer')
         setFieldErrors(next)
         if (Object.keys(next).length > 0) return
 
@@ -77,17 +78,17 @@ export default function GaragePage() {
             if (editingId) {
                 const updated = await updateVehicle(editingId, data)
                 setVehicles(vehicles.map((v) => (v.id === editingId ? updated : v)))
-                setToast('Vehicle updated')
+                setToast(t('garage.updated'))
             } else {
                 const created = await createVehicle(data)
                 setVehicles([...vehicles, created])
-                setToast('Vehicle added')
+                setToast(t('garage.added'))
             }
             setShowForm(false)
             resetForm()
             reloadVehicles()
         } catch (err) {
-            const msg = err instanceof Error ? err.message : 'Something went wrong.'
+            const msg = err instanceof Error ? err.message : t('common.somethingWrong')
             if (msg.includes('plate')) setFieldErrors({ plateNumber: msg })
             else setErrors(msg)
         } finally {
@@ -111,7 +112,7 @@ export default function GaragePage() {
         try {
             await deleteVehicle(id)
             setVehicles(vehicles.filter((v) => v.id !== id))
-            setToast('Vehicle deleted')
+            setToast(t('garage.deleted'))
 
             reloadVehicles()
         } catch (err) {
@@ -122,11 +123,11 @@ export default function GaragePage() {
     return (
         <>
             <div className="flex items-start justify-between gap-3">
-                <PageHeader title="Garage" subtitle="Every vehicle you own, in one place." />
+                <PageHeader title={t('garage.title')} subtitle={t('garage.subtitle')} />
                 <button type="button" onClick={() => { resetForm(); setShowForm(true) }}
                     className="h-8 px-3.5 rounded-md bg-accent text-on-accent text-xs font-medium
              hover:opacity-90 transition-opacity cursor-pointer whitespace-nowrap">
-                    + Add vehicle
+                    {t('garage.add')}
                 </button>
             </div>
             <FormMessage text={errors} />
@@ -146,20 +147,20 @@ export default function GaragePage() {
                                     <div className="text-base font-medium text-ink">{vehicle.name}</div>
                                     <div className="text-xs text-muted">{vehicle.brand} {vehicle.model} · {vehicle.year}</div>
                                 </div>
-                                <Badge>{vehicle.plateNumber ?? 'No plate'}</Badge>
+                                <span className="inline-flex items-center h-5 px-2 rounded-full border border-line font-mono text-[9px] uppercase tracking-widest text-muted whitespace-nowrap">{vehicle.plateNumber ?? t('garage.noPlate')}</span>
                             </div>
-                            <Label>Odometer</Label>
+                            <Label>{t('common.odometer')}</Label>
                             <div className="font-mono text-sm text-ink tracking-tight mt-1">{km(vehicle.odometer)}</div>
                             <div className="flex gap-2 mt-4 pt-4 border-t border-line">
                                 <button type="button" onClick={() => onEdit(vehicle)}
                                     className="h-8 px-3 rounded-md border border-line text-xs text-ink
              hover:bg-raised transition-colors cursor-pointer">
-                                    Edit
+                                    {t('common.edit')}
                                 </button>
                                 <button type="button" onClick={() => setDeleteId(vehicle.id)}
                                     className="h-8 px-3 rounded-md border border-line text-xs text-warn
              hover:bg-raised transition-colors cursor-pointer">
-                                    Delete
+                                    {t('common.delete')}
                                 </button>
                             </div>
                         </div>
@@ -172,19 +173,19 @@ export default function GaragePage() {
                     <div className="w-14 h-14 rounded-full bg-raised flex items-center justify-center mb-4">
                         <Icon name="bike" size={24} className="text-muted" />
                     </div>
-                    <div className="text-sm font-medium text-ink">No vehicles yet</div>
-                    <p className="text-xs text-muted mt-1 mb-5">Add your first ride to start tracking it.</p>
+                    <div className="text-sm font-medium text-ink">{t('garage.none')}</div>
+                    <p className="text-xs text-muted mt-1 mb-5">{t('garage.noneHelp')}</p>
                     <button type="button" onClick={() => { resetForm(); setShowForm(true) }}
                         className="h-8 px-3.5 rounded-md bg-accent text-on-accent text-xs font-medium
          hover:opacity-90 transition-opacity cursor-pointer">
-                        + Add your first vehicle
+                        {t('garage.addFirst')}
                     </button>
                 </div>
             )}
 
-            <Modal open={showForm} title={editingId ? 'Edit vehicle' : 'Add vehicle'} onClose={() => setShowForm(false)}>
+            <Modal open={showForm} title={editingId ? t('garage.formEdit') : t('garage.formAdd')} onClose={() => setShowForm(false)}>
                 <form onSubmit={onSubmit} className="flex flex-col gap-3 mb-4">
-                    <Field label="Name" icon="garage" placeholder="My daily ride" name="name"
+                    <Field label={t('garage.name')} icon="garage" placeholder={t('garage.namePlaceholder')} name="name"
                         value={name}
                         onChange={(e) => {
                             setName(e.target.value)
@@ -192,14 +193,14 @@ export default function GaragePage() {
                         }}
                         error={fieldErrors.name} />
                     <div className="grid grid-cols-2 gap-3">
-                        <Field label="Brand" icon="tag" placeholder="Honda" name="brand"
+                        <Field label={t('garage.brand')} icon="tag" placeholder="Honda" name="brand"
                             value={brand}
                             onChange={(e) => {
                                 setBrand(e.target.value)
                                 setFieldErrors({ ...fieldErrors, brand: undefined })
                             }}
                             error={fieldErrors.brand} />
-                        <Field label="Model" icon="bike" placeholder="Click 125i" name="model"
+                        <Field label={t('garage.model')} icon="bike" placeholder="Click 125i" name="model"
                             value={model}
                             onChange={(e) => {
                                 setModel(e.target.value)
@@ -208,14 +209,14 @@ export default function GaragePage() {
                             error={fieldErrors.model} />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
-                        <Field label="Year" icon="calendar" placeholder="2022" name="year" type="number"
+                        <Field label={t('garage.year')} icon="calendar" placeholder="2022" name="year" type="number"
                             value={year}
                             onChange={(e) => {
                                 setYear(e.target.value)
                                 setFieldErrors({ ...fieldErrors, year: undefined })
                             }}
                             error={fieldErrors.year} />
-                        <Field label="Odometer" icon="gauge" placeholder="12000" name="odometer" type="number"
+                        <Field label={t('common.odometer')} icon="gauge" placeholder="12000" name="odometer" type="number"
                             value={odometer}
                             onChange={(e) => {
                                 setOdometer(e.target.value)
@@ -223,7 +224,7 @@ export default function GaragePage() {
                             }}
                             error={fieldErrors.odometer} />
                     </div>
-                    <Field label="Plate Number" icon="hash" placeholder="ABC 1234" name="plateNumber"
+                    <Field label={t('garage.plate')} icon="hash" placeholder="ABC 1234" name="plateNumber"
                         value={plateNumber}
                         onChange={(e) => {
                             setplateNumber(e.target.value)
@@ -233,7 +234,7 @@ export default function GaragePage() {
                     <button type="submit" disabled={saving}
                         className="h-10 mt-2 rounded-md bg-accent text-on-accent text-[13px] font-medium
          hover:opacity-90 transition-opacity cursor-pointer">
-                        {saving ? 'Saving...' : editingId ? 'Save changes' : 'Save vehicle'}
+                        {saving ? t('common.saving') : editingId ? t('common.saveChanges') : t('garage.save')}
                     </button>
                 </form>
             </Modal>
@@ -241,9 +242,9 @@ export default function GaragePage() {
 
             <ConfirmDialog
                 open={deleteId !== null}
-                title="Delete bike"
-                message="This bike will be removed. This can't be undone."
-                confirmText="Delete"
+                title={t('garage.deleteTitle')}
+                message={t('garage.deleteMessage')}
+                confirmText={t('common.delete')}
                 danger
                 onConfirm={() => { onDelete(deleteId!); setDeleteId(null) }}
                 onCancel={() => setDeleteId(null)}

@@ -5,6 +5,9 @@ import Icon from './Icon'
 import type { IconName } from './Icon'
 import Logo from './Logo'
 import ThemeToggle from './ThemeToggle'
+import LanguageToggle from './LanguageToggle'
+import { useT } from '../lib/i18n'
+import type { TKey } from '../lib/i18n'
 import QuickAdd from './QuickAdd'
 import ReminderBell from './ReminderBell'
 import WelcomeModal from './WelcomeModal'
@@ -20,16 +23,16 @@ import { getVehicles } from '../api/vehicles'
 import type { Vehicle } from '../types/vehicles'
 
 
-const navItems: { to: string; label: string; icon: IconName }[] = [
-    { to: '/dashboard', label: 'Dashboard', icon: 'grid' },
-    { to: '/garage', label: 'Garage', icon: 'garage' },
-    { to: '/maintenance', label: 'Maintenance', icon: 'wrench' },
-    { to: '/fuel', label: 'Fuel', icon: 'fuel' },
-    { to: '/expenses', label: 'Expenses', icon: 'wallet' },
-    { to: '/analytics', label: 'Analytics', icon: 'chart' },
-    { to: '/reminders', label: 'Reminders', icon: 'bell' },
-    { to: '/settings', label: 'Settings', icon: 'settings' },
-    { to: '/guide', label: 'Guide', icon: 'help' },
+const navDefs: { to: string; labelKey: TKey; icon: IconName }[] = [
+    { to: '/dashboard', labelKey: 'nav.dashboard', icon: 'grid' },
+    { to: '/garage', labelKey: 'nav.garage', icon: 'garage' },
+    { to: '/maintenance', labelKey: 'nav.maintenance', icon: 'wrench' },
+    { to: '/fuel', labelKey: 'nav.fuel', icon: 'fuel' },
+    { to: '/expenses', labelKey: 'nav.expenses', icon: 'wallet' },
+    { to: '/analytics', labelKey: 'nav.analytics', icon: 'chart' },
+    { to: '/reminders', labelKey: 'nav.reminders', icon: 'bell' },
+    { to: '/settings', labelKey: 'nav.settings', icon: 'settings' },
+    { to: '/guide', labelKey: 'nav.guide', icon: 'help' },
 ]
 
 const navLink = ({ isActive }: { isActive: boolean }) =>
@@ -38,6 +41,8 @@ const navLink = ({ isActive }: { isActive: boolean }) =>
 
 export default function AppLayout() {
     const navigate = useNavigate()
+    const t = useT()
+    const navItems = navDefs.map((d) => ({ to: d.to, icon: d.icon, label: t(d.labelKey) }))
     const [me, setMe] = useState<Me | null>(null)
     const online = useOnline()
     const navStyle = useNavStyle()
@@ -62,10 +67,10 @@ export default function AppLayout() {
 
 
     const bikeSelect = (
-        <select data-tour="bike" value={vehicleId ?? ''} onChange={(e) => setVehicleId(e.target.value)} aria-label="Active bike"
+        <select data-tour="bike" value={vehicleId ?? ''} onChange={(e) => setVehicleId(e.target.value)} aria-label={t('bike.active')}
             className="w-full h-8 rounded-md border border-line bg-surface px-2 text-xs text-ink
                  outline-none focus:border-accent cursor-pointer">
-            {vehicles.length === 0 && <option value="">{vehiclesLoading ? 'Loading...' : 'No bikes yet'}</option>}
+            {vehicles.length === 0 && <option value="">{vehiclesLoading ? t('bike.loading') : t('bike.none')}</option>}
             {vehicles.map((v) => <option key={v.id} value={v.id}>{v.name}</option>)}
         </select>
     )
@@ -110,9 +115,7 @@ export default function AppLayout() {
     }, [online])
 
     const signOut = () => {
-        if (outbox.length > 0 && !window.confirm(
-            `${outbox.length} log${outbox.length === 1 ? ' hasn\'t' : 's haven\'t'} synced yet. ` +
-            'Signing out deletes them from this device. Sign out anyway?')) return
+        if (outbox.length > 0 && !window.confirm(t('sync.signOutConfirm', { count: outbox.length }))) return
         clearOutbox()
         clearToken()
         navigate('/login', { replace: true })
@@ -130,7 +133,7 @@ export default function AppLayout() {
                     <Logo to="/dashboard" />
                 </div>
                 <div className="p-3 border-b border-line">
-                    <div className="font-mono text-[9px] uppercase tracking-[.14em] text-faint mb-1.5">Active bike</div>
+                    <div className="font-mono text-[9px] uppercase tracking-[.14em] text-faint mb-1.5">{t('bike.active')}</div>
                     {bikeSelect}
                 </div>
                 <nav data-tour="nav" className="flex-1 flex flex-col gap-0.5 p-3 overflow-y-auto">
@@ -149,7 +152,7 @@ export default function AppLayout() {
                     <button type="button" className={navLink({ isActive: false })}
                         onClick={signOut}>
                         <Icon name="logout" size={14} />
-                        Sign out
+                        {t('nav.signOut')}
                     </button>
                 </div>
             </aside>
@@ -160,20 +163,21 @@ export default function AppLayout() {
                     <div className="h-14 flex items-center justify-between gap-3 px-4 md:px-8">
                         <div className="lg:hidden"><Logo to="/dashboard" /></div>
                         <div className="hidden lg:block text-xs text-muted">
-                            {vehicle?.name} <span className="text-faint">· {vehicle?.plateNumber}</span>
+                            {vehicle?.name}{vehicle?.plateNumber && <span className="text-faint"> · {vehicle.plateNumber}</span>}
                         </div>
                         <div className="flex items-center gap-2.5">
                             {vehicle && <QuickAdd />}
                             {vehicle && <ReminderBell vehicleId={vehicle.id} />}
-                            <Link data-tour="guide" to="/guide" aria-label="Guide" title="Guide"
+                            <Link data-tour="guide" to="/guide" aria-label={t('nav.guide')} title={t('nav.guide')}
                                 className="w-8 h-8 rounded-md border border-line text-muted flex items-center justify-center
                                      hover:text-ink hover:bg-raised transition-colors no-underline">
                                 <Icon name="help" size={16} />
                             </Link>
+                            <LanguageToggle className="hidden sm:block" />
                             <ThemeToggle />
                             <button className="lg:hidden w-8 h-8 rounded-md border border-line text-muted
                             flex items-center justify-center
-                            hover:text-ink hover:bg-raised transition-colors cursor-pointer" type="button" onClick={signOut} aria-label="Sign Out">
+                            hover:text-ink hover:bg-raised transition-colors cursor-pointer" type="button" onClick={signOut} aria-label={t('nav.signOut')}>
                                 <Icon name="logout" size={16} />
                             </button>
                         </div>
@@ -187,11 +191,10 @@ export default function AppLayout() {
                     <div role="status" className="flex items-start gap-3 px-4 md:px-8 py-3 border-b-2 border-warn bg-warn/15">
                         <Icon name="alert" size={18} className="text-warn shrink-0 mt-px" />
                         <div className="min-w-0">
-                            <div className="text-[13px] font-semibold text-warn">You're offline</div>
+                            <div className="text-[13px] font-semibold text-warn">{t('offline.title')}</div>
                             <div className="text-xs text-ink">
-                                Showing the last data loaded on this device. New fill-ups, services and expenses
-                                are saved here and sync when you're back online.
-                                {waiting > 0 && <span className="font-medium"> {waiting} waiting to sync.</span>}
+                                {t('offline.body')}
+                                {waiting > 0 && <span className="font-medium"> {t('offline.waiting', { count: waiting })}</span>}
                             </div>
                         </div>
                     </div>
@@ -201,12 +204,12 @@ export default function AppLayout() {
                     <div role="status" className="flex items-center gap-3 px-4 md:px-8 py-2.5 border-b-2 border-accent bg-accent/10">
                         <Icon name="clock" size={16} className="text-accent shrink-0" />
                         <div className="flex-1 text-xs text-ink">
-                            {syncing ? 'Syncing' : 'Waiting to sync'} {waiting} log{waiting === 1 ? '' : 's'} saved offline…
+                            {t(syncing ? 'sync.syncing' : 'sync.waiting', { count: waiting })}
                         </div>
                         {!syncing && (
                             <button type="button" onClick={sync}
                                 className="h-7 px-3 rounded-md bg-accent text-on-accent text-[11px] font-medium hover:opacity-90 cursor-pointer">
-                                Sync now
+                                {t('sync.now')}
                             </button>
                         )}
                     </div>
@@ -217,9 +220,9 @@ export default function AppLayout() {
                         <Icon name="alert" size={16} className="text-warn shrink-0 mt-px" />
                         <div className="text-xs text-ink">
                             <span className="font-semibold text-warn">
-                                {refused} log{refused === 1 ? '' : 's'} couldn't sync.
+                                {t('sync.refused', { count: refused })}
                             </span>{' '}
-                            Look for "Couldn't sync" in Fuel, Maintenance or Expenses, then edit it to try again or delete it.
+                            {t('sync.refusedHelp')}
                         </div>
                     </div>
                 )}

@@ -1,3 +1,4 @@
+import { t } from './i18n'
 import type { PendingFields } from './outbox'
 import type { OtherExpense } from '../types/expenses'
 import type { FuelLog } from '../types/fuelLogs'
@@ -14,7 +15,7 @@ const byDateDesc = <T extends { date: string }>(a: T, b: T) => b.date.localeComp
 /** Fuel, maintenance and other costs as one list, newest first. */
 export function toExpenses(fuel: FuelLog[], services: ServiceLog[], other: OtherExpense[]): Expense[] {
     return [
-        ...fuel.map((f): Expense => ({ id: f.id, date: f.date, category: 'Fuel', label: `Fill-up · ${f.liters.toFixed(1)} L`, cost: f.cost, pending: f.pending, syncError: f.syncError })),
+        ...fuel.map((f): Expense => ({ id: f.id, date: f.date, category: 'Fuel', label: t('expense.fillUpLabel', { liters: f.liters.toFixed(1) }), cost: f.cost, pending: f.pending, syncError: f.syncError })),
         ...services.map((s): Expense => ({ id: s.id, date: s.date, category: 'Maintenance', label: s.type, cost: s.cost, pending: s.pending, syncError: s.syncError })),
         ...other.map((o): Expense => ({ id: o.id, date: o.date, category: 'Other', label: o.label, cost: o.cost, pending: o.pending, syncError: o.syncError })),
     ].sort(byDateDesc)

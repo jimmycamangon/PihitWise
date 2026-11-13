@@ -5,11 +5,13 @@ import AuthLayout, { Field } from '../components/AuthLayout'
 import Icon from '../components/Icon'
 import { FormMessage } from '../components/ui'
 import { requestPasswordReset } from '../api/auth'
+import { useT } from '../lib/i18n'
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export default function ForgotPasswordPage() {
     const [email, setEmail] = useState('')
+    const t = useT()
     const [error, setError] = useState('')
     const [failure, setFailure] = useState('')
     const [sentTo, setSentTo] = useState('')
@@ -17,7 +19,7 @@ export default function ForgotPasswordPage() {
 
     const onSubmit = async (e: FormEvent) => {
         e.preventDefault()
-        if (!emailPattern.test(email.trim())) return setError('Enter a valid email address.')
+        if (!emailPattern.test(email.trim())) return setError(t('auth.err.email'))
         setError('')
         setFailure('')
         setSending(true)
@@ -25,7 +27,7 @@ export default function ForgotPasswordPage() {
             await requestPasswordReset(email.trim())
             setSentTo(email.trim())
         } catch {
-            setFailure('Could not send the reset link. Please try again.')
+            setFailure(t('forgot.failed'))
         } finally {
             setSending(false)
         }
@@ -33,10 +35,10 @@ export default function ForgotPasswordPage() {
 
     return (
         <AuthLayout
-            title="Reset your password"
-            subtitle="Enter your email and we'll send you a reset link."
-            footer={<>Remembered it?{' '}
-                <Link to="/login" className="text-accent no-underline hover:opacity-80">Back to sign in</Link></>}
+            title={t('forgot.title')}
+            subtitle={t('forgot.subtitle')}
+            footer={<>{t('auth.remembered')}{' '}
+                <Link to="/login" className="text-accent no-underline hover:opacity-80">{t('auth.backToSignIn')}</Link></>}
         >
             {sentTo ? (
                 <div role="status" className="flex flex-col items-center text-center gap-3 py-2">
@@ -44,26 +46,26 @@ export default function ForgotPasswordPage() {
                         <Icon name="mail" size={20} className="text-accent" />
                     </div>
                     <p className="text-xs text-ink">
-                        If <span className="font-medium">{sentTo}</span> has a PihitWise account, a reset link is on its way.
+                        {t('forgot.sent', { email: sentTo })}
                     </p>
                     <p className="text-[11px] text-muted">
-                        The link works for 1 hour. Check your spam folder if it doesn't show up.
+                        {t('forgot.sentHelp')}
                     </p>
                     <button type="button" onClick={() => setSentTo('')}
                         className="text-[11px] text-accent hover:opacity-80 cursor-pointer">
-                        Use a different email
+                        {t('forgot.useDifferent')}
                     </button>
                 </div>
             ) : (
                 <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
-                    <Field label="Email" icon="mail" type="email" name="email" autoComplete="email"
+                    <Field label={t('auth.email')} icon="mail" type="email" name="email" autoComplete="email"
                         placeholder="you@example.com" value={email} error={error}
                         onChange={(e) => { setEmail(e.target.value); setError('') }} />
 
                     <button type="submit" disabled={sending}
                         className="inline-flex items-center justify-center gap-2 h-10 rounded-md bg-accent text-on-accent
                              text-[13px] font-medium hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-60">
-                        {sending ? 'Sending...' : 'Send reset link'}
+                        {sending ? t('forgot.sending') : t('forgot.send')}
                         {!sending && <Icon name="arrow" size={14} />}
                     </button>
 

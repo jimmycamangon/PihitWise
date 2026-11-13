@@ -9,6 +9,7 @@ import { getServiceLogs } from '../api/serviceLogs'
 import { useBike } from '../hooks/useBike'
 import SetupChecklist from '../components/SetupChecklist'
 import { hideChecklist, useOnboarding } from '../lib/onboarding'
+import { useT } from '../lib/i18n'
 import { useVehicleData } from '../hooks/useVehicleData'
 import { monthOf, sumCost, toExpenses, today } from '../lib/expenses'
 import type { ExpenseCategory } from '../lib/expenses'
@@ -33,9 +34,10 @@ const loadDashboard = async (vehicleId: string) => {
 }
 
 function ViewAll({ to }: { to: string }) {
+    const t = useT()
     return (
         <Link to={to} className="inline-flex items-center gap-1 text-[11px] text-accent no-underline hover:opacity-80">
-            View all <Icon name="arrow" size={11} />
+            {t('common.viewAll')} <Icon name="arrow" size={11} />
         </Link>
     )
 }
@@ -52,12 +54,13 @@ export default function DashboardPage() {
     const { vehicle, vehiclesLoading } = useBike()
     const { data, loading, error } = useVehicleData(vehicle?.id, loadDashboard)
     const { checklistHidden } = useOnboarding()
+    const t = useT()
 
     // Bikes are still loading (the free API server can take a while to wake up).
     if (vehiclesLoading && !vehicle) {
         return (
             <>
-                <PageHeader title="Dashboard" subtitle="Overview of your bike." />
+                <PageHeader title={t('dashboard.title')} subtitle={t('dashboard.subtitle')} />
                 <div className="h-40 bg-surface border border-line rounded-xl animate-pulse" />
             </>
         )
@@ -66,18 +69,18 @@ export default function DashboardPage() {
     if (!vehicle) {
         return (
             <>
-                <PageHeader title="Dashboard" subtitle="Overview of your bike." />
+                <PageHeader title={t('dashboard.title')} subtitle={t('dashboard.subtitle')} />
                 {!checklistHidden && <div data-tour="checklist" className="mb-3"><SetupChecklist onHide={hideChecklist} /></div>}
                 <div className="flex flex-col items-center text-center py-16 border border-dashed border-line rounded-xl">
                     <div className="w-14 h-14 rounded-full bg-raised flex items-center justify-center mb-4">
                         <Icon name="bike" size={24} className="text-muted" />
                     </div>
-                    <div className="text-sm font-medium text-ink">No bike yet</div>
-                    <p className="text-xs text-muted mt-1 mb-5">Add your first bike to start tracking fuel, maintenance and reminders.</p>
+                    <div className="text-sm font-medium text-ink">{t('dashboard.noBike')}</div>
+                    <p className="text-xs text-muted mt-1 mb-5">{t('dashboard.noBikeHelp')}</p>
                     <Link to="/garage"
                         className="h-8 px-3.5 inline-flex items-center rounded-md bg-accent text-on-accent text-xs font-medium
                              no-underline hover:opacity-90 transition-opacity">
-                        Go to Garage
+                        {t('common.goToGarage')}
                     </Link>
                 </div>
             </>
@@ -97,7 +100,7 @@ export default function DashboardPage() {
 
     return (
         <>
-            <PageHeader title="Dashboard" subtitle={`Overview of your ${vehicle.name}.`} />
+            <PageHeader title={t('dashboard.title')} subtitle={t('dashboard.subtitleBike', { bike: vehicle.name })} />
             <FormMessage text={error} />
 
             {/* First-visit checklist; Settings can bring it back after it's hidden */}
@@ -114,7 +117,7 @@ export default function DashboardPage() {
                             {due[0].title} · {statusLabel[due[0].status].toLowerCase()}
                         </div>
                         <div className="text-[11px] text-muted truncate">
-                            {leftText(due[0])}{due.length > 1 ? ` · ${due.length - 1} more need attention` : ''}
+                            {leftText(due[0])}{due.length > 1 ? ` · ${t('dashboard.moreNeedAttention', { count: due.length - 1 })}` : ''}
                         </div>
                     </div>
                     <Icon name="arrow" size={14} className="text-faint" />
@@ -126,34 +129,34 @@ export default function DashboardPage() {
                 <div>
                     <div className="flex items-center gap-1.5 mb-2">
                         <span className="w-1 h-1 rounded-full bg-accent" />
-                        <Label>Active ride</Label>
+                        <Label>{t('dashboard.activeRide')}</Label>
                     </div>
                     <div className="text-base font-medium text-ink">{vehicle.name}</div>
                     <div className="text-xs text-faint mb-4">
                         {vehicle.year}{vehicle.plateNumber ? ` · ${vehicle.plateNumber}` : ''}
                     </div>
-                    <Label>Odometer</Label>
+                    <Label>{t('dashboard.odometer')}</Label>
                     <div className="font-mono text-2xl text-ink tracking-tight mt-0.5">{km(vehicle.odometer)}</div>
                 </div>
                 <div className="text-right">
                     <div className="font-mono text-2xl text-ok tracking-tight">
                         {show(average !== null ? average.toFixed(1) : '—')}
                     </div>
-                    <Label>km/L avg</Label>
+                    <Label>{t('dashboard.kmlAvg')}</Label>
                 </div>
             </div>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
-                <Stat label="This month" value={show(peso(sumCost(thisMonth)))} sub="total spent" tone="accent" />
-                <Stat label="Fuel this month" value={show(peso(sumCost(thisMonth.filter((e) => e.category === 'Fuel'))))} sub="on fill-ups" />
-                <Stat label="Fuel price" value={show(lastFill && lastFill.liters > 0 ? `₱${(lastFill.cost / lastFill.liters).toFixed(1)}` : '—')}
-                    sub="per liter, last fill-up" />
-                <Stat label="Next due" value={show(next ? leftText(next) : '—')} sub={next?.title}
+                <Stat label={t('dashboard.thisMonth')} value={show(peso(sumCost(thisMonth)))} sub={t('dashboard.totalSpent')} tone="accent" />
+                <Stat label={t('dashboard.fuelThisMonth')} value={show(peso(sumCost(thisMonth.filter((e) => e.category === 'Fuel'))))} sub={t('dashboard.onFillUps')} />
+                <Stat label={t('dashboard.fuelPrice')} value={show(lastFill && lastFill.liters > 0 ? `₱${(lastFill.cost / lastFill.liters).toFixed(1)}` : '—')}
+                    sub={t('dashboard.perLiter')} />
+                <Stat label={t('dashboard.nextDue')} value={show(next ? leftText(next) : '—')} sub={next?.title}
                     tone={next ? statusTone[next.status] : 'ink'} />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 mb-3">
-                <Card title="Fuel economy — last 6 fill-ups (km/L)" action={<ViewAll to="/fuel" />} className="lg:col-span-3">
+                <Card title={t('dashboard.economyChart')} action={<ViewAll to="/fuel" />} className="lg:col-span-3">
                     {loading
                         ? <div className="h-40 bg-raised rounded animate-pulse" />
                         : <BarChart bars={economy.map((p) => ({
@@ -161,9 +164,9 @@ export default function DashboardPage() {
                         }))} />}
                 </Card>
 
-                <Card title="Upcoming reminders" action={<ViewAll to="/reminders" />} className="lg:col-span-2">
+                <Card title={t('dashboard.upcoming')} action={<ViewAll to="/reminders" />} className="lg:col-span-2">
                     {loading && <Skeleton />}
-                    {!loading && upcoming.length === 0 && <p className="text-xs text-faint py-6 text-center">No reminders set.</p>}
+                    {!loading && upcoming.length === 0 && <p className="text-xs text-faint py-6 text-center">{t('dashboard.noReminders')}</p>}
                     {!loading && upcoming.slice(0, 3).map((r) => (
                         <div key={r.id} className="flex items-center justify-between gap-3 py-2.5 border-t border-line first:border-0 first:pt-0">
                             <div className="min-w-0">
@@ -176,10 +179,10 @@ export default function DashboardPage() {
                 </Card>
             </div>
 
-            <Card title="Recent activity" action={<ViewAll to="/expenses" />}>
+            <Card title={t('dashboard.recent')} action={<ViewAll to="/expenses" />}>
                 {loading && <Skeleton />}
                 {!loading && expenses.length === 0 && (
-                    <p className="text-xs text-faint py-6 text-center">No fill-ups or services logged yet.</p>
+                    <p className="text-xs text-faint py-6 text-center">{t('dashboard.noActivity')}</p>
                 )}
                 {!loading && expenses.slice(0, 5).map((e) => (
                     <div key={e.id} className="flex items-center gap-3 py-2.5 border-t border-line first:border-0 first:pt-0 last:pb-0">
@@ -188,7 +191,7 @@ export default function DashboardPage() {
                         </div>
                         <div className="flex-1 min-w-0">
                             <div className="text-xs font-medium text-ink truncate">{e.label}</div>
-                            <div className="text-[11px] text-faint">{e.category} · {formatDate(e.date)}</div>
+                            <div className="text-[11px] text-faint">{t(`category.${e.category}`)} · {formatDate(e.date)}</div>
                         </div>
                         <div className="font-mono text-xs text-ink">{peso(e.cost)}</div>
                     </div>

@@ -1,19 +1,21 @@
 import { useEffect, useState } from 'react'
 import { endTour, goToStep, useTour } from '../lib/tour'
+import { useT } from '../lib/i18n'
+import type { TKey } from '../lib/i18n'
 
 // Guided tour: dims the screen, cuts a glowing spotlight around one part of the app at a time,
 // and explains it in a card next to it. Parts are marked in the markup with data-tour="…".
 // A step whose part isn't on screen (hidden on this screen size or not there yet) is skipped.
 
-interface TourStep { target: string; title: string; text: string }
+interface TourStep { target: string; title: TKey; text: TKey }
 
 const STEPS: TourStep[] = [
-    { target: 'nav', title: 'Your pages', text: 'Dashboard, Garage, Fuel, Maintenance, Reminders and more. On phones you can change how this looks in Settings.' },
-    { target: 'bike', title: 'Active bike', text: 'Every log and reminder belongs to the bike picked here. Switch it if you have more than one.' },
-    { target: 'quick-add', title: '+ Log', text: 'Add a fill-up, service or expense from any page, even without signal.' },
-    { target: 'bell', title: 'Reminder alerts', text: 'The number shows reminders that are overdue or due soon. Tap it to see them.' },
-    { target: 'checklist', title: 'Get started', text: 'Your setup steps. Each one ticks itself off when you do it.' },
-    { target: 'guide', title: 'Guide', text: 'Forgot how something works? Open the guide anytime. You can replay this tour from there.' },
+    { target: 'nav', title: 'tour.nav.title', text: 'tour.nav.text' },
+    { target: 'bike', title: 'tour.bike.title', text: 'tour.bike.text' },
+    { target: 'quick-add', title: 'tour.quickAdd.title', text: 'tour.quickAdd.text' },
+    { target: 'bell', title: 'tour.bell.title', text: 'tour.bell.text' },
+    { target: 'checklist', title: 'tour.checklist.title', text: 'tour.checklist.text' },
+    { target: 'guide', title: 'tour.guide.title', text: 'tour.guide.text' },
 ]
 
 interface Box { top: number; left: number; width: number; height: number }
@@ -29,6 +31,7 @@ const CARD_WIDTH = 320
 
 export default function Tour() {
     const { active, step } = useTour()
+    const t = useT()
     const [box, setBox] = useState<Box | null>(null)
 
     const steps = active ? STEPS.filter((s) => findTarget(s.target)) : []
@@ -83,7 +86,7 @@ export default function Tour() {
         : { bottom: Math.max(vh - spot.top + 14, 16), left, width }
 
     return (
-        <div className="fixed inset-0 z-[80]" role="dialog" aria-modal="true" aria-label={`Tour: ${current.title}`}>
+        <div className="fixed inset-0 z-[80]" role="dialog" aria-modal="true" aria-label={t('tour.label', { title: t(current.title) })}>
             {/* Blocks clicks on the app while the tour is open. */}
             <div className="absolute inset-0" onClick={() => { }} />
 
@@ -95,10 +98,10 @@ export default function Tour() {
 
             <div key={step} className="tour-card fixed rounded-xl border border-line bg-surface shadow-2xl p-4" style={cardPosition}>
                 <div className="font-mono text-[10px] uppercase tracking-[.14em] text-accent mb-1">
-                    Step {step + 1} of {steps.length}
+                    {t('tour.stepOf', { step: step + 1, total: steps.length })}
                 </div>
-                <div className="text-sm font-semibold text-ink mb-1">{current.title}</div>
-                <p className="text-xs text-muted leading-relaxed mb-4">{current.text}</p>
+                <div className="text-sm font-semibold text-ink mb-1">{t(current.title)}</div>
+                <p className="text-xs text-muted leading-relaxed mb-4">{t(current.text)}</p>
 
                 <div className="flex items-center gap-2">
                     <div className="flex gap-1 mr-auto">
@@ -109,17 +112,17 @@ export default function Tour() {
                     </div>
                     <button type="button" onClick={endTour}
                         className="h-8 px-2.5 text-[11px] text-muted hover:text-ink cursor-pointer">
-                        Skip
+                        {t('tour.skip')}
                     </button>
                     {step > 0 && (
                         <button type="button" onClick={back}
                             className="h-8 px-3 rounded-md border border-line text-xs text-ink hover:bg-raised cursor-pointer">
-                            Back
+                            {t('tour.back')}
                         </button>
                     )}
                     <button type="button" onClick={next} autoFocus
                         className="h-8 px-3.5 rounded-md bg-accent text-on-accent text-xs font-medium hover:opacity-90 cursor-pointer">
-                        {last ? 'Done' : 'Next'}
+                        {last ? t('tour.done') : t('tour.next')}
                     </button>
                 </div>
             </div>

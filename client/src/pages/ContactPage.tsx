@@ -5,6 +5,7 @@ import Icon from '../components/Icon'
 import PublicLayout from '../components/PublicLayout'
 import { FormMessage } from '../components/ui'
 import { sendContactMessage } from '../api/contact'
+import { useT } from '../lib/i18n'
 
 interface ContactErrors { name?: string; email?: string; message?: string }
 
@@ -12,6 +13,7 @@ const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export default function ContactPage() {
     const [name, setName] = useState('')
+    const t = useT()
     const [email, setEmail] = useState('')
     const [message, setMessage] = useState('')
     const [errors, setErrors] = useState<ContactErrors>({})
@@ -23,9 +25,9 @@ export default function ContactPage() {
     const onSubmit = async (e: FormEvent) => {
         e.preventDefault()
         const next: ContactErrors = {}
-        if (!name.trim()) next.name = 'Enter your name.'
-        if (!emailPattern.test(email.trim())) next.email = 'Enter a valid email address.'
-        if (!message.trim()) next.message = 'Write a message.'
+        if (!name.trim()) next.name = t('contact.err.name')
+        if (!emailPattern.test(email.trim())) next.email = t('auth.err.email')
+        if (!message.trim()) next.message = t('contact.err.message')
         setErrors(next)
         setFailure('')
         if (Object.keys(next).length > 0) return
@@ -36,7 +38,7 @@ export default function ContactPage() {
             setSent(true)
             setMessage('')
         } catch (err) {
-            setFailure(err instanceof Error && err.message ? err.message : 'Your message couldn\'t be sent. Please try again later.')
+            setFailure(err instanceof Error && err.message ? err.message : t('contact.failed'))
         } finally {
             setSending(false)
         }
@@ -44,10 +46,10 @@ export default function ContactPage() {
 
     if (sent) {
         return (
-            <PublicLayout eyebrow="Contact" title="Message sent." intro={`Thanks, ${name.trim()}. We'll reply to ${email.trim()}.`}>
+            <PublicLayout eyebrow={t('public.contact')} title={t('contact.sentTitle')} intro={t('contact.sentIntro', { name: name.trim(), email: email.trim() })}>
                 <button type="button" onClick={() => setSent(false)}
                     className="text-xs text-accent hover:opacity-80 cursor-pointer">
-                    Send another message
+                    {t('contact.another')}
                 </button>
             </PublicLayout>
         )
@@ -55,23 +57,23 @@ export default function ContactPage() {
 
     return (
         <PublicLayout
-            eyebrow="Contact"
-            title="Get in touch."
-            intro="Questions, feedback, or a feature you'd like to see? Send us a message."
+            eyebrow={t('public.contact')}
+            title={t('contact.title')}
+            intro={t('contact.intro')}
         >
             <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4 max-w-md">
-                <Field label="Name" icon="user" type="text" name="name" autoComplete="name"
+                <Field label={t('contact.name')} icon="user" type="text" name="name" autoComplete="name"
                     placeholder="Juan Dela Cruz" value={name} error={errors.name}
                     onChange={(e) => setName(e.target.value)} />
-                <Field label="Email" icon="mail" type="email" name="email" autoComplete="email"
+                <Field label={t('auth.email')} icon="mail" type="email" name="email" autoComplete="email"
                     placeholder="you@example.com" value={email} error={errors.email}
                     onChange={(e) => setEmail(e.target.value)} />
                 <div>
-                    <label htmlFor="message" className="block text-[11px] font-medium text-muted mb-1.5">Message</label>
+                    <label htmlFor="message" className="block text-[11px] font-medium text-muted mb-1.5">{t('contact.message')}</label>
                     <textarea id="message" name="message" rows={5} value={message}
                         onChange={(e) => setMessage(e.target.value)}
                         aria-invalid={!!errors.message}
-                        placeholder="How can we help?"
+                        placeholder={t('contact.messagePlaceholder')}
                         className={`w-full rounded-md border bg-surface px-3 py-2.5 text-[13px] text-ink
                             placeholder:text-faint outline-none transition-colors resize-y
                             focus:border-accent focus:ring-2 focus:ring-accent/20
@@ -87,7 +89,7 @@ export default function ContactPage() {
                 <button type="submit" disabled={sending}
                     className="inline-flex items-center justify-center gap-2 h-10 rounded-md bg-accent text-on-accent
                          text-[13px] font-medium hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-60">
-                    {sending ? 'Sending...' : 'Send message'}
+                    {sending ? t('contact.sending') : t('contact.send')}
                     {!sending && <Icon name="arrow" size={14} />}
                 </button>
 

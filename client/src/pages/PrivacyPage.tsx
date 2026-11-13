@@ -1,21 +1,14 @@
 import PublicLayout, { Section } from '../components/PublicLayout'
+import { useT } from '../lib/i18n'
 
 // Placeholder copy — replace with the reviewed policy before launch.
 export default function PrivacyPage() {
+    const t = useT()
     return (
-        <PublicLayout
-            eyebrow="Privacy"
-            title="Privacy Policy"
-        >
-            <Section title="What we collect">
-                <p>Your account details (name and email) and the records you choose to log: bikes, services, fill-ups, expenses, and reminders.</p>
-            </Section>
-            <Section title="How we use it">
-                <p>To show your dashboard, calculate your fuel economy and costs, and send the reminders you set up.</p>
-            </Section>
-            <Section title="Your data">
-                <p>Your records are yours. The final policy will describe how to export or delete them.</p>
-            </Section>
+        <PublicLayout eyebrow={t('public.privacy')} title={t('privacy.title')}>
+            <Section title={t('privacy.collectTitle')}><p>{t('privacy.collect')}</p></Section>
+            <Section title={t('privacy.useTitle')}><p>{t('privacy.use')}</p></Section>
+            <Section title={t('privacy.dataTitle')}><p>{t('privacy.data')}</p></Section>
         </PublicLayout>
     )
 }

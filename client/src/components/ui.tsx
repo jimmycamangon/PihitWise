@@ -49,11 +49,20 @@ export function Stat({ label, value, sub, tone = 'ink' }: StatProps) {
     )
 }
 
+// Solid status colors. `on-accent` is white in light mode and near-black in dark mode,
+// so the text stays readable on every tone in both themes.
+const toneFill: Record<Tone, string> = {
+    accent: 'bg-accent text-on-accent',
+    ok: 'bg-ok text-on-accent',
+    warn: 'bg-warn text-on-accent',
+    ink: 'bg-ink text-canvas',
+    muted: 'bg-muted text-on-accent',
+}
+
 export function Badge({ tone = 'muted', children }: { tone?: Tone; children: ReactNode }) {
     return (
-        <span className={`inline-flex items-center gap-1.5 h-5 px-2 rounded-full border border-line
-            font-mono text-[9px] uppercase tracking-widest whitespace-nowrap ${toneText[tone]}`}>
-            <span className="w-1 h-1 rounded-full bg-current" />
+        <span className={`inline-flex items-center h-5 px-2 rounded-full
+            font-mono text-[9px] font-semibold uppercase tracking-widest whitespace-nowrap ${toneFill[tone]}`}>
             {children}
         </span>
     )

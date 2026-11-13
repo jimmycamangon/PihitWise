@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { startTourOnDashboard } from '../lib/tour'
+import { useT } from '../lib/i18n'
 import Icon from './Icon'
 import { Card } from './ui'
 import { useBike } from '../hooks/useBike'
@@ -14,18 +15,21 @@ interface SetupChecklistProps {
 export default function SetupChecklist({ onHide }: SetupChecklistProps) {
     const { vehicle, vehiclesLoading } = useBike()
     const navigate = useNavigate()
+    const t = useT()
     const { steps, loading, doneCount, requiredCount, complete } = useSetupSteps(vehicle, vehiclesLoading)
     const percent = Math.round((doneCount / requiredCount) * 100)
 
-    // On the Dashboard the card goes away once the required steps are done.
-    if (onHide && complete && !loading) return null
+    // On the Dashboard the card only shows once we know setup isn't finished:
+    // while the bike and its logs are still loading it stays hidden, so riders who are
+    // already set up never see it flash in after signing in.
+    if (onHide && (loading || complete)) return null
 
     return (
-        <Card title={complete ? 'You\'re all set' : 'Get started'}
+        <Card title={complete ? t('setup.allSet') : t('setup.getStarted')}
             action={onHide && (
                 <button type="button" onClick={onHide}
                     className="text-[11px] text-muted hover:text-ink cursor-pointer">
-                    {complete ? 'Close' : 'Hide'}
+                    {complete ? t('setup.close') : t('setup.hide')}
                 </button>
             )}>
             <div className="flex items-center gap-3 mb-4">
@@ -45,7 +49,7 @@ export default function SetupChecklist({ onHide }: SetupChecklistProps) {
                         <div className="flex-1 min-w-0">
                             <div className={`text-xs font-medium ${step.done ? 'text-muted line-through' : 'text-ink'}`}>
                                 {step.title}
-                                {step.optional && <span className="ml-1.5 font-normal text-faint no-underline">(optional)</span>}
+                                {step.optional && <span className="ml-1.5 font-normal text-faint no-underline">{t('setup.optional')}</span>}
                             </div>
                             {!step.done && <p className="text-[11px] text-muted mt-0.5 leading-relaxed">{step.description}</p>}
                         </div>
@@ -62,10 +66,10 @@ export default function SetupChecklist({ onHide }: SetupChecklistProps) {
             {onHide && (
                 <div className="flex items-center gap-3 mt-3 pt-3 border-t border-line">
                     <Icon name="zap" size={14} className="text-accent shrink-0" />
-                    <span className="flex-1 text-[11px] text-muted">Not sure where things are? A quick tour shows you around.</span>
+                    <span className="flex-1 text-[11px] text-muted">{t('setup.tourPrompt')}</span>
                     <button type="button" onClick={() => startTourOnDashboard(navigate)}
                         className="shrink-0 h-7 px-3 rounded-md bg-accent text-on-accent text-[11px] font-medium hover:opacity-90 cursor-pointer">
-                        Take the tour
+                        {t('setup.takeTour')}
                     </button>
                 </div>
             )}

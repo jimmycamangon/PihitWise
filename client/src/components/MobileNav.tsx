@@ -4,6 +4,7 @@ import { NavLink, useLocation } from 'react-router-dom'
 import Icon from './Icon'
 import type { IconName } from './Icon'
 import type { NavStyle } from '../lib/navStyle'
+import { useT } from '../lib/i18n'
 
 export interface NavItem { to: string; label: string; icon: IconName }
 
@@ -27,6 +28,7 @@ const row = ({ isActive }: { isActive: boolean }) =>
 /** Page navigation on phones and tablets, in the style picked in Settings. Hidden on desktop (sidebar). */
 export function MobileNavTop({ style, items, bikeSelect }: MobileNavProps) {
     const [open, setOpen] = useState(false)
+    const t = useT()
     const { pathname } = useLocation()
     const current = items.find((i) => pathname.startsWith(i.to))
 
@@ -38,7 +40,7 @@ export function MobileNavTop({ style, items, bikeSelect }: MobileNavProps) {
                         className="h-8 px-2.5 inline-flex items-center gap-2 rounded-md border border-line text-xs text-ink
                              hover:bg-raised transition-colors cursor-pointer shrink-0">
                         <Icon name="menu" size={14} />
-                        {current?.label ?? 'Menu'}
+                        {current?.label ?? t('nav.menu')}
                     </button>
                     <div className="flex-1 min-w-0">{bikeSelect}</div>
                 </div>
@@ -79,6 +81,7 @@ export function MobileNavTop({ style, items, bikeSelect }: MobileNavProps) {
 /** Fixed bar at the bottom of the screen (only for the "Bottom bar" style). */
 export function MobileNavBottom({ items }: { items: NavItem[] }) {
     const [more, setMore] = useState(false)
+    const t = useT()
     const { pathname } = useLocation()
     const main = items.filter((i) => BOTTOM_MAIN.includes(i.to))
     const rest = items.filter((i) => !BOTTOM_MAIN.includes(i.to))
@@ -92,7 +95,7 @@ export function MobileNavBottom({ items }: { items: NavItem[] }) {
         <div className="lg:hidden">
             {more && (
                 <>
-                    <button type="button" aria-label="Close" onClick={() => setMore(false)}
+                    <button type="button" aria-label={t('nav.close')} onClick={() => setMore(false)}
                         className="fixed inset-0 z-40 bg-black/30 cursor-default" />
                     <nav className="fixed left-3 right-3 bottom-[calc(4rem+env(safe-area-inset-bottom)+0.5rem)] z-50
                          flex flex-col gap-0.5 p-2 rounded-xl border border-line bg-surface shadow-lg">
@@ -117,7 +120,7 @@ export function MobileNavBottom({ items }: { items: NavItem[] }) {
                     ))}
                     <button type="button" onClick={() => setMore(!more)} aria-expanded={more} className={cell(more || inMore)}>
                         <Icon name="more" size={18} />
-                        More
+                        {t('nav.more')}
                     </button>
                 </div>
             </nav>

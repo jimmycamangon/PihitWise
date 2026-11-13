@@ -11,6 +11,7 @@ import { createOtherExpense, deleteOtherExpense, getOtherExpenses, updateOtherEx
 import { getFuelLogs } from '../api/fuelLogs'
 import { getServiceLogs } from '../api/serviceLogs'
 import { useBike } from '../hooks/useBike'
+import { useT } from '../lib/i18n'
 import { useQuickAdd } from '../hooks/useQuickAdd'
 import { useVehicleData } from '../hooks/useVehicleData'
 import { monthOf, recentMonths, sumCost, toExpenses, today } from '../lib/expenses'
@@ -34,6 +35,7 @@ const loadExpenses = async (vehicleId: string) => {
 
 export default function ExpensesPage() {
     const { vehicle, vehiclesLoading } = useBike()
+    const t = useT()
     const [filter, setFilter] = useState<'All' | ExpenseCategory>('All')
     const { data, loading, error, reload } = useVehicleData(vehicle?.id, loadExpenses)
 
@@ -70,13 +72,13 @@ export default function ExpensesPage() {
         if (!vehicle) return
 
         const next: ExpenseErrors = {}
-        if (label.trim() === '') next.label = 'Enter what it was for.'
-        else if (label.trim().length > 100) next.label = 'Keep it under 100 letters.'
-        if (cost === '') next.cost = 'Enter the cost.'
-        else if (Number(cost) < 0) next.cost = 'The cost can\'t be below 0.'
-        else if (Number(cost) > 1_000_000) next.cost = 'That cost is too high.'
-        if (date === '') next.date = 'Pick a date.'
-        else if (date > today()) next.date = 'The date can\'t be in the future.'
+        if (label.trim() === '') next.label = t('expenses.err.label')
+        else if (label.trim().length > 100) next.label = t('expenses.err.long')
+        if (cost === '') next.cost = t('common.err.cost')
+        else if (Number(cost) < 0) next.cost = t('expenses.err.negative')
+        else if (Number(cost) > 1_000_000) next.cost = t('expenses.err.high')
+        if (date === '') next.date = t('common.err.date')
+        else if (date > today()) next.date = t('common.err.future')
         setFieldErrors(next)
         if (Object.keys(next).length > 0) return
 
@@ -85,16 +87,16 @@ export default function ExpensesPage() {
             const request = { label: label.trim(), cost: Number(cost), date, notes: editing?.notes ?? null }
             if (editing) {
                 const saved = await updateOtherExpense(editing.id, request)
-                setToast(saved.pending ? "Saved on this device. It syncs when you're back online." : 'Expense updated')
+                setToast(saved.pending ? t('common.savedOffline') : t('expenses.updated'))
             } else {
                 const saved = await createOtherExpense(vehicle.id, request)
-                setToast(saved.pending ? "Saved on this device. It syncs when you're back online." : 'Expense added')
+                setToast(saved.pending ? t('common.savedOffline') : t('expenses.added'))
             }
             setShowForm(false)
             setSaveError('')
             reload()
         } catch (err) {
-            setSaveError(err instanceof Error ? err.message : 'Something went wrong.')
+            setSaveError(err instanceof Error ? err.message : t('common.somethingWrong'))
         } finally {
             setSaving(false)
         }
@@ -103,11 +105,11 @@ export default function ExpensesPage() {
     const onDelete = async (id: string) => {
         try {
             await deleteOtherExpense(id)
-            setToast('Expense deleted')
+            setToast(t('expenses.deleted'))
             setSaveError('')
             reload()
         } catch (err) {
-            setSaveError(err instanceof Error ? err.message : 'Something went wrong.')
+            setSaveError(err instanceof Error ? err.message : t('common.somethingWrong'))
         }
     }
 
@@ -115,7 +117,7 @@ export default function ExpensesPage() {
     if (vehiclesLoading && !vehicle) {
         return (
             <>
-                <PageHeader title="Expenses" subtitle="What your bike really costs." />
+                <PageHeader title={t('expenses.title')} subtitle={t('expenses.subtitle')} />
                 <div className="h-40 bg-surface border border-line rounded-xl animate-pulse" />
             </>
         )
@@ -124,17 +126,17 @@ export default function ExpensesPage() {
     if (!vehicle) {
         return (
             <>
-                <PageHeader title="Expenses" subtitle="What your bike really costs." />
+                <PageHeader title={t('expenses.title')} subtitle={t('expenses.subtitle')} />
                 <div className="flex flex-col items-center text-center py-16 border border-dashed border-line rounded-xl">
                     <div className="w-14 h-14 rounded-full bg-raised flex items-center justify-center mb-4">
                         <Icon name="bike" size={24} className="text-muted" />
                     </div>
-                    <div className="text-sm font-medium text-ink">No bike yet</div>
-                    <p className="text-xs text-muted mt-1 mb-5">Add a bike in your Garage first. Its costs show up here.</p>
+                    <div className="text-sm font-medium text-ink">{t('common.noBike')}</div>
+                    <p className="text-xs text-muted mt-1 mb-5">{t('expenses.noBikeHelp')}</p>
                     <Link to="/garage"
                         className="h-8 px-3.5 inline-flex items-center rounded-md bg-accent text-on-accent text-xs font-medium
                              no-underline hover:opacity-90 transition-opacity">
-                        Go to Garage
+                        {t('common.goToGarage')}
                     </Link>
                 </div>
             </>
@@ -151,23 +153,23 @@ export default function ExpensesPage() {
     return (
         <>
             <div className="flex items-start justify-between gap-3">
-                <PageHeader title="Expenses" subtitle={`What your ${vehicle.name} really costs.`} />
+                <PageHeader title={t('expenses.title')} subtitle={t('expenses.subtitleBike', { bike: vehicle.name })} />
                 <button type="button" onClick={openAdd}
                     className="h-8 px-3.5 rounded-md bg-accent text-on-accent text-xs font-medium
                          hover:opacity-90 transition-opacity cursor-pointer whitespace-nowrap">
-                    + Add expense
+                    {t('expenses.add')}
                 </button>
             </div>
             <FormMessage text={error || saveError} />
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
-                <Stat label="This month" value={show(sumCost(thisMonth))} sub="total spent" tone="accent" />
-                <Stat label="Fuel" value={show(totalOf('Fuel'))} sub="this month" />
-                <Stat label="Maintenance" value={show(totalOf('Maintenance'))} sub="this month" />
-                <Stat label="Other" value={show(totalOf('Other'))} sub="this month" />
+                <Stat label={t('dashboard.thisMonth')} value={show(sumCost(thisMonth))} sub={t('dashboard.totalSpent')} tone="accent" />
+                <Stat label={t('category.Fuel')} value={show(totalOf('Fuel'))} sub={t('expenses.thisMonth')} />
+                <Stat label={t('category.Maintenance')} value={show(totalOf('Maintenance'))} sub={t('expenses.thisMonth')} />
+                <Stat label={t('category.Other')} value={show(totalOf('Other'))} sub={t('expenses.thisMonth')} />
             </div>
 
-            <Card title="Monthly spend — last 6 months" className="mb-3">
+            <Card title={t('expenses.chart')} className="mb-3">
                 {loading
                     ? <div className="h-40 bg-raised rounded animate-pulse" />
                     : <BarChart zeroBase bars={months.map((m) => {
@@ -176,13 +178,13 @@ export default function ExpensesPage() {
                     })} />}
             </Card>
 
-            <Card title="All expenses" action={
+            <Card title={t('expenses.all')} action={
                 <div className="flex gap-1">
                     {filters.map((f) => (
                         <button key={f} type="button" onClick={() => setFilter(f)} aria-pressed={filter === f}
                             className={`h-6 px-2.5 rounded-full border text-[10px] transition-colors cursor-pointer
                                 ${filter === f ? 'border-accent text-accent' : 'border-line text-muted hover:text-ink'}`}>
-                            {f}
+                            {f === 'All' ? t('common.all') : t(`category.${f}`)}
                         </button>
                     ))}
                 </div>
@@ -197,32 +199,32 @@ export default function ExpensesPage() {
                     <DataTable
                         rows={shown}
                         empty={filter === 'All'
-                            ? 'No expenses yet. Log a fill-up, a service, or add an expense.'
-                            : 'No expenses in this category.'}
+                            ? t('expenses.none')
+                            : t('expenses.noneCategory')}
                         columns={[
-                            { head: 'Date', cell: (e) => <>{formatDate(e.date)}<SyncBadge row={e} /></> },
-                            { head: 'Item', cell: (e) => <span className="font-medium">{e.label}</span> },
-                            { head: 'Category', cell: (e) => <span className="text-muted">{e.category}</span> },
-                            { head: 'Cost', cell: (e) => peso(e.cost), align: 'right', mono: true },
+                            { head: t('common.date'), cell: (e) => <>{formatDate(e.date)}<SyncBadge row={e} /></> },
+                            { head: t('expenses.item'), cell: (e) => <span className="font-medium">{e.label}</span> },
+                            { head: t('expenses.category'), cell: (e) => <span className="text-muted">{t(`category.${e.category}`)}</span> },
+                            { head: t('common.cost'), cell: (e) => peso(e.cost), align: 'right', mono: true },
                             {
                                 head: '', align: 'right', cell: (e) => e.category === 'Other' ? (
                                     <div className="flex justify-end gap-1.5">
                                         <button type="button" onClick={() => onEdit(e.id)}
                                             className="h-6 px-2 rounded-md border border-line text-[10px] text-ink
                                                  hover:bg-raised transition-colors cursor-pointer">
-                                            Edit
+                                            {t('common.edit')}
                                         </button>
                                         <button type="button" onClick={() => setDeleteId(e.id)}
                                             className="h-6 px-2 rounded-md border border-line text-[10px] text-warn
                                                  hover:bg-raised transition-colors cursor-pointer">
-                                            Delete
+                                            {t('common.delete')}
                                         </button>
                                     </div>
                                 ) : (
                                     // Fuel and maintenance costs are edited on their own pages.
                                     <Link to={e.category === 'Fuel' ? '/fuel' : '/maintenance'}
                                         className="text-[10px] text-faint no-underline hover:text-ink">
-                                        View
+                                        {t('common.view')}
                                     </Link>
                                 ),
                             },
@@ -231,9 +233,9 @@ export default function ExpensesPage() {
                 )}
             </Card>
 
-            <Modal open={showForm} title={editing ? 'Edit expense' : 'Add expense'} onClose={() => setShowForm(false)}>
+            <Modal open={showForm} title={editing ? t('expenses.formEdit') : t('expenses.formAdd')} onClose={() => setShowForm(false)}>
                 <form onSubmit={onSubmit} className="flex flex-col gap-3 mb-4">
-                    <Field label="What was it for?" icon="wallet" placeholder="Bike wash" name="label" list="expense-label-ideas" maxLength={100}
+                    <Field label={t('expenses.what')} icon="wallet" placeholder={t('expenses.whatPlaceholder')} name="label" list="expense-label-ideas" maxLength={100}
                         value={label}
                         onChange={(e) => { setLabel(e.target.value); setFieldErrors({ ...fieldErrors, label: undefined }) }}
                         error={fieldErrors.label} />
@@ -241,29 +243,29 @@ export default function ExpensesPage() {
                         {labelIdeas.map((l) => <option key={l} value={l} />)}
                     </datalist>
                     <div className="grid grid-cols-2 gap-3">
-                        <Field label="Cost (₱)" icon="wallet" placeholder="120" name="cost" type="number" min={0} step="0.01"
+                        <Field label={t('common.costPeso')} icon="wallet" placeholder="120" name="cost" type="number" min={0} step="0.01"
                             value={cost}
                             onChange={(e) => { setCost(e.target.value); setFieldErrors({ ...fieldErrors, cost: undefined }) }}
                             error={fieldErrors.cost} />
-                        <Field label="Date" icon="calendar" name="date" type="date" max={today()}
+                        <Field label={t('common.date')} icon="calendar" name="date" type="date" max={today()}
                             value={date}
                             onChange={(e) => { setDate(e.target.value); setFieldErrors({ ...fieldErrors, date: undefined }) }}
                             error={fieldErrors.date} />
                     </div>
-                    <p className="text-[11px] text-muted -mt-1">For costs that aren't a fill-up or a service. Log those on the Fuel and Maintenance pages.</p>
+                    <p className="text-[11px] text-muted -mt-1">{t('expenses.formHelp')}</p>
                     <button type="submit" disabled={saving}
                         className="h-10 mt-2 rounded-md bg-accent text-on-accent text-[13px] font-medium
                              hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-60">
-                        {saving ? 'Saving...' : editing ? 'Save changes' : 'Save expense'}
+                        {saving ? t('common.saving') : editing ? t('common.saveChanges') : t('expenses.save')}
                     </button>
                 </form>
             </Modal>
 
             <ConfirmDialog
                 open={deleteId !== null}
-                title="Delete expense"
-                message="This expense will be removed. This can't be undone."
-                confirmText="Delete"
+                title={t('expenses.deleteTitle')}
+                message={t('expenses.deleteMessage')}
+                confirmText={t('common.delete')}
                 danger
                 onConfirm={() => { onDelete(deleteId!); setDeleteId(null) }}
                 onCancel={() => setDeleteId(null)}
