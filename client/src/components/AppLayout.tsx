@@ -1,12 +1,14 @@
 import { clearToken } from '../lib/token'
 import { useState, useEffect, useRef } from 'react'
-import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import Icon from './Icon'
 import type { IconName } from './Icon'
 import Logo from './Logo'
 import ThemeToggle from './ThemeToggle'
 import QuickAdd from './QuickAdd'
 import ReminderBell from './ReminderBell'
+import WelcomeModal from './WelcomeModal'
+import Tour from './Tour'
 import { MobileNavBottom, MobileNavTop } from './MobileNav'
 import { useNavStyle } from '../lib/navStyle'
 import { useOnline } from '../hooks/useOnline'
@@ -27,6 +29,7 @@ const navItems: { to: string; label: string; icon: IconName }[] = [
     { to: '/analytics', label: 'Analytics', icon: 'chart' },
     { to: '/reminders', label: 'Reminders', icon: 'bell' },
     { to: '/settings', label: 'Settings', icon: 'settings' },
+    { to: '/guide', label: 'Guide', icon: 'help' },
 ]
 
 const navLink = ({ isActive }: { isActive: boolean }) =>
@@ -59,7 +62,7 @@ export default function AppLayout() {
 
 
     const bikeSelect = (
-        <select value={vehicleId ?? ''} onChange={(e) => setVehicleId(e.target.value)} aria-label="Active bike"
+        <select data-tour="bike" value={vehicleId ?? ''} onChange={(e) => setVehicleId(e.target.value)} aria-label="Active bike"
             className="w-full h-8 rounded-md border border-line bg-surface px-2 text-xs text-ink
                  outline-none focus:border-accent cursor-pointer">
             {vehicles.length === 0 && <option value="">{vehiclesLoading ? 'Loading...' : 'No bikes yet'}</option>}
@@ -130,7 +133,7 @@ export default function AppLayout() {
                     <div className="font-mono text-[9px] uppercase tracking-[.14em] text-faint mb-1.5">Active bike</div>
                     {bikeSelect}
                 </div>
-                <nav className="flex-1 flex flex-col gap-0.5 p-3 overflow-y-auto">
+                <nav data-tour="nav" className="flex-1 flex flex-col gap-0.5 p-3 overflow-y-auto">
                     {navItems.map((item) => (
                         <NavLink key={item.to} to={item.to} className={navLink}>
                             <Icon name={item.icon} size={14} />
@@ -162,6 +165,11 @@ export default function AppLayout() {
                         <div className="flex items-center gap-2.5">
                             {vehicle && <QuickAdd />}
                             {vehicle && <ReminderBell vehicleId={vehicle.id} />}
+                            <Link data-tour="guide" to="/guide" aria-label="Guide" title="Guide"
+                                className="w-8 h-8 rounded-md border border-line text-muted flex items-center justify-center
+                                     hover:text-ink hover:bg-raised transition-colors no-underline">
+                                <Icon name="help" size={16} />
+                            </Link>
                             <ThemeToggle />
                             <button className="lg:hidden w-8 h-8 rounded-md border border-line text-muted
                             flex items-center justify-center
@@ -218,6 +226,8 @@ export default function AppLayout() {
 
                 <main className={`px-4 md:px-8 py-6 md:py-8 max-w-6xl ${bottomNav ? "pb-28 lg:pb-8" : ""}`}>
                     <Outlet key={pageVersion} context={context} />
+                    <WelcomeModal name={me?.name} isNewRider={!vehiclesLoading && vehicles.length === 0} />
+                    <Tour />
                 </main>
             </div>
 

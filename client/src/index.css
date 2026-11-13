@@ -120,3 +120,34 @@ body {
     transform: translateX(0);
   }
 }
+/* ── Guided tour (components/Tour.tsx) ─────────────────────────────────── */
+/* The spotlight glides between targets; the ring pulses; the card fades up. */
+.tour-spotlight {
+  transition: top .35s cubic-bezier(.4, 0, .2, 1), left .35s cubic-bezier(.4, 0, .2, 1),
+    width .35s cubic-bezier(.4, 0, .2, 1), height .35s cubic-bezier(.4, 0, .2, 1);
+}
+.tour-ring {
+  animation: tour-pulse 1.6s ease-out infinite;
+}
+@keyframes tour-pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent); }
+  100% { box-shadow: 0 0 0 14px color-mix(in srgb, var(--accent) 0%, transparent); }
+}
+.tour-card {
+  animation: tour-in .3s cubic-bezier(.2, .8, .2, 1) both;
+}
+@keyframes tour-in {
+  from { opacity: 0; transform: translateY(8px) scale(.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.check-pop {
+  animation: check-pop .4s cubic-bezier(.2, .9, .3, 1.4) both;
+}
+@keyframes check-pop {
+  from { transform: scale(.4); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tour-spotlight { transition: none; }
+  .tour-ring, .tour-card, .check-pop { animation: none; }
+}

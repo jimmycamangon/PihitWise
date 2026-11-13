@@ -29,7 +29,7 @@ export default function QuickAdd() {
     }, [open])
 
     return (
-        <div ref={ref} className="relative">
+        <div ref={ref} data-tour="quick-add" className="relative">
             <button type="button" onClick={() => setOpen(!open)} aria-haspopup="menu" aria-expanded={open}
                 className="h-8 px-3 inline-flex items-center gap-1 rounded-md bg-accent text-on-accent
                      text-xs font-medium hover:opacity-90 transition-opacity cursor-pointer">

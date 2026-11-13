@@ -32,7 +32,7 @@ export function MobileNavTop({ style, items, bikeSelect }: MobileNavProps) {
 
     if (style === 'menu') {
         return (
-            <div className="lg:hidden border-t border-line">
+            <div data-tour="nav" className="lg:hidden border-t border-line">
                 <div className="flex items-center gap-2 px-3 py-2">
                     <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} aria-controls="mobile-menu"
                         className="h-8 px-2.5 inline-flex items-center gap-2 rounded-md border border-line text-xs text-ink
@@ -62,7 +62,7 @@ export function MobileNavTop({ style, items, bikeSelect }: MobileNavProps) {
     }
 
     return (
-        <div className="lg:hidden border-t border-line">
+        <div data-tour="nav" className="lg:hidden border-t border-line">
             <nav className="flex gap-1 px-3 py-2 overflow-x-auto">
                 {items.map((item) => (
                     <NavLink key={item.to} to={item.to} className={tab}>
@@ -105,7 +105,7 @@ export function MobileNavBottom({ items }: { items: NavItem[] }) {
                     </nav>
                 </>
             )}
-            <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-canvas/95 backdrop-blur-xl
+            <nav data-tour="nav" className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-canvas/95 backdrop-blur-xl
                  pb-[env(safe-area-inset-bottom)]">
                 <div className="flex h-16">
                     {main.map((item) => (

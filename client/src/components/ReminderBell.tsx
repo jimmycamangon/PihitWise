@@ -48,7 +48,7 @@ export default function ReminderBell({ vehicleId }: { vehicleId: string }) {
     }
 
     return (
-        <div ref={ref} className="relative">
+        <div ref={ref} data-tour="bell" className="relative">
             <button type="button" onClick={toggle} aria-haspopup="menu" aria-expanded={open}
                 aria-label={items.length ? `${items.length} reminder${items.length === 1 ? '' : 's'} need attention` : 'Reminders'}
                 className="relative w-8 h-8 rounded-md border border-line text-muted flex items-center justify-center

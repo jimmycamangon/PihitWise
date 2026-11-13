@@ -8,6 +8,9 @@ import { Field } from '../components/AuthLayout'
 import { Card, FormMessage, Label, PageHeader } from '../components/ui'
 import { useBike } from '../hooks/useBike'
 import { navStyles, setNavStyle, useNavStyle } from '../lib/navStyle'
+import { showChecklistAgain } from '../lib/onboarding'
+import { startTourOnDashboard } from '../lib/tour'
+import { Link, useNavigate } from 'react-router-dom'
 import { changePassword, updateProfile } from '../api/auth'
 
 const MIN_PASSWORD = 8
@@ -35,6 +38,7 @@ export default function SettingsPage() {
     const { me, setMe, vehicles, vehiclesLoading, signOut } = useBike()
     const [toast, setToast] = useState('')
     const navStyle = useNavStyle()
+    const navigate = useNavigate()
 
     // Edit profile
     const [profileOpen, setProfileOpen] = useState(false)
@@ -142,6 +146,28 @@ export default function SettingsPage() {
                     <Row label="Distance" value="Kilometers" />
                     <Row label="Fuel economy" value="km/L" />
                     <Row label="Theme" value="Use the toggle in the top bar" />
+                </Card>
+
+                <Card title="Guide" className="lg:col-span-2">
+                    <p className="text-[11px] text-muted mb-3">
+                        Forgot how something works? Show the setup steps on your Dashboard again, or open the full guide.
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                        <button type="button"
+                            onClick={() => { showChecklistAgain(); navigate('/dashboard') }}
+                            className={outlineButton}>
+                            <Icon name="check" size={14} />
+                            Show setup guide again
+                        </button>
+                        <button type="button" onClick={() => startTourOnDashboard(navigate)} className={outlineButton}>
+                            <Icon name="zap" size={14} />
+                            Replay tour
+                        </button>
+                        <Link to="/guide" className={`${outlineButton} no-underline`}>
+                            <Icon name="help" size={14} />
+                            Open guide
+                        </Link>
+                    </div>
                 </Card>
 
                 <Card title="Navigation on phones" className="lg:col-span-2">
