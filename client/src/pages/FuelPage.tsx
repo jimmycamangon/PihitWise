@@ -7,6 +7,7 @@ import ConfirmDialog from '../components/ConfirmDialog'
 import Toast from '../components/Toast'
 import Icon from '../components/Icon'
 import { useBike } from '../hooks/useBike'
+import { useQuickAdd } from '../hooks/useQuickAdd'
 import { createFuelLog, deleteFuelLog, getFuelEconomy, getFuelLogs, updateFuelLog } from '../api/fuelLogs'
 import type { FuelEconomy, FuelLog } from '../types/fuelLogs'
 import { formatDate, km, peso } from '../lib/format'
@@ -80,6 +81,7 @@ export default function FuelPage() {
     }
 
     const openAdd = () => { resetForm(); setShowForm(true) }
+    useQuickAdd(openAdd, !!vehicle)
 
     const onSubmit = async (e: FormEvent) => {
         e.preventDefault()
