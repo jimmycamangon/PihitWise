@@ -10,6 +10,7 @@ using PihitWise.Application.ServiceLogs;
 using PihitWise.Application.FuelLogs;
 using PihitWise.Application.Reminders;
 using PihitWise.Application.Expenses;
+using PihitWise.Application.Email;
 
 using PihitWise.Infrastructure.Persistence;
 using PihitWise.Infrastructure.Auth;
@@ -18,6 +19,7 @@ using PihitWise.Infrastructure.ServiceLogs;
 using PihitWise.Infrastructure.FuelLogs;
 using PihitWise.Infrastructure.Reminders;
 using PihitWise.Infrastructure.Expenses;
+using PihitWise.Infrastructure.Email;
 
 namespace PihitWise.Infrastructure;
 
@@ -45,6 +47,10 @@ public static class DependencyInjection
         // JWT settings come from the "Jwt" section; Jwt:Key lives in user-secrets.
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
         services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
+
+        // Email goes out through Resend; Email:ApiKey lives in user-secrets.
+        services.Configure<EmailSettings>(configuration.GetSection(EmailSettings.SectionName));
+        services.AddHttpClient<IEmailSender, ResendEmailSender>();
 
         return services;
     }

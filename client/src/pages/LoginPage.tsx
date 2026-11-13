@@ -21,7 +21,8 @@ export default function LoginPage() {
     const [errors, setErrors] = useState<LoginErrors>({})
     const [searchParams] = useSearchParams()
     const [notice, setNotice] = useState(
-        searchParams.get('expired') ? 'Your session ended. Please log in again.' : ''
+        searchParams.get('expired') ? 'Your session ended. Please log in again.'
+            : searchParams.get('reset') ? 'Password changed. Sign in with your new password.' : ''
 )
 
     const onSubmit = async (e: FormEvent) => {

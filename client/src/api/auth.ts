@@ -66,3 +66,26 @@ export async function changePassword(currentPassword: string, newPassword: strin
         throw new Error(await response.text())
     }
 }
+
+
+export async function requestPasswordReset(email: string) : Promise<void> {
+    const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+    })
+    if(!response.ok) {
+        throw new Error(await response.text())
+    }
+}
+
+export async function resetPassword(email: string, token: string, newPassword: string) : Promise<void> {
+    const response = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, token, newPassword })
+    })
+    if(!response.ok) {
+        throw new Error(await response.text())
+    }
+}

@@ -84,6 +84,22 @@ namespace PihitWise.API.Controllers
             };
         }
 
+        [HttpPost("forgot-password")]  // POST /api/auth/forgot-password
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest request)
+        {
+            // Same answer whether or not the email has an account.
+            await _authService.RequestPasswordResetAsync(request);
+            return NoContent();
+        }
+
+        [HttpPost("reset-password")]  // POST /api/auth/reset-password
+        public async Task<IActionResult> ResetPassword(ResetPasswordRequest request)
+        {
+            if (!await _authService.ResetPasswordAsync(request))
+                return BadRequest("This reset link is invalid or has expired. Ask for a new one.");
+            return NoContent();
+        }
+
         private Guid GetUserId() =>
             Guid.Parse(User.FindFirstValue(JwtRegisteredClaimNames.Sub)!);
     }
