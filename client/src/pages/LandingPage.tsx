@@ -5,6 +5,7 @@ import Icon from '../components/Icon'
 import Logo from '../components/Logo'
 import ThemeToggle from '../components/ThemeToggle'
 import LanguageToggle from '../components/LanguageToggle'
+import SiteFooter from '../components/SiteFooter'
 import { t, useT } from '../lib/i18n'
 import { useTightHeader } from '../hooks/useTightHeader'
 import type { IconName } from '../components/Icon'
@@ -521,20 +522,8 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* ── FOOTER ──────────────────────────────────────────────────────── */}
-            <footer className="py-8 border-t border-line">
-                <div className="max-w-6xl mx-auto px-6 md:px-16">
-                    <div className="flex items-center justify-between flex-wrap gap-5">
-                        <Logo />
-                        <div className="flex gap-6 flex-wrap">
-                            {[[t('lp.nav.features'), '#features'], [t('lp.nav.dashboard'), '#showcase'], [t('public.about'), '/about'], [t('public.privacy'), '/privacy'], [t('public.contact'), '/contact']].map(([l, h]) => (
-                                <a key={l} href={h} className="text-xs text-muted hover:text-ink transition-colors no-underline">{l}</a>
-                            ))}
-                        </div>
-                        <div className="text-[11px] text-faint">© {new Date().getFullYear()} PihitWise</div>
-                    </div>
-                </div>
-            </footer>
+            {/* ── FOOTER ── */}
+            <SiteFooter />
         </div>
     )
 }

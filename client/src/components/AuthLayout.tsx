@@ -5,6 +5,7 @@ import type { IconName } from './Icon'
 import Logo from './Logo'
 import ThemeToggle from './ThemeToggle'
 import LanguageToggle from './LanguageToggle'
+import { FooterLine } from './SiteFooter'
 import { useT } from '../lib/i18n'
 import { useTightHeader } from '../hooks/useTightHeader'
 
@@ -73,6 +74,7 @@ export default function AuthLayout({ title, subtitle, children, footer }: AuthLa
                         <div className="text-xs text-faint mt-6 text-center">{footer}</div>
                     </div>
                 </main>
+                <FooterLine />
             </div>
 
             {/* Brand side */}

@@ -38,7 +38,7 @@ export const en = {
 
     // Offline and sync
     'offline.title': 'You\'re offline',
-    'offline.body': 'Showing the last data loaded on this device. New fill-ups, services and expenses are saved here and sync when you\'re back online.',
+    'offline.body': "Showing the last data loaded on this device. Adding, editing and deleting fill-ups, services and expenses, and marking reminders done, are saved here and sync when you're back online.",
     'offline.waiting': '{count} waiting to sync.',
     'sync.syncing': 'Syncing {count} logs saved offline…',
     'sync.waiting': 'Waiting to sync {count} logs saved offline…',
@@ -634,9 +634,9 @@ export const en = {
     'guide.offline.title': "Offline mode",
     'guide.offline.p1': "**1. Install it.** On Android (Chrome): ⋮ menu → **Add to Home screen** or **Install app**. On iPhone (Safari): Share → **Add to Home Screen**. Open PihitWise from that icon.",
     'guide.offline.p2': "**2. Open it online first.** Visit the Dashboard and the pages you'll need before a long ride. Each page you open is saved on the phone.",
-    'guide.offline.p3': "**3. Without signal**, an orange **You're offline** bar shows. You see your last loaded data, and you can still add fill-ups, services and expenses. They show **Waiting to sync**.",
+    'guide.offline.p3': "**3. Without signal**, an orange **You're offline** bar shows. You see your last loaded data, and you can still add, edit and delete fill-ups, services and expenses, and mark reminders **Done**. Those changes show **Waiting to sync**.",
     'guide.offline.p4': "**4. Back online**, they sync by themselves (or tap **Sync now**). If one can't be saved, it shows **Couldn't sync**: edit it to try again or delete it.",
-    'guide.offline.p5': "Online only: reminders, bikes, and editing or deleting logs that already synced. Signing out removes the offline copy and asks first if logs are still waiting.",
+    'guide.offline.p5': "Online only: adding, editing or deleting reminders and bikes. Signing out removes the offline copy and asks first if changes are still waiting.",
     'guide.settings.title': "Account and settings",
     'guide.settings.p1': "In **Settings** you can change your name, email and password, choose the language, and choose how pages are listed on phones: scrolling tabs, a collapsible menu, or a bottom bar.",
     'guide.settings.p2': "Forgot your password? Use **Forgot password** on the sign-in page to get a reset link by email.",
@@ -683,4 +683,11 @@ export const en = {
     'admin.noMatch': "No users match your search.",
     'admin.privacyNote': "Only account details and counts are shown. Riders' logs stay private.",
     'privacy.admin': "The app's administrators can see your name, email, when you joined and last used the app, and how many records you've logged — not the records themselves.",
+
+    // Footer
+    'footer.tagline': "Your digital garage for fuel, maintenance and reminders.",
+    'footer.madeBy': "Made by",
+
+    // 
+    'footer.aiAssisted': ", with AI assistance",
 }

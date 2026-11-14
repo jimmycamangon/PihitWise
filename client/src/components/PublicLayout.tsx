@@ -3,13 +3,12 @@ import { Link } from 'react-router-dom'
 import Logo from './Logo'
 import ThemeToggle from './ThemeToggle'
 import LanguageToggle from './LanguageToggle'
+import SiteFooter from './SiteFooter'
 import { useT } from '../lib/i18n'
 import { useTightHeader } from '../hooks/useTightHeader'
-import type { TKey } from '../lib/i18n'
 
 interface PublicLayoutProps { eyebrow: string; title: string; intro?: string; children: ReactNode }
 
-const footerLinks: [TKey, string][] = [['public.about', '/about'], ['public.privacy', '/privacy'], ['public.terms', '/terms'], ['public.contact', '/contact']]
 
 export function Section({ title, children }: { title: string; children: ReactNode }) {
     return (
@@ -51,16 +50,7 @@ export default function PublicLayout({ eyebrow, title, intro, children }: Public
                 {children}
             </main>
 
-            <footer className="border-t border-line">
-                <div className="max-w-6xl mx-auto px-6 md:px-16 py-8 flex items-center justify-between flex-wrap gap-5">
-                    <div className="flex gap-6 flex-wrap">
-                        {footerLinks.map(([label, to]) => (
-                            <Link key={to} to={to} className="text-xs text-muted hover:text-ink transition-colors no-underline">{t(label)}</Link>
-                        ))}
-                    </div>
-                    <div className="text-[11px] text-faint">© {new Date().getFullYear()} PihitWise</div>
-                </div>
-            </footer>
+            <SiteFooter />
         </div>
     )
 }
