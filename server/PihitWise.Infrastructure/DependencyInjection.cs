@@ -12,6 +12,7 @@ using PihitWise.Application.Reminders;
 using PihitWise.Application.Expenses;
 using PihitWise.Application.Email;
 using PihitWise.Application.Contact;
+using PihitWise.Application.Admin;
 
 using PihitWise.Infrastructure.Persistence;
 using PihitWise.Infrastructure.Auth;
@@ -22,6 +23,7 @@ using PihitWise.Infrastructure.Reminders;
 using PihitWise.Infrastructure.Expenses;
 using PihitWise.Infrastructure.Email;
 using PihitWise.Infrastructure.Contact;
+using PihitWise.Infrastructure.Admin;
 
 namespace PihitWise.Infrastructure;
 
@@ -54,6 +56,10 @@ public static class DependencyInjection
         services.Configure<EmailSettings>(configuration.GetSection(EmailSettings.SectionName));
         services.AddHttpClient<IEmailSender, ResendEmailSender>();
         services.AddScoped<IContactService, ContactService>();
+
+        // Admin: who is an admin comes from the Admin:Emails setting.
+        services.Configure<AdminSettings>(configuration.GetSection(AdminSettings.SectionName));
+        services.AddScoped<IAdminService, AdminService>();
 
         return services;
     }

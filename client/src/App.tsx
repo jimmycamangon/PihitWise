@@ -3,6 +3,7 @@ import AppLayout from './components/AppLayout'
 import AboutPage from './pages/AboutPage'
 import AnalyticsPage from './pages/AnalyticsPage'
 import GuidePage from './pages/GuidePage'
+import AdminPage from './pages/AdminPage'
 import ContactPage from './pages/ContactPage'
 import DashboardPage from './pages/DashboardPage'
 import ExpensesPage from './pages/ExpensesPage'
@@ -48,6 +49,7 @@ export default function App() {
             <Route path="/analytics" element={<AnalyticsPage />} />
             <Route path="/reminders" element={<RemindersPage />} />
             <Route path="/guide" element={<GuidePage />} />
+            <Route path="/admin" element={<AdminPage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Route>
         </Route>

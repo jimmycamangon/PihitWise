@@ -4,6 +4,7 @@ using PihitWise.Infrastructure.Persistence;
 using PihitWise.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using PihitWise.Application.Auth;
+using PihitWise.Application.Admin;
 using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -16,10 +17,12 @@ namespace PihitWise.API.Controllers
     {
 
         private readonly IAuthService _authService;
+        private readonly IAdminService _adminService;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthService authService, IAdminService adminService)
         {
             _authService = authService;
+            _adminService = adminService;
         }
 
         [HttpPost("register")]  // POST /api/auth/register
@@ -52,7 +55,8 @@ namespace PihitWise.API.Controllers
             var email = User.FindFirstValue(JwtRegisteredClaimNames.Email);
             var name = User.FindFirstValue(JwtRegisteredClaimNames.Name);
 
-            return Ok(new { id, email, name });
+            // isAdmin shows the Admin page in the app; the admin endpoints check it again themselves.
+            return Ok(new { id, email, name, isAdmin = _adminService.IsAdmin(email) });
         }
 
         [Authorize]

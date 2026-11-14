@@ -91,7 +91,7 @@ export default function SettingsPage() {
             const result = await updateProfile(name.trim(), email.trim(), isRemembered())
             // The old token still carries the old name and email, so keep the new one.
             setToken(result.token)
-            setMe({ id: result.user.id, name: result.user.fullName, email: result.user.email })
+            setMe({ ...me, id: result.user.id, name: result.user.fullName, email: result.user.email })
             setProfileOpen(false)
             setToast(t('settings.profileUpdated'))
         } catch (err) {

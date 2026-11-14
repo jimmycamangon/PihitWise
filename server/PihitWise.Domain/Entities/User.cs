@@ -10,6 +10,8 @@ namespace PihitWise.Domain.Entities
         public string? PasswordResetTokenHash { get; set; }
         public DateTime? PasswordResetExpiresAt { get; set; }
         public DateTime CreatedAt { get; set; }
+        // Last time the rider used the app while signed in (updated at most every 15 minutes).
+        public DateTime? LastActiveAt { get; set; }
 
     }
 }
