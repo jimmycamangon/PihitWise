@@ -13,4 +13,5 @@ export interface Me {
     id: string
     email: string
     name: string
+    isAdmin?: boolean   // email is in the server's Admin:Emails setting
 }

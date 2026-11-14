@@ -7,7 +7,7 @@ export default function PrivacyPage() {
     return (
         <PublicLayout eyebrow={t('public.privacy')} title={t('privacy.title')}>
             <Section title={t('privacy.collectTitle')}><p>{t('privacy.collect')}</p></Section>
-            <Section title={t('privacy.useTitle')}><p>{t('privacy.use')}</p></Section>
+            <Section title={t('privacy.useTitle')}><p>{t('privacy.use')}</p><p className="mt-2">{t('privacy.admin')}</p></Section>
             <Section title={t('privacy.dataTitle')}><p>{t('privacy.data')}</p></Section>
         </PublicLayout>
     )

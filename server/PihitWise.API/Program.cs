@@ -101,6 +101,22 @@ app.UseCors("Client");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Remembers when each rider last used the app (for the admin user list). Written at most every 15 minutes per rider.
+var lastSeenWrites = new System.Collections.Concurrent.ConcurrentDictionary<Guid, DateTime>();
+app.Use(async (context, next) =>
+{
+    var sub = context.User.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value;
+    if (Guid.TryParse(sub, out var userId)
+        && (!lastSeenWrites.TryGetValue(userId, out var last) || DateTime.UtcNow - last > TimeSpan.FromMinutes(15)))
+    {
+        lastSeenWrites[userId] = DateTime.UtcNow;
+        var db = context.RequestServices.GetRequiredService<AppDbContext>();
+        await db.Users.Where(u => u.Id == userId)
+            .ExecuteUpdateAsync(s => s.SetProperty(u => u.LastActiveAt, DateTime.UtcNow));
+    }
+    await next();
+});
 app.UseRateLimiter();
 
 app.MapControllers();

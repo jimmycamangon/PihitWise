@@ -34,6 +34,7 @@ const navDefs: { to: string; labelKey: TKey; icon: IconName }[] = [
     { to: '/reminders', labelKey: 'nav.reminders', icon: 'bell' },
     { to: '/settings', labelKey: 'nav.settings', icon: 'settings' },
     { to: '/guide', labelKey: 'nav.guide', icon: 'help' },
+    { to: '/admin', labelKey: 'nav.admin', icon: 'user' },
 ]
 
 const navLink = ({ isActive }: { isActive: boolean }) =>
@@ -44,8 +45,11 @@ export default function AppLayout() {
     const navigate = useNavigate()
     const t = useT()
     const [headerRef, headerTight] = useTightHeader<HTMLDivElement>()
-    const navItems = navDefs.map((d) => ({ to: d.to, icon: d.icon, label: t(d.labelKey) }))
     const [me, setMe] = useState<Me | null>(null)
+    // The Admin page is only listed for admins (the server checks again on every request).
+    const navItems = navDefs
+        .filter((d) => d.to !== '/admin' || me?.isAdmin)
+        .map((d) => ({ to: d.to, icon: d.icon, label: t(d.labelKey) }))
     const online = useOnline()
     const navStyle = useNavStyle()
     const bottomNav = navStyle === 'bottom'
