@@ -1,4 +1,6 @@
-export interface Vehicle {
+import type { PendingFields } from '../lib/outbox'
+
+export interface Vehicle extends PendingFields {
     id: string
     type: 'Motorcycle' | 'Car'
     name: string

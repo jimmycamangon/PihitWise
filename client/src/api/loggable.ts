@@ -24,6 +24,8 @@ async function read<T>(response: Response): Promise<T> {
 export function loggable<T extends { id: string }, R extends object>(kind: OutboxKind, listPath: (vehicleId: string) => string, itemPath: (id: string) => string) {
     return {
         async list(vehicleId: string): Promise<T[]> {
+            // A bike added offline isn't on the server yet: only what was logged for it on this device.
+            if (isPendingId(vehicleId)) return pendingRecords<T>(kind, vehicleId)
             const saved = await read<T[]>(await send(listPath(vehicleId), {
                 headers: { Authorization: `Bearer ${getToken()}` },
             }, NOT_CACHED))
@@ -31,6 +33,8 @@ export function loggable<T extends { id: string }, R extends object>(kind: Outbo
         },
 
         async create(vehicleId: string, data: R): Promise<T> {
+            // For a bike that's still waiting to sync, the log has to wait for it.
+            if (isPendingId(vehicleId)) return queue<T>(kind, vehicleId, data)
             try {
                 return await read<T>(await send(listPath(vehicleId), { method: 'POST', ...json(data) }))
             } catch (err) {

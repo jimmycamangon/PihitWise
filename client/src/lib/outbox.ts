@@ -8,7 +8,7 @@ import { getToken } from './token'
 // - done:   marking a reminder done
 // Each item remembers which rider made it, so another account on the same phone never sends or sees it.
 
-export type OutboxKind = 'fuel' | 'service' | 'expense' | 'reminder'
+export type OutboxKind = 'fuel' | 'service' | 'expense' | 'reminder' | 'vehicle'
 export type OutboxOp = 'create' | 'update' | 'delete' | 'done'
 
 export interface OutboxItem {
@@ -32,12 +32,14 @@ const listPath: Record<OutboxKind, (vehicleId: string) => string> = {
     service: (v) => `/api/vehicles/${v}/services`,
     expense: (v) => `/api/vehicles/${v}/expenses`,
     reminder: (v) => `/api/vehicles/${v}/reminders`,
+    vehicle: () => '/api/vehicles',
 }
 const itemPath: Record<OutboxKind, (id: string) => string> = {
     fuel: (id) => `/api/fuel/${id}`,
     service: (id) => `/api/services/${id}`,
     expense: (id) => `/api/expenses/${id}`,
     reminder: (id) => `/api/reminders/${id}`,
+    vehicle: (id) => `/api/vehicles/${id}`,
 }
 const opOf = (item: OutboxItem): OutboxOp => item.op ?? 'create'
 
@@ -156,7 +158,8 @@ export function updatePending<T>(id: string, body: object): T {
 }
 
 export function removePending(id: string) {
-    writeAll(readAll().filter((i) => i.id !== id))
+    // Removing a bike that was added offline also drops everything logged for it.
+    writeAll(readAll().filter((i) => i.id !== id && i.vehicleId !== id))
 }
 
 // ── Changes to records the server already has (update / delete / done) ────
@@ -181,6 +184,8 @@ export function queueChange(kind: OutboxKind, op: Exclude<OutboxOp, 'create'>, t
         }
     }
     if (op === 'delete') all = all.filter((i) => !(sameTarget(i, owner, kind, targetId) && (i.op === 'update' || i.op === 'done')))
+    // Deleting a bike: anything still queued for it would only fail, so drop it.
+    if (op === 'delete' && kind === 'vehicle') all = all.filter((i) => !(i.owner === owner && i.vehicleId === targetId))
     if (op === 'done' && all.some((i) => sameTarget(i, owner, kind, targetId) && i.op === 'done')) return
 
     all.push({ id: newId(), owner, kind, op, vehicleId: '', targetId, body: { ...body }, queuedAt: new Date().toISOString() })
@@ -244,8 +249,10 @@ export function syncOutbox(): Promise<number> {
     syncing ??= (async () => {
         let sent = 0
         try {
-            for (const item of getOutbox()) {
-                if (item.error) continue
+            for (const queued of getOutbox()) {
+                // Re-read: an earlier step may have changed it (a bike added offline gets its real id).
+                const item = readAll().find((i) => i.id === queued.id)
+                if (!item || item.error) continue
                 let response: Response
                 try {
                     response = await fetch(...requestFor(item))
@@ -259,7 +266,13 @@ export function syncOutbox(): Promise<number> {
                 const op = opOf(item)
                 const gone = response.status === 404 && op !== 'create'
                 if (response.ok || gone || (!response.ok && (op === 'delete' || op === 'done'))) {
-                    writeAll(all.filter((i) => i.id !== item.id))
+                    let rest = all.filter((i) => i.id !== item.id)
+                    // A bike added offline now has a real id: point everything logged for it there.
+                    if (response.ok && op === 'create' && item.kind === 'vehicle') {
+                        const created = await response.json() as { id: string }
+                        rest = rest.map((i) => (i.vehicleId === item.id ? { ...i, vehicleId: created.id } : i))
+                    }
+                    writeAll(rest)
                     sent++
                 } else {
                     const target = all.find((i) => i.id === item.id)
