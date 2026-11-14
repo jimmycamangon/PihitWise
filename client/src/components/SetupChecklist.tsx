@@ -6,6 +6,7 @@ import Icon from './Icon'
 import { Card } from './ui'
 import { useBike } from '../hooks/useBike'
 import { useSetupSteps } from '../hooks/useSetupSteps'
+import type { SetupState } from '../hooks/useSetupSteps'
 import { markDoneSeen, useOnboarding } from '../lib/onboarding'
 import type { IconName } from './Icon'
 import type { TKey } from '../lib/i18n'
@@ -13,14 +14,18 @@ import type { TKey } from '../lib/i18n'
 interface SetupChecklistProps {
     /** Shows a Hide button (Dashboard). The Guide page always shows the list. */
     onHide?: () => void
+    /** Setup status the page already loaded (Dashboard), so the card appears with the page instead of after it. */
+    setup?: SetupState
 }
 
 /** "Get started" steps that tick themselves off from the rider's real data. */
-export default function SetupChecklist({ onHide }: SetupChecklistProps) {
+export default function SetupChecklist({ onHide, setup }: SetupChecklistProps) {
     const { vehicle, vehiclesLoading } = useBike()
     const navigate = useNavigate()
     const t = useT()
-    const { steps, loading, doneCount, requiredCount, complete } = useSetupSteps(vehicle, vehiclesLoading)
+    // Load our own status only when the page didn't pass one in.
+    const own = useSetupSteps(setup ? null : vehicle, setup ? false : vehiclesLoading)
+    const { steps, loading, doneCount, requiredCount, complete } = setup ?? own
     const percent = Math.round((doneCount / requiredCount) * 100)
 
     const { doneSeen } = useOnboarding()

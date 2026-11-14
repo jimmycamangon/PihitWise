@@ -8,6 +8,7 @@ import { getReminders } from '../api/reminders'
 import { getServiceLogs } from '../api/serviceLogs'
 import { useBike } from '../hooks/useBike'
 import SetupChecklist from '../components/SetupChecklist'
+import { useSetupSteps } from '../hooks/useSetupSteps'
 import { hideChecklist, useOnboarding } from '../lib/onboarding'
 import { useT } from '../lib/i18n'
 import { useVehicleData } from '../hooks/useVehicleData'
@@ -55,9 +56,12 @@ export default function DashboardPage() {
     const { data, loading, error } = useVehicleData(vehicle?.id, loadDashboard)
     const { checklistHidden } = useOnboarding()
     const t = useT()
+    // Whether to show Get started is known before anything is drawn, so the page appears in one go
+    // (no bike card first and the checklist dropping in on top of it a moment later).
+    const setup = useSetupSteps(vehicle, vehiclesLoading)
 
-    // Bikes are still loading (the free API server can take a while to wake up).
-    if (vehiclesLoading && !vehicle) {
+    // Still loading the bikes (the free API server can take a while to wake up), or the setup status.
+    if ((vehiclesLoading && !vehicle) || (vehicle && !checklistHidden && setup.loading)) {
         return (
             <>
                 <PageHeader title={t('dashboard.title')} subtitle={t('dashboard.subtitle')} />
@@ -70,7 +74,7 @@ export default function DashboardPage() {
         return (
             <>
                 <PageHeader title={t('dashboard.title')} subtitle={t('dashboard.subtitle')} />
-                {!checklistHidden && <div data-tour="checklist" className="mb-3"><SetupChecklist onHide={hideChecklist} /></div>}
+                {!checklistHidden && <div data-tour="checklist" className="mb-3"><SetupChecklist onHide={hideChecklist} setup={setup} /></div>}
                 <div className="flex flex-col items-center text-center py-16 border border-dashed border-line rounded-xl">
                     <div className="w-14 h-14 rounded-full bg-raised flex items-center justify-center mb-4">
                         <Icon name="bike" size={24} className="text-muted" />
@@ -104,7 +108,7 @@ export default function DashboardPage() {
             <FormMessage text={error} />
 
             {/* First-visit checklist; Settings can bring it back after it's hidden */}
-            {!checklistHidden && <div data-tour="checklist" className="mb-3"><SetupChecklist onHide={hideChecklist} /></div>}
+            {!checklistHidden && <div data-tour="checklist" className="mb-3"><SetupChecklist onHide={hideChecklist} setup={setup} /></div>}
 
             {/* Reminders that need attention now */}
             {due.length > 0 && (
