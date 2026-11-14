@@ -4,6 +4,7 @@ import Logo from './Logo'
 import ThemeToggle from './ThemeToggle'
 import LanguageToggle from './LanguageToggle'
 import { useT } from '../lib/i18n'
+import { useTightHeader } from '../hooks/useTightHeader'
 import type { TKey } from '../lib/i18n'
 
 interface PublicLayoutProps { eyebrow: string; title: string; intro?: string; children: ReactNode }
@@ -21,11 +22,12 @@ export function Section({ title, children }: { title: string; children: ReactNod
 
 export default function PublicLayout({ eyebrow, title, intro, children }: PublicLayoutProps) {
     const t = useT()
+    const [headerRef, headerTight] = useTightHeader<HTMLElement>()
     return (
         <div className="min-h-screen flex flex-col bg-canvas text-ink font-sans antialiased transition-colors duration-300">
-            <nav className="sticky top-0 z-50 flex items-center justify-between px-6 md:px-16 h-14
+            <nav ref={headerRef} className="sticky top-0 z-50 flex items-center justify-between px-6 md:px-16 h-14
                       backdrop-blur-xl border-b border-line bg-canvas/80">
-                <Logo />
+                <Logo compact={headerTight} />
                 <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                     <LanguageToggle />
                     <ThemeToggle />

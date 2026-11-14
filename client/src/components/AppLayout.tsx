@@ -7,6 +7,7 @@ import Logo from './Logo'
 import ThemeToggle from './ThemeToggle'
 import LanguageToggle from './LanguageToggle'
 import { useT } from '../lib/i18n'
+import { useTightHeader } from '../hooks/useTightHeader'
 import type { TKey } from '../lib/i18n'
 import QuickAdd from './QuickAdd'
 import ReminderBell from './ReminderBell'
@@ -42,6 +43,7 @@ const navLink = ({ isActive }: { isActive: boolean }) =>
 export default function AppLayout() {
     const navigate = useNavigate()
     const t = useT()
+    const [headerRef, headerTight] = useTightHeader<HTMLDivElement>()
     const navItems = navDefs.map((d) => ({ to: d.to, icon: d.icon, label: t(d.labelKey) }))
     const [me, setMe] = useState<Me | null>(null)
     const online = useOnline()
@@ -160,8 +162,8 @@ export default function AppLayout() {
             <div className="lg:pl-56">
                 {/* ── TOP BAR ─────────────────────────────────────────────────── */}
                 <header className="sticky top-0 z-40 bg-canvas/80 backdrop-blur-xl border-b border-line">
-                    <div className="h-14 flex items-center justify-between gap-3 px-4 md:px-8">
-                        <div className="lg:hidden"><Logo to="/dashboard" /></div>
+                    <div ref={headerRef} className="h-14 flex items-center justify-between gap-3 px-4 md:px-8">
+                        <div className="lg:hidden"><Logo to="/dashboard" compact={headerTight} /></div>
                         <div className="hidden lg:block text-xs text-muted">
                             {vehicle?.name}{vehicle?.plateNumber && <span className="text-faint"> · {vehicle.plateNumber}</span>}
                         </div>

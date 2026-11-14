@@ -6,6 +6,7 @@ import Logo from './Logo'
 import ThemeToggle from './ThemeToggle'
 import LanguageToggle from './LanguageToggle'
 import { useT } from '../lib/i18n'
+import { useTightHeader } from '../hooks/useTightHeader'
 
 interface AuthLayoutProps { title: string; subtitle: string; children: ReactNode; footer: ReactNode }
 interface FieldProps extends InputHTMLAttributes<HTMLInputElement> { label: string; icon: IconName; error?: string }
@@ -50,13 +51,14 @@ export function Field({ label, icon, error, type, id, ...rest }: FieldProps) {
 // ── Layout ─────────────────────────────────────────────────────────────────
 export default function AuthLayout({ title, subtitle, children, footer }: AuthLayoutProps) {
     const t = useT()
+    const [headerRef, headerTight] = useTightHeader<HTMLElement>()
     return (
         <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-canvas text-ink font-sans antialiased transition-colors duration-300">
 
             {/* Form side */}
             <div className="flex flex-col min-h-screen px-6 md:px-16">
-                <header className="flex items-center justify-between h-14">
-                    <Logo />
+                <header ref={headerRef} className="flex items-center justify-between gap-3 h-14">
+                    <Logo compact={headerTight} />
                     <div className="flex items-center gap-2">
                         <LanguageToggle />
                         <ThemeToggle />

@@ -6,6 +6,7 @@ import Logo from '../components/Logo'
 import ThemeToggle from '../components/ThemeToggle'
 import LanguageToggle from '../components/LanguageToggle'
 import { t, useT } from '../lib/i18n'
+import { useTightHeader } from '../hooks/useTightHeader'
 import type { IconName } from '../components/Icon'
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -118,6 +119,7 @@ const btnGhost = `inline-flex items-center justify-center gap-2 rounded-md white
 export default function LandingPage() {
     useT()   // re-render everything (sub-components too) when the language changes
     const months = t('lp.months').split(',')
+    const [headerRef, headerTight] = useTightHeader<HTMLElement>()
     // Scroll reveal
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -132,11 +134,11 @@ export default function LandingPage() {
         <div className="bg-canvas text-ink font-sans antialiased overflow-x-hidden transition-colors duration-300">
 
             {/* ── NAV ─────────────────────────────────────────────────────────── */}
-            <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between
+            <nav ref={headerRef} className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between
                       gap-3 px-4 sm:px-6 md:px-16 h-14
                       backdrop-blur-xl border-b border-line bg-canvas/80
                       transition-colors duration-300">
-                <Logo />
+                <Logo compact={headerTight} />
 
                 <div className="hidden md:flex items-center gap-8">
                     {[t('lp.nav.features'), t('lp.nav.dashboard'), t('lp.nav.mobile')].map((l, i) => (
@@ -150,7 +152,7 @@ export default function LandingPage() {
                 <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                     <LanguageToggle />
                     <ThemeToggle />
-                    <Link to="/login" className={`${btnGhost} hidden md:inline-flex h-8 px-3.5 text-xs`}>
+                    <Link to="/login" className={`${btnGhost} max-md:hidden h-8 px-3.5 text-xs`}>
                         {t('public.signIn')}
                     </Link>
                     <Link to="/register" className={`${btnPrimary} h-8 px-3 sm:px-3.5 text-xs`}>

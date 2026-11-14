@@ -59,3 +59,5 @@ export function useSetupSteps(vehicle: Vehicle | null, vehiclesLoading: boolean)
         complete: required.every((s) => s.done),
     }
 }
+
+export type SetupState = ReturnType<typeof useSetupSteps>
