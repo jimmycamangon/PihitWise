@@ -40,7 +40,7 @@ export const fil: Dictionary = {
 
     // Offline and sync
     'offline.title': 'Offline ka',
-    'offline.body': "Ipinapakita ang huling data na na-load sa device na ito. Ang pagdagdag, pag-edit at pagbura ng karga, serbisyo at gastos, at pagmarka ng paalala na tapos, ay sine-save dito at isi-sync pagbalik ng signal.",
+    'offline.body': "Ipinapakita ang huling data na na-load sa device na ito. Ang pagdagdag, pag-edit at pagbura ng motor, karga, serbisyo, gastos at paalala ay sine-save dito at isi-sync pagbalik ng signal.",
     'offline.waiting': '{count} ang naghihintay ma-sync.',
     'sync.syncing': 'Sini-sync ang {count} log na na-save offline…',
     'sync.waiting': 'Naghihintay ma-sync ang {count} log na na-save offline…',
@@ -636,9 +636,9 @@ export const fil: Dictionary = {
     'guide.offline.title': "Offline mode",
     'guide.offline.p1': "**1. I-install.** Sa Android (Chrome): ⋮ menu → **Add to Home screen** o **Install app**. Sa iPhone (Safari): Share → **Add to Home Screen**. Buksan ang PihitWise mula sa icon na iyon.",
     'guide.offline.p2': "**2. Buksan muna habang online.** Bisitahin ang Dashboard at ang mga page na kailangan mo bago ang mahabang biyahe. Ang bawat page na binuksan mo ay nase-save sa phone.",
-    'guide.offline.p3': "**3. Kapag walang signal**, lalabas ang orange na **Offline ka** bar. Makikita mo ang huling na-load na data, at puwede ka pa ring magdagdag, mag-edit at magbura ng karga, serbisyo at gastos, at markahang **Tapos na** ang paalala. Lalabas ang mga pagbabagong iyon na **Naghihintay ma-sync**.",
+    'guide.offline.p3': "**3. Kapag walang signal**, lalabas ang orange na **Offline ka** bar. Makikita mo ang huling na-load na data, at puwede ka pa ring magdagdag, mag-edit at magbura ng motor, karga, serbisyo, gastos at paalala, at markahang **Tapos na** ang paalala. Lalabas ang mga pagbabagong iyon na **Naghihintay ma-sync**.",
     'guide.offline.p4': "**4. Pagbalik ng signal**, kusa silang magsi-sync (o i-tap ang **I-sync ngayon**). Kung may hindi ma-save, lalabas ang **Hindi na-sync**: i-edit para subukan ulit o burahin.",
-    'guide.offline.p5': "Online lang: pagdagdag, pag-edit o pagbura ng paalala at motor. Kapag nag-sign out, mabubura ang offline na kopya at magtatanong muna kung may naghihintay pang pagbabago.",
+    'guide.offline.p5': "Online lang: ang account mo (pangalan, email, password) at ang Admin page. Kapag nag-sign out, mabubura ang offline na kopya at magtatanong muna kung may naghihintay pang pagbabago.",
     'guide.settings.title': "Account at settings",
     'guide.settings.p1': "Sa **Settings**, puwede mong palitan ang pangalan, email at password, piliin ang wika, at piliin kung paano ipapakita ang mga page sa phone: scrolling tabs, collapsible menu, o bottom bar.",
     'guide.settings.p2': "Nakalimutan ang password? Gamitin ang **Nakalimutan ang password?** sa sign-in page para makakuha ng reset link sa email.",
@@ -692,4 +692,7 @@ export const fil: Dictionary = {
 
     // 
     'footer.aiAssisted': ", sa tulong ng AI",
+
+    // 
+    'rem.syncFirst': "Idinagdag offline ang paalalang ito at hindi pa na-sync. Markahan itong tapos pagbalik ng signal.",
 }

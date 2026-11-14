@@ -11,6 +11,7 @@ import Toast from '../components/Toast'
 import Icon from '../components/Icon'
 import { useBike } from '../hooks/useBike'
 import { useT } from '../lib/i18n'
+import SyncBadge from '../components/SyncBadge'
 
 interface VehicleErrors { name?: string, brand?: string, model?: string, year?: string, plateNumber?: string, odometer?: string }
 
@@ -78,11 +79,11 @@ export default function GaragePage() {
             if (editingId) {
                 const updated = await updateVehicle(editingId, data)
                 setVehicles(vehicles.map((v) => (v.id === editingId ? updated : v)))
-                setToast(t('garage.updated'))
+                setToast(updated.pending ? t('common.savedOffline') : t('garage.updated'))
             } else {
                 const created = await createVehicle(data)
                 setVehicles([...vehicles, created])
-                setToast(t('garage.added'))
+                setToast(created.pending ? t('common.savedOffline') : t('garage.added'))
             }
             setShowForm(false)
             resetForm()
@@ -144,7 +145,7 @@ export default function GaragePage() {
                         <div key={vehicle.id} className="bg-surface border border-line rounded-xl p-5">
                             <div className="flex items-start justify-between gap-3 mb-4">
                                 <div>
-                                    <div className="text-base font-medium text-ink">{vehicle.name}</div>
+                                    <div className="text-base font-medium text-ink">{vehicle.name}<SyncBadge row={vehicle} /></div>
                                     <div className="text-xs text-muted">{vehicle.brand} {vehicle.model} · {vehicle.year}</div>
                                 </div>
                                 <span className="inline-flex items-center h-5 px-2 rounded-full border border-line font-mono text-[9px] uppercase tracking-widest text-muted whitespace-nowrap">{vehicle.plateNumber ?? t('garage.noPlate')}</span>

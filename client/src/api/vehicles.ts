@@ -1,75 +1,11 @@
-import { getToken } from '../lib/token'
-import type { Vehicle, VehicleRequest } from "../types/vehicles";
-import { checkSession } from './session'
+import type { Vehicle, VehicleRequest } from '../types/vehicles'
+import { loggable } from './loggable'
 
-export async function getVehicles(): Promise<Vehicle[]> {
-    const token = getToken()
+// Bikes work offline too: adding, editing and deleting are queued on the device (lib/outbox).
+// A bike added offline gets its real id when it syncs, and anything logged for it follows.
+const vehicles = loggable<Vehicle, VehicleRequest>('vehicle', () => '/api/vehicles', (id) => `/api/vehicles/${id}`)
 
-    const response = await fetch('/api/vehicles', {
-        method: 'GET',
-        headers: { Authorization: `Bearer ${token}` },
-    })
-    checkSession(response)
-    if (!response.ok) {
-        throw new Error(await response.text())
-    }
-    return response.json()
-}
-
-
-export async function createVehicle(data: VehicleRequest): Promise<Vehicle> {
-    const token = getToken()
-
-    const response = await fetch('/api/vehicles', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(data),
-    })
-    checkSession(response)
-    if (response.status === 409) {
-        const body = await response.json()
-        throw new Error(body.message)
-    }
-    if (!response.ok) {
-        throw new Error(await response.text())
-    }
-    return response.json()
-}
-
-export async function updateVehicle(id: string, data: VehicleRequest): Promise<Vehicle> {
-    const token = getToken()
-
-    const response = await fetch(`/api/vehicles/${id}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(data),
-    })
-    checkSession(response)
-    if (response.status === 409) {
-        const body = await response.json()
-        throw new Error(body.message)
-    }
-    if (!response.ok) {
-        throw new Error(await response.text())
-    }
-    return response.json()
-}
-
-export async function deleteVehicle(id: string): Promise<void> {
-    const token = getToken()
-
-    const response = await fetch(`/api/vehicles/${id}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
-    })
-    checkSession(response)
-    if (!response.ok) {
-        throw new Error(await response.text())
-    }
-}
+export const getVehicles = () => vehicles.list('')
+export const createVehicle = (data: VehicleRequest) => vehicles.create('', data)
+export const updateVehicle = vehicles.update
+export const deleteVehicle = vehicles.remove

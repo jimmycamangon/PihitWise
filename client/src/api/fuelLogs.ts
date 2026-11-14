@@ -1,5 +1,5 @@
 import { getToken } from '../lib/token'
-import { send } from '../lib/outbox'
+import { isPendingId, send } from '../lib/outbox'
 import type { FuelLog, FuelLogRequest, FuelEconomy } from '../types/fuelLogs'
 import { checkSession } from './session'
 import { NOT_CACHED, loggable } from './loggable'
@@ -13,6 +13,7 @@ export const deleteFuelLog = fuel.remove
 
 // km/L is worked out by the server, so fill-ups still waiting to sync aren't counted yet.
 export async function getFuelEconomy(vehicleId: string): Promise<FuelEconomy> {
+    if (isPendingId(vehicleId)) return { averageKmPerLiter: null, points: [] }   // bike added offline
     const response = await send(`/api/vehicles/${vehicleId}/fuel/economy`, {
         headers: { Authorization: `Bearer ${getToken()}` },
     }, NOT_CACHED)
