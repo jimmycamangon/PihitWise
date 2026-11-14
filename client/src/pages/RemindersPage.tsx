@@ -106,11 +106,11 @@ export default function RemindersPage() {
                 repeatEveryKm: repeatEveryKm === '' ? null : Number(repeatEveryKm),
             }
             if (editingId) {
-                await updateReminder(editingId, data)
-                setToast(t('rem.updated'))
+                const saved = await updateReminder(editingId, data)
+                setToast(saved.pending ? t('common.savedOffline') : t('rem.updated'))
             } else {
-                await createReminder(vehicle.id, data)
-                setToast(t('rem.added'))
+                const saved = await createReminder(vehicle.id, data)
+                setToast(saved.pending ? t('common.savedOffline') : t('rem.added'))
             }
             setShowForm(false)
             resetForm()
