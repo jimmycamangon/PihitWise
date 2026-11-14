@@ -12,6 +12,7 @@ import type { TKey } from '../lib/i18n'
 import QuickAdd from './QuickAdd'
 import ReminderBell from './ReminderBell'
 import WelcomeModal from './WelcomeModal'
+import { FooterLine } from './SiteFooter'
 import Tour from './Tour'
 import { MobileNavBottom, MobileNavTop } from './MobileNav'
 import { useNavStyle } from '../lib/navStyle'
@@ -235,6 +236,7 @@ export default function AppLayout() {
 
                 <main className={`px-4 md:px-8 py-6 md:py-8 max-w-6xl ${bottomNav ? "pb-28 lg:pb-8" : ""}`}>
                     <Outlet key={pageVersion} context={context} />
+                    <FooterLine />
                     <WelcomeModal name={me?.name} isNewRider={!vehiclesLoading && vehicles.length === 0} />
                     <Tour />
                 </main>

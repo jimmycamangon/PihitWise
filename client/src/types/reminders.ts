@@ -1,6 +1,8 @@
 export type ReminderStatus = 'overdue' | 'soon' | 'ok' | 'done'
 
-export interface Reminder {
+import type { PendingFields } from '../lib/outbox'
+
+export interface Reminder extends PendingFields {
     id: string
     vehicleId: string
     title: string
