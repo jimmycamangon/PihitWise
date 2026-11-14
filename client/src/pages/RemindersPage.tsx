@@ -13,6 +13,7 @@ import { createReminder, deleteReminder, getReminders, markReminderDone, updateR
 import type { Reminder, ReminderRequest, ReminderStatus } from '../types/reminders'
 import { formatDate, km } from '../lib/format'
 import { leftText, statusLabel, statusTone } from '../lib/reminders'
+import SyncBadge from '../components/SyncBadge'
 
 interface ReminderErrors { title?: string, due?: string }
 
@@ -135,9 +136,11 @@ export default function RemindersPage() {
         try {
             const updated = await markReminderDone(id)
             // A repeating reminder stays open with its next due km.
-            setToast(updated.isDone || updated.dueOdometer === null
-                ? t('rem.markedDone')
-                : t('rem.nextAt', { km: km(updated.dueOdometer) }))
+            setToast(updated.pending
+                ? t('common.savedOffline')
+                : updated.isDone || updated.dueOdometer === null
+                    ? t('rem.markedDone')
+                    : t('rem.nextAt', { km: km(updated.dueOdometer) }))
             await reload()
         } catch (err) {
             setErrors(err instanceof Error ? err.message : t('common.somethingWrong'))
@@ -243,7 +246,7 @@ export default function RemindersPage() {
                                     <div className="flex items-start justify-between gap-2">
                                         <div className={`text-[13px] sm:text-xs font-medium text-ink break-words sm:truncate
                                             ${r.isDone ? 'line-through' : ''}`}>
-                                            {r.title}
+                                            {r.title}<SyncBadge row={r} />
                                         </div>
                                         <span className="sm:hidden shrink-0">
                                             <Badge tone={statusTone[r.status]}>{statusLabel[r.status]}</Badge>
