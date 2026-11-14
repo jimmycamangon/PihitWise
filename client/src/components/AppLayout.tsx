@@ -164,7 +164,8 @@ export default function AppLayout() {
                 </div>
             </aside>
 
-            <div className="lg:pl-56">
+            {/* Full-height column: the page grows to fill it, so the footer always sits at the bottom. */}
+            <div className={`lg:pl-56 min-h-screen flex flex-col ${bottomNav ? 'pb-20 lg:pb-0' : ''}`}>
                 {/* ── TOP BAR ─────────────────────────────────────────────────── */}
                 <header className="sticky top-0 z-40 bg-canvas/80 backdrop-blur-xl border-b border-line">
                     <div ref={headerRef} className="h-14 flex items-center justify-between gap-3 px-4 md:px-8">
@@ -234,12 +235,13 @@ export default function AppLayout() {
                     </div>
                 )}
 
-                <main className={`px-4 md:px-8 py-6 md:py-8 max-w-6xl ${bottomNav ? "pb-28 lg:pb-8" : ""}`}>
+                <main className="flex-1 w-full px-4 md:px-8 py-6 md:py-8 max-w-6xl">
                     <Outlet key={pageVersion} context={context} />
-                    <FooterLine />
                     <WelcomeModal name={me?.name} isNewRider={!vehiclesLoading && vehicles.length === 0} />
                     <Tour />
                 </main>
+
+                <FooterLine />
             </div>
 
             {bottomNav && <MobileNavBottom items={navItems} />}

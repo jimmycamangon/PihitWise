@@ -61,7 +61,7 @@ export default function SiteFooter() {
 export function FooterLine() {
     const t = useT()
     return (
-        <p className="text-[11px] text-faint text-center py-6 leading-relaxed">
+        <p className="text-[11px] text-faint text-center px-4 py-6 leading-relaxed">
             <Credits />
             <span aria-hidden> · </span>
             <Link to="/privacy" className="text-faint hover:text-ink no-underline">{t('public.privacy')}</Link>

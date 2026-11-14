@@ -51,6 +51,69 @@ function Skeleton({ rows = 3 }: { rows?: number }) {
     )
 }
 
+/** Placeholder shaped like the real Dashboard (bike card, stats, chart, reminders, activity) while it loads. */
+/** A grey placeholder bar (skeleton). */
+function Bar({ className }: { className: string }) {
+    return <div className={`bg-raised rounded ${className}`} />
+}
+
+function DashboardSkeleton() {
+    // Grey bars in the same places as the real content.
+    const block = 'bg-surface border border-line rounded-xl'
+
+    return (
+        <div className="animate-pulse motion-reduce:animate-none" aria-hidden>
+            {/* Active bike */}
+            <div className={`${block} p-5 mb-3 flex items-end justify-between gap-4`}>
+                <div className="flex flex-col gap-2">
+                    <Bar className="h-2.5 w-20" />
+                    <Bar className="h-4 w-36" />
+                    <Bar className="h-3 w-24 mb-3" />
+                    <Bar className="h-2.5 w-16" />
+                    <Bar className="h-7 w-32" />
+                </div>
+                <div className="flex flex-col items-end gap-2">
+                    <Bar className="h-7 w-14" />
+                    <Bar className="h-2.5 w-16" />
+                </div>
+            </div>
+
+            {/* Stat tiles */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
+                {[0, 1, 2, 3].map((i) => (
+                    <div key={i} className={`${block} p-4 flex flex-col gap-2`}>
+                        <Bar className="h-2.5 w-16" />
+                        <Bar className="h-5 w-20" />
+                        <Bar className="h-2.5 w-24" />
+                    </div>
+                ))}
+            </div>
+
+            {/* Fuel economy chart + upcoming reminders */}
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 mb-3">
+                <div className={`${block} p-4 lg:col-span-3`}>
+                    <Bar className="h-3 w-48 mb-4" />
+                    <div className="flex items-end gap-2 h-36">
+                        {[55, 70, 45, 80, 65, 90].map((h, i) => (
+                            <div key={i} className="bg-raised rounded-t-sm flex-1" style={{ height: `${h}%` }} />
+                        ))}
+                    </div>
+                </div>
+                <div className={`${block} p-4 lg:col-span-2`}>
+                    <Bar className="h-3 w-36 mb-4" />
+                    <Skeleton />
+                </div>
+            </div>
+
+            {/* Recent activity */}
+            <div className={`${block} p-4`}>
+                <Bar className="h-3 w-28 mb-4" />
+                <Skeleton rows={4} />
+            </div>
+        </div>
+    )
+}
+
 export default function DashboardPage() {
     const { vehicle, vehiclesLoading } = useBike()
     const { data, loading, error } = useVehicleData(vehicle?.id, loadDashboard)
@@ -65,7 +128,7 @@ export default function DashboardPage() {
         return (
             <>
                 <PageHeader title={t('dashboard.title')} subtitle={t('dashboard.subtitle')} />
-                <div className="h-40 bg-surface border border-line rounded-xl animate-pulse" />
+                <DashboardSkeleton />
             </>
         )
     }
