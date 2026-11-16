@@ -8,6 +8,8 @@ using PihitWise.Infrastructure.Persistence;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.ResponseCompression;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -57,6 +59,26 @@ builder.Services.AddRateLimiter(options =>
         _ => new FixedWindowRateLimiterOptions { PermitLimit = 5, Window = TimeSpan.FromMinutes(1) }));
 });
 
+// Requests reach the API through proxies (Vercel, then the host). Use the rider's real address from
+// X-Forwarded-For, so per-visitor limits (Contact form) don't treat every rider as one visitor.
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.ForwardLimit = null;          // walk the whole chain back to the first (rider) address
+    options.KnownNetworks.Clear();         // the hosting proxies' addresses aren't fixed
+    options.KnownProxies.Clear();
+});
+
+// Compress API answers (JSON shrinks ~70-80%), which matters most on slow mobile data.
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+    options.Providers.Add<BrotliCompressionProvider>();
+    options.Providers.Add<GzipCompressionProvider>();
+});
+builder.Services.Configure<BrotliCompressionProviderOptions>(o => o.Level = System.IO.Compression.CompressionLevel.Fastest);
+builder.Services.Configure<GzipCompressionProviderOptions>(o => o.Level = System.IO.Compression.CompressionLevel.Fastest);
+
 builder.Services.AddControllers()
     .AddJsonOptions(o => o.JsonSerializerOptions.Converters
         .Add(new JsonStringEnumConverter()));
@@ -80,6 +102,10 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
+
+// First, so everything after sees the rider's real address and scheme.
+app.UseForwardedHeaders();
+app.UseResponseCompression();
 
 // Applies any new EF Core migrations on start, so the live database (Neon)
 // stays in sync without running "dotnet ef database update" against it by hand.

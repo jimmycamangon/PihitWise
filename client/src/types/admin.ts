@@ -10,3 +10,13 @@ export interface AdminUser {
     expenses: number
     reminders: number
 }
+
+export interface AdminUsersPage {
+    items: AdminUser[]
+    total: number           // users matching the search
+    page: number
+    pageSize: number
+    totalUsers: number
+    newThisMonth: number
+    activeLast30Days: number
+}

@@ -693,4 +693,9 @@ export const en = {
 
     // 
     'rem.syncFirst': "This reminder was added offline and hasn't synced yet. Mark it done once you're back online.",
+
+    // Admin paging
+    'admin.prev': "Previous",
+    'admin.next': "Next",
+    'admin.pageOf': "Page {page} of {pages}",
 }

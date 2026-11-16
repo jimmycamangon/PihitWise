@@ -19,12 +19,14 @@ namespace PihitWise.API.Controllers
             _adminService = adminService;
         }
 
-        [HttpGet("users")]  // GET /api/admin/users
-        public async Task<IActionResult> Users()
+        [HttpGet("users")]  // GET /api/admin/users?search=&page=1&pageSize=50
+        public async Task<IActionResult> Users(string? search, int page = 1, int pageSize = 50)
         {
             if (!_adminService.IsAdmin(User.FindFirstValue(JwtRegisteredClaimNames.Email)))
                 return Forbid();
-            return Ok(await _adminService.GetUsersAsync());
+            page = Math.Max(1, page);
+            pageSize = Math.Clamp(pageSize, 1, 100);
+            return Ok(await _adminService.GetUsersAsync(search, page, pageSize));
         }
     }
 }
