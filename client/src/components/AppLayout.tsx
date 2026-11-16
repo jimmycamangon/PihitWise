@@ -1,5 +1,5 @@
 import { clearToken } from '../lib/token'
-import { useState, useEffect, useRef } from 'react'
+import { Suspense, useState, useEffect, useRef } from 'react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import Icon from './Icon'
 import type { IconName } from './Icon'
@@ -236,7 +236,10 @@ export default function AppLayout() {
                 )}
 
                 <main className="flex-1 w-full px-4 md:px-8 py-6 md:py-8 max-w-6xl">
-                    <Outlet key={pageVersion} context={context} />
+                    {/* While a page's code arrives, keep the menu and show a page-shaped placeholder. */}
+                    <Suspense fallback={<PageLoading />}>
+                        <Outlet key={pageVersion} context={context} />
+                    </Suspense>
                     <WelcomeModal name={me?.name} isNewRider={!vehiclesLoading && vehicles.length === 0} />
                     <Tour />
                 </main>
@@ -245,6 +248,17 @@ export default function AppLayout() {
             </div>
 
             {bottomNav && <MobileNavBottom items={navItems} />}
+        </div>
+    )
+}
+
+/** Shown inside the layout while a page's code is downloading (usually a split second). */
+function PageLoading() {
+    return (
+        <div className="animate-pulse motion-reduce:animate-none" aria-hidden>
+            <div className="h-6 w-40 bg-raised rounded mb-2" />
+            <div className="h-3 w-64 bg-raised rounded mb-6" />
+            <div className="h-40 bg-surface border border-line rounded-xl" />
         </div>
     )
 }

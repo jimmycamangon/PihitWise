@@ -4,6 +4,7 @@ namespace PihitWise.Application.Admin
     {
         /// <summary>True when this email is in the Admin:Emails setting.</summary>
         bool IsAdmin(string? email);
-        Task<List<AdminUserResponse>> GetUsersAsync();
+        /// <summary>One page of users (newest first), optionally filtered by name or email.</summary>
+        Task<AdminUsersPage> GetUsersAsync(string? search, int page, int pageSize);
     }
 }

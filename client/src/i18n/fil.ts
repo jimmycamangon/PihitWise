@@ -695,4 +695,9 @@ export const fil: Dictionary = {
 
     // 
     'rem.syncFirst': "Idinagdag offline ang paalalang ito at hindi pa na-sync. Markahan itong tapos pagbalik ng signal.",
+
+    // Admin paging
+    'admin.prev': "Nakaraan",
+    'admin.next': "Susunod",
+    'admin.pageOf': "Pahina {page} ng {pages}",
 }

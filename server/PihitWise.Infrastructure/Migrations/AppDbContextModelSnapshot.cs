@@ -192,6 +192,13 @@ namespace PihitWise.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("LastActiveAt");
+
                     b.ToTable("Users");
                 });
 
