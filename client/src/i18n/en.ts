@@ -698,4 +698,21 @@ export const en = {
     'admin.prev': "Previous",
     'admin.next': "Next",
     'admin.pageOf': "Page {page} of {pages}",
+
+    // Export service history
+    'export.button': "Export",
+    'export.title': "Service history",
+    'export.generated': "Generated",
+    'export.currentOdometer': "Current odometer",
+    'export.firstService': "First service",
+    'export.pdf': "Save as PDF",
+    'export.csv': "Download CSV",
+    'export.pdfHint': "Save as PDF opens your print screen. Choose \"Save as PDF\" as the printer. The CSV file opens in Excel or Google Sheets.",
+    'export.back': "Back",
+    'export.noBike': "This bike wasn't found. It may have been deleted.",
+    'export.costPhp': "Cost (PHP)",
+    'export.notes': "Notes",
+    'export.status': "Status",
+    'export.recordedNote': "Records as logged by the owner in PihitWise.",
+    'export.pendingNote': "Saved on the owner's device, not yet synced to PihitWise.",
 }

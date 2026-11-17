@@ -700,4 +700,21 @@ export const fil: Dictionary = {
     'admin.prev': "Nakaraan",
     'admin.next': "Susunod",
     'admin.pageOf': "Pahina {page} ng {pages}",
+
+    // Export service history
+    'export.button': "I-export",
+    'export.title': "Service history",
+    'export.generated': "Ginawa noong",
+    'export.currentOdometer': "Kasalukuyang odometer",
+    'export.firstService': "Unang serbisyo",
+    'export.pdf': "I-save bilang PDF",
+    'export.csv': "I-download ang CSV",
+    'export.pdfHint': "Bubuksan ng I-save bilang PDF ang print screen. Piliin ang \"Save as PDF\" bilang printer. Bubukas ang CSV file sa Excel o Google Sheets.",
+    'export.back': "Bumalik",
+    'export.noBike': "Hindi makita ang motor na ito. Baka nabura na ito.",
+    'export.costPhp': "Halaga (PHP)",
+    'export.notes': "Notes",
+    'export.status': "Status",
+    'export.recordedNote': "Mga record ayon sa na-log ng may-ari sa PihitWise.",
+    'export.pendingNote': "Naka-save sa device ng may-ari, hindi pa na-sync sa PihitWise.",
 }

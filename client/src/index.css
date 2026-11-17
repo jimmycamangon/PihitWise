@@ -151,3 +151,9 @@ body {
   .tour-spotlight { transition: none; }
   .tour-ring, .tour-card, .check-pop { animation: none; }
 }
+
+/* ── Printing (service history report, pages/ReportPage.tsx) ─────────────── */
+@media print {
+  @page { size: A4; margin: 14mm; }
+  html, body { background: #fff !important; }
+}
