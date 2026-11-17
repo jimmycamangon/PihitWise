@@ -14,5 +14,7 @@ namespace PihitWise.Domain.Entities
         public string Type { get; set; } = string.Empty;
         public string? Notes { get; set; }
         public DateTime CreatedAt { get; set; }
+        // Last time the entry was changed after it was first saved (null = never edited). Shown on exported reports.
+        public DateTime? UpdatedAt { get; set; }
     }
 }

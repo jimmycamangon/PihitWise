@@ -151,6 +151,9 @@ namespace PihitWise.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<Guid>("VehicleId")
                         .HasColumnType("uuid");
 

@@ -715,6 +715,21 @@ export const fil: Dictionary = {
     'export.costPhp': "Halaga (PHP)",
     'export.notes': "Notes",
     'export.status': "Status",
-    'export.recordedNote': "Mga record ayon sa na-log ng may-ari sa PihitWise.",
+    'export.recordedNote': "Na-log ng may-ari sa PihitWise. Ang mga entry na may \"idinagdag pagkatapos\" ay inilagay nang higit 7 araw mula sa petsa ng serbisyo.",
     'export.pendingNote': "Naka-save sa device ng may-ari, hindi pa na-sync sa PihitWise.",
+
+    // Report trust checks
+    'check.title': "Pagsusuri ng record",
+    'check.odoOk': "Tumataas lang ang odometer sa paglipas ng panahon.",
+    'check.odoBack': "Bumababa ang odometer noong {date}. Suriin ang entry na ito.",
+    'check.onTime': "{count} sa {total} entry ang na-log sa loob ng {days} araw mula sa serbisyo.",
+    'check.gap': "Walang serbisyong na-log mula {from} hanggang {to} ({months} buwan).",
+    'check.edited': "{count} entry ang binago pagkatapos unang ma-save.",
+    'check.fuel': "{count} karga ang na-log mula {from} hanggang {to} ({kmFrom} → {kmTo} km), na sumusuporta sa mileage.",
+    'check.fewFuel': "Kaunti ang naka-log na karga, kaya walang ibang record na sumusuporta sa mileage.",
+    'export.loggedOn': "Na-log noong",
+    'export.edited': "Binago",
+    'export.editedMark': "binago {date}",
+    'export.addedLater': "idinagdag pagkatapos",
+    'export.onTime': "nasa oras",
 }
