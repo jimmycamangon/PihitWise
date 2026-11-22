@@ -44,6 +44,7 @@ namespace PihitWise.Infrastructure.Vehicles
                 Year = request.Year,
                 PlateNumber = request.PlateNumber,
                 Odometer = request.Odometer,
+                StartOdometer = request.Odometer,
                 CreatedAt = DateTime.UtcNow
             };
             _db.Vehicles.Add(vehicle);
@@ -66,11 +67,19 @@ namespace PihitWise.Infrastructure.Vehicles
             vehicle.Model = request.Model;
             vehicle.Year = request.Year;
             vehicle.PlateNumber = request.PlateNumber;
-            vehicle.Odometer = request.Odometer;
+            // The Garage reading becomes the new starting point; logs can still raise it.
+            vehicle.StartOdometer = request.Odometer;
+            vehicle.Odometer = Math.Max(request.Odometer, await OdometerCalculator.HighestLogAsync(_db, vehicle.Id) ?? 0);
 
             await _db.SaveChangesAsync();
 
             return ToResponse(vehicle);
+        }
+
+        public async Task<int?> HighestLogOdometerAsync(Guid userId, Guid vehicleId)
+        {
+            var owns = await _db.Vehicles.AnyAsync(v => v.Id == vehicleId && v.UserId == userId);
+            return owns ? await OdometerCalculator.HighestLogAsync(_db, vehicleId) : null;
         }
 
         public async Task<bool> DeleteAsync(Guid userId, Guid id)

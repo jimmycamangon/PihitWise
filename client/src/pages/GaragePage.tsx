@@ -91,7 +91,10 @@ export default function GaragePage() {
             reloadVehicles()
         } catch (err) {
             const msg = err instanceof Error ? err.message : t('common.somethingWrong')
-            if (msg.includes('plate')) setFieldErrors({ plateNumber: msg })
+            // The server refuses an odometer below a logged reading; show which reading, in the rider's language.
+            const belowLogs = /ODOMETER_BELOW_LOGS:(\d+)/.exec(msg)
+            if (belowLogs) setFieldErrors({ odometer: t('garage.err.belowLogs', { km: km(Number(belowLogs[1])) }) })
+            else if (msg.includes('plate')) setFieldErrors({ plateNumber: msg })
             else setErrors(msg)
         } finally {
             setSaving(false)

@@ -13,6 +13,8 @@ namespace PihitWise.Domain.Entities
         public int Year { get; set; }
         public string? PlateNumber { get; set; }
         public int Odometer { get; set; }
+        // The reading the rider entered in the Garage. Odometer = the highest of this and all fill-up / service readings.
+        public int StartOdometer { get; set; }
         public DateTime CreatedAt { get; set; }
 
     }
