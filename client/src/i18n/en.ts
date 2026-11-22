@@ -713,6 +713,21 @@ export const en = {
     'export.costPhp': "Cost (PHP)",
     'export.notes': "Notes",
     'export.status': "Status",
-    'export.recordedNote': "Records as logged by the owner in PihitWise.",
+    'export.recordedNote': "Logged by the owner in PihitWise. Entries marked \"added later\" were entered more than 7 days after the service date.",
     'export.pendingNote': "Saved on the owner's device, not yet synced to PihitWise.",
+
+    // Report trust checks
+    'check.title': "Record checks",
+    'check.odoOk': "Odometer readings only go up over time.",
+    'check.odoBack': "The odometer goes down on {date}. Check this entry.",
+    'check.onTime': "{count} of {total} entries were logged within {days} days of the service.",
+    'check.gap': "No services were logged between {from} and {to} ({months} months).",
+    'check.edited': "{count} entries were changed after they were first saved.",
+    'check.fuel': "{count} fill-ups logged from {from} to {to} ({kmFrom} → {kmTo} km) back up the mileage.",
+    'check.fewFuel': "Few fill-ups are logged, so the mileage isn't backed up by other records.",
+    'export.loggedOn': "Logged on",
+    'export.edited': "Edited",
+    'export.editedMark': "edited {date}",
+    'export.addedLater': "added later",
+    'export.onTime': "on time",
 }

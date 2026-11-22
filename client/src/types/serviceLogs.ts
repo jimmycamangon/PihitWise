@@ -10,6 +10,7 @@ export interface ServiceLog extends PendingFields {
     type: string
     notes: string | null
     createdAt: string
+    updatedAt?: string | null   // set when the entry was changed after it was first saved
 }
 
 export interface ServiceLogRequest {

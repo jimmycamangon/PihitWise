@@ -3,10 +3,12 @@ import { Link, useSearchParams } from 'react-router-dom'
 import Icon from '../components/Icon'
 import { getVehicles } from '../api/vehicles'
 import { getServiceLogs } from '../api/serviceLogs'
+import { getFuelLogs } from '../api/fuelLogs'
 import { useT } from '../lib/i18n'
 import { formatDate, km, peso } from '../lib/format'
-import { downloadServiceHistoryCsv, exportFileName, serviceSummary, sortServices } from '../lib/exportHistory'
+import { addedLater, downloadServiceHistoryCsv, exportFileName, loggedOn, recordChecks, serviceSummary, sortServices, wasEdited } from '../lib/exportHistory'
 import type { ServiceLog } from '../types/serviceLogs'
+import type { FuelLog } from '../types/fuelLogs'
 import type { Vehicle } from '../types/vehicles'
 
 /**
@@ -18,17 +20,17 @@ export default function ReportPage() {
     const t = useT()
     const [params] = useSearchParams()
     const bikeId = params.get('bike') ?? ''
-    const [data, setData] = useState<{ vehicle: Vehicle; logs: ServiceLog[] } | null>(null)
+    const [data, setData] = useState<{ vehicle: Vehicle; logs: ServiceLog[]; fuel: FuelLog[] } | null>(null)
     const [error, setError] = useState('')
 
     useEffect(() => {
         let current = true
-        Promise.all([getVehicles(), getServiceLogs(bikeId)])
-            .then(([vehicles, logs]) => {
+        Promise.all([getVehicles(), getServiceLogs(bikeId), getFuelLogs(bikeId).catch(() => [] as FuelLog[])])
+            .then(([vehicles, logs, fuel]) => {
                 if (!current) return
                 const vehicle = vehicles.find((v) => v.id === bikeId)
                 if (!vehicle) return setError(t('export.noBike'))
-                setData({ vehicle, logs })
+                setData({ vehicle, logs, fuel })
             })
             .catch((err) => { if (current) setError(err instanceof Error ? err.message : t('common.somethingWrong')) })
         return () => { current = false }
@@ -55,7 +57,8 @@ export default function ReportPage() {
         )
     }
 
-    const { vehicle, logs } = data
+    const { vehicle, logs, fuel } = data
+    const checks = recordChecks(logs, fuel, formatDate)
     const services = sortServices(logs)
     const summary = serviceSummary(logs)
     const hasPending = logs.some((l) => l.pending)
@@ -108,6 +111,22 @@ export default function ReportPage() {
                     <Detail label={t('service.last')} value={summary.last ? formatDate(summary.last) : '—'} />
                 </section>
 
+                {checks.length > 0 && (
+                    <section className="py-4 border-b border-neutral-300 break-inside-avoid">
+                        <div className="text-[10px] uppercase tracking-wider text-neutral-500 mb-2">{t('check.title')}</div>
+                        <ul className="flex flex-col gap-1">
+                            {checks.map((c) => (
+                                <li key={c.text} className="flex items-start gap-2">
+                                    <span className={`shrink-0 w-4 text-center font-semibold ${c.ok ? 'text-emerald-600' : 'text-amber-600'}`}>
+                                        {c.ok ? '✓' : '!'}
+                                    </span>
+                                    <span>{c.text}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </section>
+                )}
+
                 {services.length === 0 ? (
                     <p className="py-10 text-center text-neutral-500">{t('service.noneShort')}</p>
                 ) : (
@@ -118,6 +137,7 @@ export default function ReportPage() {
                                 <th className="py-2 pr-3 font-medium text-right">{t('common.odometer')}</th>
                                 <th className="py-2 pr-3 font-medium">{t('service.service')}</th>
                                 <th className="py-2 pr-3 font-medium">{t('service.shop')}</th>
+                                <th className="py-2 pr-3 font-medium">{t('export.loggedOn')}</th>
                                 <th className="py-2 font-medium text-right">{t('common.cost')}</th>
                             </tr>
                         </thead>
@@ -127,17 +147,26 @@ export default function ReportPage() {
                                     <td className="py-2 pr-3 whitespace-nowrap">{formatDate(l.date)}</td>
                                     <td className="py-2 pr-3 text-right font-mono whitespace-nowrap">{km(l.odometer)}</td>
                                     <td className="py-2 pr-3">
-                                        <div className="font-medium">{l.type}{l.pending ? ' *' : ''}</div>
+                                        <div className="font-medium">
+                                            {l.type}{l.pending ? ' *' : ''}
+                                            {wasEdited(l) && <span className="ml-1.5 text-[10px] font-normal text-amber-700">({t('export.editedMark', { date: formatDate(l.updatedAt!) })})</span>}
+                                        </div>
                                         {l.notes && <div className="text-[11px] text-neutral-600">{l.notes}</div>}
                                     </td>
                                     <td className="py-2 pr-3">{l.shop ?? '—'}</td>
+                                    <td className="py-2 pr-3 whitespace-nowrap">
+                                        {formatDate(loggedOn(l))}
+                                        {addedLater(l)
+                                            ? <div className="text-[10px] text-amber-700">{t('export.addedLater')}</div>
+                                            : <div className="text-[10px] text-emerald-700">✓ {t('export.onTime')}</div>}
+                                    </td>
                                     <td className="py-2 text-right font-mono whitespace-nowrap">{peso(l.cost)}</td>
                                 </tr>
                             ))}
                         </tbody>
                         <tfoot>
                             <tr className="font-semibold">
-                                <td colSpan={4} className="pt-3 text-right pr-3">{t('an.total')}</td>
+                                <td colSpan={5} className="pt-3 text-right pr-3">{t('an.total')}</td>
                                 <td className="pt-3 text-right font-mono">{peso(summary.total)}</td>
                             </tr>
                         </tfoot>
@@ -145,7 +174,10 @@ export default function ReportPage() {
                 )}
 
                 <footer className="mt-8 pt-3 border-t border-neutral-300 text-[10px] text-neutral-500 flex flex-wrap justify-between gap-2">
-                    <span>{hasPending ? `* ${t('export.pendingNote')}` : t('export.recordedNote')}</span>
+                    <span>
+                        {t('export.recordedNote')}
+                        {hasPending && <><br />* {t('export.pendingNote')}</>}
+                    </span>
                     <span>PihitWise · v{__APP_VERSION__}</span>
                 </footer>
             </article>

@@ -11,7 +11,8 @@ namespace PihitWise.Application.ServiceLogs
         string? Shop,
         decimal Cost,
         string? Notes,
-        DateTime CreatedAt
+        DateTime CreatedAt,
+        DateTime? UpdatedAt
     );
     
 }

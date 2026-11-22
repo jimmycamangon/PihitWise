@@ -71,6 +71,12 @@ namespace PihitWise.Infrastructure.ServiceLogs
             
             if (serviceLog is null) return null;
 
+            // Only a real change counts as an edit (saving the form unchanged doesn't).
+            var changed = serviceLog.Date != request.Date || serviceLog.Odometer != request.Odometer
+                || serviceLog.Type != request.Type || serviceLog.Shop != request.Shop
+                || serviceLog.Cost != request.Cost || serviceLog.Notes != request.Notes;
+            if (changed) serviceLog.UpdatedAt = DateTime.UtcNow;
+
             serviceLog.Date = request.Date;
             serviceLog.Odometer = request.Odometer;
             serviceLog.Type = request.Type;
@@ -113,7 +119,8 @@ namespace PihitWise.Infrastructure.ServiceLogs
                 sl.Shop,
                 sl.Cost,
                 sl.Notes,
-                sl.CreatedAt
+                sl.CreatedAt,
+                sl.UpdatedAt
             );
         
     }
