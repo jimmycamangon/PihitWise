@@ -179,11 +179,19 @@ export default function MaintenancePage() {
         <>
             <div className="flex items-start justify-between gap-3">
                 <PageHeader title={t('service.title')} subtitle={t('service.subtitleBike', { bike: vehicle.name })} />
-                <button type="button" onClick={openAdd}
-                    className="h-8 px-3.5 rounded-md bg-accent text-on-accent text-xs font-medium
-                         hover:opacity-90 transition-opacity cursor-pointer whitespace-nowrap">
-                    {t('service.add')}
-                </button>
+                <div className="flex gap-2 shrink-0">
+                    <Link to={`/report?bike=${vehicle.id}`}
+                        className="h-8 px-3 inline-flex items-center gap-1.5 rounded-md border border-line text-xs text-ink
+                             no-underline hover:bg-raised transition-colors whitespace-nowrap">
+                        <Icon name="file" size={13} />
+                        {t('export.button')}
+                    </Link>
+                    <button type="button" onClick={openAdd}
+                        className="h-8 px-3.5 rounded-md bg-accent text-on-accent text-xs font-medium
+                             hover:opacity-90 transition-opacity cursor-pointer whitespace-nowrap">
+                        {t('service.add')}
+                    </button>
+                </div>
             </div>
             <FormMessage text={errors} />
 

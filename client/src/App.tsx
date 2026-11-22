@@ -27,6 +27,7 @@ const pages = {
   ResetPassword: () => import('./pages/ResetPasswordPage'),
   Settings: () => import('./pages/SettingsPage'),
   Terms: () => import('./pages/TermsPage'),
+  Report: () => import('./pages/ReportPage'),
   // Not a page, but fetched ahead too so switching to Filipino works offline.
   Filipino: () => import('./i18n/fil'),
 }
@@ -50,6 +51,7 @@ const RemindersPage = lazy(pages.Reminders)
 const ResetPasswordPage = lazy(pages.ResetPassword)
 const SettingsPage = lazy(pages.Settings)
 const TermsPage = lazy(pages.Terms)
+const ReportPage = lazy(pages.Report)
 
 /**
  * Once the first screen is shown and the browser is idle, fetch every other page's code too.
@@ -90,6 +92,8 @@ export default function App() {
           <Route path="/contact" element={<ContactPage />} />
 
           <Route element={<ProtectedRoute />}>
+            {/* Printable service history: full page, no app menu (also what gets printed). */}
+            <Route path="/report" element={<ReportPage />} />
             <Route element={<AppLayout />}>
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/garage" element={<GaragePage />} />

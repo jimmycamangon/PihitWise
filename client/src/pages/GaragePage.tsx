@@ -8,6 +8,7 @@ import { createVehicle, deleteVehicle, updateVehicle } from '../api/vehicles'
 import Modal from '../components/Modal'
 import ConfirmDialog from '../components/ConfirmDialog'
 import Toast from '../components/Toast'
+import { Link } from 'react-router-dom'
 import Icon from '../components/Icon'
 import { useBike } from '../hooks/useBike'
 import { useT } from '../lib/i18n'
@@ -163,6 +164,12 @@ export default function GaragePage() {
              hover:bg-raised transition-colors cursor-pointer">
                                     {t('common.delete')}
                                 </button>
+                                <Link to={`/report?bike=${vehicle.id}`}
+                                    className="ml-auto h-8 px-3 inline-flex items-center gap-1.5 rounded-md border border-line text-xs text-ink
+                                         no-underline hover:bg-raised transition-colors">
+                                    <Icon name="file" size={13} />
+                                    {t('export.button')}
+                                </Link>
                             </div>
                         </div>
                     )
