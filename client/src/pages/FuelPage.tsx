@@ -254,7 +254,7 @@ export default function FuelPage() {
                         columns={[
                             { head: t('common.date'), cell: (f) => <>{formatDate(f.date)}<SyncBadge row={f} /></> },
                             { head: t('common.odometer'), cell: (f) => km(f.odometer), align: 'right', mono: true },
-                            { head: t('common.liters'), cell: (f) => f.liters.toFixed(2), align: 'right', mono: true },
+                            { head: t('common.liters'), cell: (f) => f.liters.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 3 }), align: 'right', mono: true },
                             { head: t('fuel.full'), cell: (f) => f.isFullTank ? <span className="text-ok">{t('fuel.yes')}</span> : <span className="text-faint">No</span> },
                             { head: '₱ / L', cell: (f) => (f.cost / f.liters).toFixed(2), align: 'right', mono: true },
                             { head: 'km/L', cell: (f) => kmlById.get(f.id)?.toFixed(1) ?? '—', align: 'right', mono: true },
@@ -299,7 +299,7 @@ export default function FuelPage() {
                             error={fieldErrors.odometer} />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
-                        <Field label={t('common.liters')} icon="fuel" placeholder="3.5" name="liters" type="number" min={0} step="0.01"
+                        <Field label={t('common.liters')} icon="fuel" placeholder="3.5" name="liters" type="number" min={0} step="0.001"
                             value={liters}
                             onChange={(e) => {
                                 setLiters(e.target.value)
