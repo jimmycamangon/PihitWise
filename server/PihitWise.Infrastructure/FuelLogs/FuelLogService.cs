@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PihitWise.Application.FuelLogs;
 using PihitWise.Infrastructure.Persistence;
+using PihitWise.Infrastructure.Vehicles;
 using PihitWise.Domain.Entities;
 
 
@@ -42,11 +43,8 @@ namespace PihitWise.Infrastructure.FuelLogs
                 CreatedAt = DateTime.UtcNow
             };
             _db.FuelLogs.Add(fuelLog);
-            if (request.Odometer > vehicle.Odometer)
-            {
-                vehicle.Odometer = request.Odometer;
-            }
             await _db.SaveChangesAsync();
+            await OdometerCalculator.RecalculateAsync(_db, vehicle);
             return ToResponse(fuelLog);
         }
 
@@ -61,11 +59,9 @@ namespace PihitWise.Infrastructure.FuelLogs
             fuelLog.Liters = request.Liters;
             fuelLog.Cost = request.Cost;
             fuelLog.IsFullTank = request.IsFullTank;
-            if (request.Odometer > fuelLog.Vehicle.Odometer)
-            {
-                fuelLog.Vehicle.Odometer = request.Odometer;
-            }
             await _db.SaveChangesAsync();
+            // A corrected reading can lower the bike's odometer too.
+            await OdometerCalculator.RecalculateAsync(_db, fuelLog.Vehicle);
             return ToResponse(fuelLog);
         }
 
@@ -77,6 +73,7 @@ namespace PihitWise.Infrastructure.FuelLogs
             if (fuelLog is null) return false;
             _db.FuelLogs.Remove(fuelLog);
             await _db.SaveChangesAsync();
+            await OdometerCalculator.RecalculateAsync(_db, fuelLog.Vehicle);
             return true;
         }
 

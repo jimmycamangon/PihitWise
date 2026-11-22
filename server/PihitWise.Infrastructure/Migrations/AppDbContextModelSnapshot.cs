@@ -232,6 +232,9 @@ namespace PihitWise.Infrastructure.Migrations
                     b.Property<string>("PlateNumber")
                         .HasColumnType("text");
 
+                    b.Property<int>("StartOdometer")
+                        .HasColumnType("integer");
+
                     b.Property<int>("Type")
                         .HasColumnType("integer");
 

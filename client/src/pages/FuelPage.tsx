@@ -158,6 +158,8 @@ export default function FuelPage() {
             setLogs(logs.filter((l) => l.id !== id))
             setToast(t('fuel.deleted'))
             reloadEconomy()
+            // Deleting a fill-up can lower the bike's odometer.
+            reloadVehicles()
         } catch (err) {
             setErrors((err as Error).message)
         }

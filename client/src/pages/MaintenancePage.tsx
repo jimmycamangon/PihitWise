@@ -136,6 +136,8 @@ export default function MaintenancePage() {
             await deleteServiceLog(id)
             setLogs(logs.filter((l) => l.id !== id))
             setToast(t('service.deleted'))
+            // Deleting a service can lower the bike's odometer.
+            reloadVehicles()
         } catch (err) {
             setErrors((err as Error).message)
         }

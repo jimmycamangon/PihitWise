@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PihitWise.Application.ServiceLogs;
 using PihitWise.Infrastructure.Persistence;
+using PihitWise.Infrastructure.Vehicles;
 using PihitWise.Domain.Entities;
 
 
@@ -52,13 +53,8 @@ namespace PihitWise.Infrastructure.ServiceLogs
                 CreatedAt = DateTime.UtcNow
             };
             _db.ServiceLogs.Add(serviceLog);
-
-            if (request.Odometer > vehicle.Odometer)
-            {
-                vehicle.Odometer = request.Odometer;
-            }
-
             await _db.SaveChangesAsync();
+            await OdometerCalculator.RecalculateAsync(_db, vehicle);
 
             return ToResponse(serviceLog);
         }
@@ -84,12 +80,9 @@ namespace PihitWise.Infrastructure.ServiceLogs
             serviceLog.Cost = request.Cost;
             serviceLog.Notes = request.Notes;
 
-            if (request.Odometer > serviceLog.Vehicle.Odometer)
-            {
-                serviceLog.Vehicle.Odometer = request.Odometer;
-            }
-
             await _db.SaveChangesAsync();
+            // A corrected reading can lower the bike's odometer too.
+            await OdometerCalculator.RecalculateAsync(_db, serviceLog.Vehicle);
 
             return ToResponse(serviceLog);
         }
@@ -97,6 +90,7 @@ namespace PihitWise.Infrastructure.ServiceLogs
         public async Task<bool> DeleteAsync(Guid userId, Guid id)
         {
             var serviceLog = await _db.ServiceLogs
+                .Include(sl => sl.Vehicle)
                 .FirstOrDefaultAsync(sl => sl.Id == id && sl.Vehicle.UserId == userId);
 
             if (serviceLog is null) return false;
@@ -104,6 +98,7 @@ namespace PihitWise.Infrastructure.ServiceLogs
             _db.ServiceLogs.Remove(serviceLog);
 
             await _db.SaveChangesAsync();
+            await OdometerCalculator.RecalculateAsync(_db, serviceLog.Vehicle);
 
             return true;
         }

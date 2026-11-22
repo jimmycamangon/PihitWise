@@ -730,4 +730,7 @@ export const en = {
     'export.editedMark': "edited {date}",
     'export.addedLater': "added later",
     'export.onTime': "on time",
+
+    // 
+    'garage.err.belowLogs': "A fill-up or service is logged at {km}. Fix that log in Fuel or Maintenance first; the odometer follows it.",
 }

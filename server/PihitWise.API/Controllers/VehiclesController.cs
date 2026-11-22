@@ -54,6 +54,11 @@ namespace PihitWise.API.Controllers
                 await _vehicleService.PlateExistsAsync(userId, request.PlateNumber, id))
                     return Conflict(new { message = "You already have a vehicle with this plate." });
 
+            // The odometer can't be set below a logged reading: that log is the one to fix.
+            // The code lets the app show this in the rider's language.
+            if (await _vehicleService.HighestLogOdometerAsync(userId, id) is int highest && request.Odometer < highest)
+                return BadRequest($"ODOMETER_BELOW_LOGS:{highest}");
+
             var updatedVehicle = await _vehicleService.UpdateAsync(userId, id, request);
             
             if (updatedVehicle is null) return NotFound();

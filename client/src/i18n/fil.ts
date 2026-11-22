@@ -732,4 +732,7 @@ export const fil: Dictionary = {
     'export.editedMark': "binago {date}",
     'export.addedLater': "idinagdag pagkatapos",
     'export.onTime': "nasa oras",
+
+    // 
+    'garage.err.belowLogs': "May karga o serbisyong naka-log sa {km}. Ayusin muna ang log na iyon sa Gasolina o Maintenance; susunod dito ang odometer.",
 }

@@ -9,6 +9,8 @@ namespace PihitWise.Application.Vehicles
         Task<VehicleResponse?> UpdateAsync(Guid userId, Guid id, VehicleRequest request);
         Task<bool> DeleteAsync(Guid userId, Guid id);
         Task<bool> PlateExistsAsync(Guid userId, string plateNumber, Guid? exceptId);
+        /// <summary>Highest odometer on this rider's bike's fill-ups and services (null when none).</summary>
+        Task<int?> HighestLogOdometerAsync(Guid userId, Guid vehicleId);
 
     }
 }
